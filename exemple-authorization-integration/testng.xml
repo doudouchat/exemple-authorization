@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="api" parallel="false">
+	<test name="account">
+		<packages>
+			<package name="com.exemple.authorization.integration.account" />
+		</packages>
+	</test>
+	<test name="back">
+		<packages>
+			<package name="com.exemple.authorization.integration.back" />
+		</packages>
+	</test>
+	<test name="password">
+		<packages>
+			<package name="com.exemple.authorization.integration.password" />
+		</packages>
+	</test>
+</suite>

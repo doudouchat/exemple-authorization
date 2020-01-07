@@ -1,0 +1,24 @@
+authorization:
+   hazelcast:
+      port: ${hazelcast.port}
+      member: 127.0.0.1:${hazelcast.port}
+   zookeeper:
+      host: 127.0.0.1:${zmp.clientPort}
+      port: ${zmp.clientPort}
+      sessionTimeout: 30000
+      connectionTimeout: 10000
+      retry: 3
+      sleepMsBetweenRetries: 1000
+      ttlMs:
+         product: 30000
+   certificat:
+      location: file:${project.parent.basedir}/conf/authorization/mytest.jks
+      alias: mytest
+      password: mypass
+   kafka:
+      bootstrap-servers: localhost:${kafka.port}
+      embedded:
+         dir: ${kafka.broker.logs-dir}
+         port: ${kafka.port}
+   password:
+      expiryTime: 60

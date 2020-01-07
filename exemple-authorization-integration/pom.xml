@@ -1,0 +1,506 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>exemple</groupId>
+		<artifactId>exemple-authorization</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>exemple-authorization-integration</artifactId>
+
+	<properties>
+
+		<!-- TOMCAT -->
+		<tomcat.container.id>tomcat8x</tomcat.container.id>
+		<tomcat.version>8.5.34</tomcat.version>
+
+		<!-- TEST -->
+		<application.log.file>${project.build.testOutputDirectory}/logback.groovy</application.log.file>
+		<application.contextpath>Test</application.contextpath>
+		<application.host>http://localhost</application.host>
+
+		<!-- AUTHORIZATION -->
+		<authorization.contextpath>ExempleAuthorization</authorization.contextpath>
+		<authorization.host>http://localhost</authorization.host>
+		<authorization.name>exemple-authorization-configuration</authorization.name>
+		<authorization.path>file:${project.build.testOutputDirectory}/exemple-authorization-test.yml</authorization.path>
+
+		<!-- SONAR -->
+		<sonar.coverage.exclusions>**/*.java</sonar.coverage.exclusions>
+
+		<cassandra.host>127.0.0.1</cassandra.host>
+		<cassandra.nativeTransportPort>9042</cassandra.nativeTransportPort>
+		<hazelcast.port>5705</hazelcast.port>
+		<zmp.clientPort>10024</zmp.clientPort>
+
+
+	</properties>
+
+	<dependencyManagement>
+
+		<dependencies>
+
+			<!-- SPRING BOOT -->
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${org.springframework.boot-version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- CLOUD SECURITY -->
+
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-starter-oauth2</artifactId>
+				<version>2.2.0.RELEASE</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-oauth2-resource-server</artifactId>
+				<version>${org.springframework.security-version}</version>
+			</dependency>
+
+		</dependencies>
+
+	</dependencyManagement>
+
+	<dependencies>
+
+		<!-- API INTEGRATION -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-api-integration</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<!-- APPLICATION -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-service-application</artifactId>
+			<version>1.0.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- AUTHORIZATION -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-authorization-server</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+			<classifier>classes</classifier>
+		</dependency>
+
+		<!-- SPRING BOOT -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+		</dependency>
+
+		<!-- CLOUD SECURITY -->
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-oauth2</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-resource-server</artifactId>
+		</dependency>
+
+		<!-- GROOVY -->
+
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy</artifactId>
+		</dependency>
+
+		<!-- HAMCREST -->
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+		</dependency>
+
+		<!-- TEST -->
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+
+		<!-- REST ASSURED -->
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured-all</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+
+		<pluginManagement>
+
+			<plugins>
+
+				<!-- SPRING BOOT -->
+				<!-- https://docs.spring.io/spring-boot/docs/current/maven-plugin/index.html -->
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>${org.springframework.boot-version}</version>
+					<configuration>
+						<jvmArguments>${jacoco.it.agent.argLine}
+							-Dlogging.config=file:${application.log.file}</jvmArguments>
+						<jmxPort>${application.jmx.port}</jmxPort>
+						<wait>3000</wait>
+						<fork>true</fork>
+					</configuration>
+					<executions>
+						<execution>
+							<id>pre-integration-test</id>
+							<goals>
+								<goal>start</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>post-integration-test</id>
+							<goals>
+								<goal>stop</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+				<!-- CARGO -->
+				<!-- https://codehaus-cargo.github.io/cargo/Maven2+plugin.html -->
+				<plugin>
+					<groupId>org.codehaus.cargo</groupId>
+					<artifactId>cargo-maven2-plugin</artifactId>
+					<version>1.7.9</version>
+					<configuration>
+						<container>
+							<containerId>${tomcat.container.id}</containerId>
+							<output>${project.build.directory}/cargo/configurations/${tomcat.container.id}/logs/container.log</output>
+							<timeout>180000</timeout>
+							<artifactInstaller>
+								<groupId>org.apache.tomcat</groupId>
+								<artifactId>tomcat</artifactId>
+								<version>${tomcat.version}</version>
+							</artifactInstaller>
+						</container>
+						<configuration>
+							<properties>
+								<cargo.servlet.port>${authorization.port}</cargo.servlet.port>
+								<cargo.rmi.port>${cargo.rmi.port}</cargo.rmi.port>
+								<cargo.tomcat.ajp.port>${cargo.ajp.port}</cargo.tomcat.ajp.port>
+								<cargo.jvmargs>${jacoco.it.agent.argLine}
+									-Dlogging.config=file:${application.log.file}</cargo.jvmargs>
+							</properties>
+						</configuration>
+					</configuration>
+					<executions>
+						<!-- start server before integration tests -->
+						<execution>
+							<id>start-container</id>
+							<phase>pre-integration-test</phase>
+							<goals>
+								<goal>start</goal>
+							</goals>
+						</execution>
+						<!-- stop server after integration tests -->
+						<execution>
+							<id>stop-container</id>
+							<phase>post-integration-test</phase>
+							<goals>
+								<goal>stop</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+				<!-- TEST INTEGRATION -->
+				<!-- http://maven.apache.org/surefire/maven-failsafe-plugin/ -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>3.0.0-M4</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>integration-test</goal>
+								<goal>verify</goal>
+							</goals>
+							<configuration>
+								<encoding>${project.build.sourceEncoding}</encoding>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+
+			</plugins>
+
+		</pluginManagement>
+
+		<plugins>
+
+			<!-- VERSION -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<configuration>
+					<processDependencyManagement>false</processDependencyManagement>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+	<profiles>
+
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+
+			<properties>
+
+				<cassandra-version>3.11.4</cassandra-version>
+
+			</properties>
+
+		</profile>
+
+		<profile>
+			<id>authorization</id>
+
+			<dependencies>
+
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>exemple-authorization-server</artifactId>
+					<version>${project.version}</version>
+					<type>war</type>
+				</dependency>
+
+			</dependencies>
+
+			<build>
+
+				<plugins>
+
+					<!-- HELPER -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>reserve-network-port</id>
+								<goals>
+									<goal>reserve-network-port</goal>
+								</goals>
+								<phase>process-resources</phase>
+								<configuration>
+									<portNames>
+										<portName>authorization.port</portName>
+										<portName>application.port</portName>
+										<portName>application.jmx.port</portName>
+										<portName>cargo.rmi.port</portName>
+										<portName>cargo.ajp.port</portName>
+										<portName>cassandra.rpcPort</portName>
+										<portName>cassandra.jmxPort</portName>
+										<portName>cassandra.storagePort</portName>
+										<portName>cassandra.stopPort</portName>
+										<portName>cassandra.nativeTransportPort</portName>
+										<portName>hazelcast.port</portName>
+										<portName>zmp.clientPort</portName>
+										<portName>zmp.shutdownPort</portName>
+										<portName>kafka.port</portName>
+									</portNames>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- CASSANDRA -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>cassandra-maven-plugin</artifactId>
+						<configuration>
+							<script>${project.basedir}/src/test/resources/cassandra/schema.cql</script>
+							<cqlScript>${project.basedir}/src/test/resources/cassandra/exec.cql</cqlScript>
+							<logLevel>INFO</logLevel>
+							<cqlVersion>3.4.5</cqlVersion>
+							<startNativeTransport>true</startNativeTransport>
+							<addTestClasspath>true</addTestClasspath>
+							<systemPropertyVariables>
+								<cassandra.unsafesystem>true</cassandra.unsafesystem>
+							</systemPropertyVariables>
+						</configuration>
+						<executions>
+							<execution>
+								<id>start cassandra</id>
+								<goals>
+									<goal>start</goal>
+									<goal>cql-exec</goal>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>org.codehaus.groovy</groupId>
+								<artifactId>groovy</artifactId>
+								<version>${groovy-version}</version>
+							</dependency>
+
+						</dependencies>
+					</plugin>
+
+					<!-- ZOOKEEPER -->
+					<plugin>
+						<groupId>net.revelc.code</groupId>
+						<artifactId>zookeeper-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>run-zookeeper</id>
+								<goals>
+									<goal>start</goal>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- CARGO -->
+					<plugin>
+						<groupId>org.codehaus.cargo</groupId>
+						<artifactId>cargo-maven2-plugin</artifactId>
+						<configuration>
+							<container>
+								<dependencies>
+									<dependency>
+										<groupId>exemple</groupId>
+										<artifactId>exemple-service-api-integration</artifactId>
+									</dependency>
+								</dependencies>
+							</container>
+							<ignoreFailures>true</ignoreFailures>
+							<deployables>
+								<deployable>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>exemple-authorization-server</artifactId>
+									<type>war</type>
+									<properties>
+										<context>/${authorization.contextpath}</context>
+									</properties>
+									<pingUrlPath>/${authorization.contextpath}/actuator/health</pingUrlPath>
+								</deployable>
+							</deployables>
+							<configuration>
+								<properties>
+									<cargo.resource.resource.authorization>
+										cargo.resource.name=${authorization.name}|
+										cargo.resource.type=java.lang.String|
+										cargo.resource.parameters=factory=com.exemple.service.api.integration.core.PrimitivesAndStringFactory;value=${authorization.path}
+									</cargo.resource.resource.authorization>
+								</properties>
+							</configuration>
+						</configuration>
+					</plugin>
+
+					<!-- SPRING BOOT -->
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<arguments>
+								<argument>--server.port=${application.port}</argument>
+								<argument>--server.servlet.context-path=/${application.contextpath}</argument>
+								<argument>--spring.config.location=${authorization.path}</argument>
+							</arguments>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>it</id>
+
+			<build>
+
+				<plugins>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<suiteXmlFiles combine.children="append">
+								<suiteXmlFile>testng.xml</suiteXmlFile>
+							</suiteXmlFiles>
+							<systemPropertyVariables>
+								<application.host>${application.host}</application.host>
+								<application.port>${application.port}</application.port>
+								<application.contextpath>${application.contextpath}</application.contextpath>
+								<authorization.host>${authorization.host}</authorization.host>
+								<authorization.port>${authorization.port}</authorization.port>
+								<authorization.contextpath>${authorization.contextpath}</authorization.contextpath>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
+	</profiles>
+
+</project>

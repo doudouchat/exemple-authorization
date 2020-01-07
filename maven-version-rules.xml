@@ -1,0 +1,43 @@
+<ruleset comparisonMethod="maven">
+	<ignoreVersions>
+		<ignoreVersion type="regex">(?i).*atlassian(?:-?\d+)?</ignoreVersion>
+		<ignoreVersion type="regex">(?i).*redhat(?:-?\d+)?</ignoreVersion>
+	</ignoreVersions>
+	<rules>
+		<rule groupId="org.slf4j" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">(?i).*(alpha|beta)(?:-?\d+)?</ignoreVersion>
+			</ignoreVersions>
+		</rule>
+		<rule groupId="ch.qos.logback" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">(?i).*alpha(?:-?\d+)?</ignoreVersion>
+			</ignoreVersions>
+		</rule>
+		<rule groupId="org.codehaus.groovy" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">(?i).*(alpha|beta|-rc)(?:-?\d+)?</ignoreVersion>
+			</ignoreVersions>
+		</rule>
+		<rule groupId="org.eclipse.jetty" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">(?i).*(alpha|beta)(?:-?\d+)?</ignoreVersion>
+			</ignoreVersions>
+		</rule>
+		<rule groupId="org.apache.cassandra" artifactId="cassandra-all" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">4.0-(alpha|beta)(?:-?\d+)?</ignoreVersion>
+			</ignoreVersions>
+		</rule>
+		<rule groupId="com.hazelcast" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">4.0-(BETA)(?:-?\d+)</ignoreVersion>
+			</ignoreVersions>
+		</rule>
+		<rule groupId="org.springframework.security.oauth" artifactId="spring-security-oauth2" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">2.4.0.RELEASE</ignoreVersion>
+			</ignoreVersions>
+		</rule>
+	</rules>
+</ruleset>

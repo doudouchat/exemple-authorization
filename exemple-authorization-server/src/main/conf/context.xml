@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context unpackWAR='true' allowLinking='false' privileged='true' swallowOutput='true' override='true' reloadable='true'>
+    
+    <Environment 
+    	name="exemple-authorization-configuration" 
+    	type="java.lang.String"
+		value="file:/usr/local/tomcat/etc/exemple-authorization.yml" />
+    
+</Context>

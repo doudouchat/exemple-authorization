@@ -1,0 +1,641 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>exemple</groupId>
+	<artifactId>exemple-authorization</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<organization>
+		<name>EXEMPLE</name>
+	</organization>
+
+	<modules>
+		<module>exemple-authorization-resource</module>
+		<module>exemple-authorization-server</module>
+		<module>exemple-authorization-integration</module>
+	</modules>
+
+	<scm>
+		<connection>scm:git:git://github.com/doudouchat/exemple-authorization.git</connection>
+		<developerConnection>scm:git:https://github.com/doudouchat/exemple-authorization.git</developerConnection>
+		<url>https://github.com/doudouchat/exemple-authorization</url>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub doudouchat Packages</name>
+			<url>https://maven.pkg.github.com/doudouchat/exemple-authorization</url>
+		</repository>
+	</distributionManagement>
+
+	<properties>
+
+		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<!-- VERSION -->
+
+		<org.springframework-version>5.2.3.RELEASE</org.springframework-version>
+		<org.springframework.security-version>5.2.1.RELEASE</org.springframework.security-version>
+		<org.springframework.boot-version>2.2.2.RELEASE</org.springframework.boot-version>
+		<org.springframework.kafka-version>2.4.0.RELEASE</org.springframework.kafka-version>
+		<org.slf4j-version>1.7.30</org.slf4j-version>
+		<datastax-version>4.3.1</datastax-version>
+		<groovy-version>2.5.9</groovy-version>
+		<cassandra-version>3.11.5</cassandra-version>
+		<zookeeper-version>3.5.6</zookeeper-version>
+		<!-- SONAR -->
+
+		<!-- force sonar to use jacoco -->
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<!-- property checked by sonar to locate jacoco UT/IT reports -->
+		<sonar.jacoco.reportPaths>${project.build.directory}/reports/jacoco-ut.exec</sonar.jacoco.reportPaths>
+		<sonar.jacoco.itReportPath>${project.build.directory}/../../target/reports/exemple-authorization.exec</sonar.jacoco.itReportPath>
+
+	</properties>
+
+	<dependencyManagement>
+
+		<dependencies>
+
+			<!-- SPRING FRAMEWORK -->
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${org.springframework-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>${org.springframework-version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- SPRING OAUTH 2 -->
+
+			<dependency>
+				<groupId>org.springframework.security.oauth</groupId>
+				<artifactId>spring-security-oauth2</artifactId>
+				<version>2.3.8.RELEASE</version>
+			</dependency>
+
+			<!-- SPRING JWT -->
+
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-jwt</artifactId>
+				<version>1.1.0.RELEASE</version>
+			</dependency>
+
+			<!-- SPRING KAFKA -->
+			<!-- https://spring.io/projects/spring-kafka -->
+
+			<dependency>
+				<groupId>org.springframework.kafka</groupId>
+				<artifactId>spring-kafka</artifactId>
+				<version>${org.springframework.kafka-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.kafka</groupId>
+				<artifactId>spring-kafka-test</artifactId>
+				<version>${org.springframework.kafka-version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- JWT TOKEN -->
+			<!-- https://github.com/auth0/java-jwt -->
+
+			<dependency>
+				<groupId>com.auth0</groupId>
+				<artifactId>java-jwt</artifactId>
+				<version>3.9.0</version>
+			</dependency>
+
+			<!-- BCRYPT -->
+
+			<!-- https://www.mindrot.org/projects/jBCrypt/ -->
+			<dependency>
+				<groupId>org.mindrot</groupId>
+				<artifactId>jbcrypt</artifactId>
+				<version>0.4</version>
+			</dependency>
+
+			<!-- DATASTAX -->
+
+			<dependency>
+				<groupId>com.datastax.oss</groupId>
+				<artifactId>java-driver-core</artifactId>
+				<version>${datastax-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.datastax.oss</groupId>
+				<artifactId>java-driver-query-builder</artifactId>
+				<version>${datastax-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.datastax.oss</groupId>
+				<artifactId>java-driver-mapper-runtime</artifactId>
+				<version>${datastax-version}</version>
+			</dependency>
+
+			<!-- ZOOKEEPER -->
+
+			<!-- https://zookeeper.apache.org/doc/current/index.html -->
+			<dependency>
+				<groupId>org.apache.zookeeper</groupId>
+				<artifactId>zookeeper</artifactId>
+				<version>${zookeeper-version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>log4j</groupId>
+						<artifactId>log4j</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<!-- CURATOR -->
+
+			<!-- https://curator.apache.org -->
+
+			<dependency>
+				<groupId>org.apache.curator</groupId>
+				<artifactId>curator-recipes</artifactId>
+				<version>4.2.0</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.zookeeper</groupId>
+						<artifactId>zookeeper</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.curator</groupId>
+				<artifactId>curator-test</artifactId>
+				<version>4.2.0</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.zookeeper</groupId>
+						<artifactId>zookeeper</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<!-- COMMONS APACHE -->
+
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.9</version>
+			</dependency>
+
+			<!-- GOOGLE GUAVA -->
+
+			<!-- https://github.com/google/guava -->
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>28.2-jre</version>
+			</dependency>
+
+			<!-- YAML -->
+
+			<!-- http://www.snakeyaml.org -->
+			<dependency>
+				<groupId>org.yaml</groupId>
+				<artifactId>snakeyaml</artifactId>
+				<version>1.25</version>
+			</dependency>
+
+			<!-- MOCKITO -->
+
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>3.2.4</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- ACHILLE -->
+
+			<dependency>
+				<groupId>info.archinnov</groupId>
+				<artifactId>achilles-embedded</artifactId>
+				<version>6.0.4</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- LOGGING -->
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${org.slf4j-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${org.slf4j-version}</version>
+				<scope>runtime</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jul-to-slf4j</artifactId>
+				<version>${org.slf4j-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>1.2.3</version>
+				<scope>runtime</scope>
+			</dependency>
+
+			<!-- TESTNG -->
+
+			<dependency>
+				<groupId>org.testng</groupId>
+				<artifactId>testng</artifactId>
+				<version>7.1.0</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- HAMCREST -->
+
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-all</artifactId>
+				<version>1.3</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- https://github.com/FDMediagroep/hamcrest-jackson -->
+			<dependency>
+				<groupId>nl.fd</groupId>
+				<artifactId>hamcrest-jackson</artifactId>
+				<version>1.0.5</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- REST ASSURED -->
+
+			<!-- http://rest-assured.io/ -->
+			<dependency>
+				<groupId>io.rest-assured</groupId>
+				<artifactId>rest-assured</artifactId>
+				<version>4.1.2</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>io.rest-assured</groupId>
+				<artifactId>rest-assured-all</artifactId>
+				<version>4.1.2</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- GROOVY -->
+
+			<dependency>
+				<groupId>org.codehaus.groovy</groupId>
+				<artifactId>groovy</artifactId>
+				<version>${groovy-version}</version>
+			</dependency>
+
+			<!-- JNDI SIMPLE -->
+
+			<dependency>
+				<groupId>com.github.h-thurow</groupId>
+				<artifactId>simple-jndi</artifactId>
+				<version>0.21.0</version>
+				<scope>test</scope>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+
+		<!-- LOGGING -->
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+		</dependency>
+
+		<!-- LOGBACK -->
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+
+		<!-- YAML -->
+
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+		</dependency>
+
+		<!-- TESTNG -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- COMPILATION -->
+				<!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.1</version>
+				</plugin>
+
+				<!-- RESSOURCES -->
+				<!-- http://maven.apache.org/plugins/maven-resources-plugin/ -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
+
+				<!-- WAR -->
+				<!-- http://maven.apache.org/plugins/maven-war-plugin/ -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>3.2.3</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
+							<manifestEntries>
+								<Built-By>${project.organization.name}</Built-By>
+								<Build-Time>${maven.build.timestamp}</Build-Time>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>
+
+				<!-- JAR -->
+				<!-- http://maven.apache.org/plugins/maven-jar-plugin/index.html -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.2.0</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
+							<manifestEntries>
+								<Built-By>${project.organization.name}</Built-By>
+								<Build-Time>${maven.build.timestamp}</Build-Time>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>
+
+				<!-- DEPLOY -->
+				<!-- https://maven.apache.org/plugins/maven-deploy-plugin/index.html -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>3.0.0-M1</version>
+				</plugin>
+
+				<!-- TEST UNITAIRE -->
+				<!-- http://maven.apache.org/plugins/maven-surefire-plugin/ -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.0.0-M4</version>
+					<configuration>
+						<suiteXmlFiles>
+							<suiteXmlFile>testng.xml</suiteXmlFile>
+						</suiteXmlFiles>
+						<argLine>${jacoco.test.agent.argLine}</argLine>
+					</configuration>
+				</plugin>
+
+				<!-- VERSION -->
+				<!-- https://www.mojohaus.org/versions-maven-plugin/index.html -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>2.7</version>
+					<configuration>
+						<outputFile>${project.build.directory}/outdated-dependencies.txt</outputFile>
+						<outputEncoding>${project.build.sourceEncoding}</outputEncoding>
+					</configuration>
+				</plugin>
+
+				<!-- JACOCO -->
+				<!-- http://www.eclemma.org/jacoco/trunk/doc/maven.html -->
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.8.5</version>
+					<executions>
+						<execution>
+							<id>prepare-jacoco-ut-agent</id>
+							<goals>
+								<goal>prepare-agent</goal>
+							</goals>
+							<phase>process-test-classes</phase>
+							<configuration>
+								<propertyName>jacoco.test.agent.argLine</propertyName>
+								<destFile>${sonar.jacoco.reportPaths}</destFile>
+							</configuration>
+						</execution>
+						<execution>
+							<id>prepare-jacoco-integration-agent</id>
+							<goals>
+								<goal>prepare-agent</goal>
+							</goals>
+							<phase>pre-integration-test</phase>
+							<configuration>
+								<propertyName>jacoco.it.agent.argLine</propertyName>
+								<destFile>${sonar.jacoco.itReportPath}</destFile>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+
+				<!-- RELEASE -->
+				<!-- http://maven.apache.org/maven-release/maven-release-plugin/ -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>3.0.0-M1</version>
+				</plugin>
+
+				<!-- CLEAN FILE -->
+				<!-- http://maven.apache.org/plugins/maven-clean-plugin/ -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
+
+				<!-- CASSANDRA -->
+				<!-- http://www.mojohaus.org/cassandra-maven-plugin/index.html -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>cassandra-maven-plugin</artifactId>
+					<version>3.6</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.cassandra</groupId>
+							<artifactId>cassandra-all</artifactId>
+							<version>${cassandra-version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+
+				<!-- ZOOKEEPER -->
+				<!-- https://code.revelc.net/zookeeper-maven-plugin/index.html -->
+				<plugin>
+					<groupId>net.revelc.code</groupId>
+					<artifactId>zookeeper-maven-plugin</artifactId>
+					<version>1.1.0</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.zookeeper</groupId>
+							<artifactId>zookeeper</artifactId>
+							<version>${zookeeper-version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+
+				<!-- HELPER -->
+				<!-- https://www.mojohaus.org/build-helper-maven-plugin/index.html -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+
+				<!-- ENFORCER -->
+				<!-- https://maven.apache.org/enforcer/maven-enforcer-plugin/ -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>3.0.0-M3</version>
+				</plugin>
+
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<!-- COMPILATION -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+
+			<!-- RESSOURCES -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+
+			<!-- TEST UNITAIRE -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+
+			<!-- JACOCO -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>com.exemple.authorization.*</include>
+					</includes>
+				</configuration>
+			</plugin>
+
+			<!-- HELPER -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+
+			<!-- RELEASE -->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+			</plugin>
+
+			<!-- JAR -->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+
+			<!-- ENFORCER -->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>3.5.4</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+
+
+</project>

@@ -1,0 +1,27 @@
+authorization:
+   resource:
+      cassandra:
+         addresses: ${cassandra.host}
+         port: ${cassandra.nativeTransportPort}
+         local_data_center: datacenter1
+   hazelcast:
+      port: ${hazelcast.port}
+      member: 127.0.0.1:${hazelcast.port}
+   zookeeper:
+      host: 127.0.0.1:${zmp.clientPort}
+   certificat:
+      location: file:${project.parent.basedir}/conf/authorization/mytest.jks
+      alias: mytest
+      password: mypass
+   kafka:
+      bootstrap-servers: localhost:${kafka.port}
+application:
+   zookeeper:
+      host: 127.0.0.1:${zmp.clientPort}
+security:
+   oauth2:
+      client:
+         clientId: resource
+         clientSecret: secret
+      resource:
+         tokenInfoUri: ${authorization.host}:${authorization.port}/${authorization.contextpath}/oauth/check_token

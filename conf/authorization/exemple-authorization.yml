@@ -1,0 +1,20 @@
+authorization:
+   resource:
+      cassandra:
+         addresses: 172.17.0.1
+         port: 9042
+         local_data_center: datacenter1
+   hazelcast:
+      port: 5705
+      member: 127.0.0.1:5705
+   zookeeper:
+      host: 172.17.0.1:10024
+   certificat:
+      location: file:/usr/local/tomcat/etc/mytest.jks
+      alias: mytest
+      password: mypass
+   kafka:
+      bootstrap-servers: localhost:10025
+application:
+   zookeeper:
+      host: 172.17.0.1:10024
