@@ -1,10 +1,11 @@
-version: "3.4"
+version: "3.5"
 services:
   authorization:
     container_name: exemple-authorization
     image: exemple-authorization
     networks:
-    - db
+    - test
+    - authorization
     environment:
     - CATALINA_OPTS="-Dlogging.config=file:/usr/local/tomcat/etc/logback.groovy"
     - "JAVA_OPTS=-Xms256m -Xmx512m -XX:MetaspaceSize=128m"
@@ -12,12 +13,15 @@ services:
     - 8084:8080
     - 5706:5705
     volumes:
-    - ./conf/authorization:/usr/local/tomcat/etc
+    - ./docker/authorization:/usr/local/tomcat/etc
     healthcheck:
       test: ["CMD", "curl", "-f", "-H", "accept:application/json", "http://localhost:8080/ExempleAuthorization/actuator/health"]
       interval: 30s
       start_period: 30s
 networks:
-  db:
+  test:
     external:
-      name: exemple-service_db
+      name: exemple-test
+  authorization:
+    driver: bridge
+    name: exemple-authorization

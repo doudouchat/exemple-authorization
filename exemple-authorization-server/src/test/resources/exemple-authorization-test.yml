@@ -12,7 +12,7 @@ authorization:
       ttlMs:
          product: 30000
    certificat:
-      location: file:${project.parent.basedir}/conf/authorization/mytest.jks
+      location: file:${project.parent.basedir}/docker/authorization/mytest.jks
       alias: mytest
       password: mypass
    kafka:
