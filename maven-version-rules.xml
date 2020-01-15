@@ -19,11 +19,6 @@
 				<ignoreVersion type="regex">(?i).*(alpha|beta|-rc)(?:-?\d+)?</ignoreVersion>
 			</ignoreVersions>
 		</rule>
-		<rule groupId="org.eclipse.jetty" comparisonMethod="maven">
-			<ignoreVersions>
-				<ignoreVersion type="regex">(?i).*(alpha|beta)(?:-?\d+)?</ignoreVersion>
-			</ignoreVersions>
-		</rule>
 		<rule groupId="org.apache.cassandra" artifactId="cassandra-all" comparisonMethod="maven">
 			<ignoreVersions>
 				<ignoreVersion type="regex">4.0-(alpha|beta)(?:-?\d+)?</ignoreVersion>
