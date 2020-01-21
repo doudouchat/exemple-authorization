@@ -3,6 +3,7 @@ package com.exemple.authorization.common;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.glassfish.jersey.message.internal.NullOutputStream;
@@ -38,7 +39,7 @@ public class LoggingFilter implements Filter {
         int counter = COUNTER.incrementAndGet();
 
         try {
-            String log = RequestPrinter.print(requestSpec, requestSpec.getMethod(), requestSpec.getURI(), LogDetail.ALL,
+            String log = RequestPrinter.print(requestSpec, requestSpec.getMethod(), requestSpec.getURI(), LogDetail.ALL, Collections.emptySet(),
                     new PrintStream(new NullOutputStream(), true, StandardCharsets.UTF_8.name()), true);
             this.log.debug("Request {}\n{}", counter, log);
         } catch (UnsupportedEncodingException e) {
@@ -49,7 +50,7 @@ public class LoggingFilter implements Filter {
 
         try {
             String log = ResponsePrinter.print(response, response, new PrintStream(new NullOutputStream(), true, StandardCharsets.UTF_8.name()),
-                    LogDetail.ALL, true);
+                    LogDetail.ALL, true, Collections.emptySet());
             this.log.debug("Response {}\n{}", counter, log);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
