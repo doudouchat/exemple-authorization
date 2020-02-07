@@ -1,7 +1,9 @@
 language: java
 jdk:
     - openjdk8
-script: mvn -s .travis.settings.xml verify -e
+before_script:
+  - echo "MAVEN_OPTS='-Xmx1g -XX:MaxPermSize=512m'" > ~/.mavenrc
+script: mvn -s .travis.settings.xml verify -Pauthorization,it
 after_success:
     - bash <(curl -s https://codecov.io/bash)
 install: true
@@ -9,3 +11,4 @@ sudo: false
 cache:
     directories:
         - $HOME/.m2
+        - $HOME/.embedded-cassandra

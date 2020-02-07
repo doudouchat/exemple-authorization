@@ -34,7 +34,7 @@
 			<groupId>com.datastax.oss</groupId>
 			<artifactId>java-driver-mapper-runtime</artifactId>
 		</dependency>
-		
+
 		<!-- TEST -->
 
 		<dependency>
@@ -54,19 +54,11 @@
 			<artifactId>hamcrest-jackson</artifactId>
 		</dependency>
 
-		<!-- GOOGLE GUAVA -->
+		<!-- CASSANDRA EMBEDDED -->
 
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>25.1-jre</version>
-		</dependency>
-
-		<!-- ACHILLE -->
-
-		<dependency>
-			<groupId>info.archinnov</groupId>
-			<artifactId>achilles-embedded</artifactId>
+			<groupId>com.github.nosan</groupId>
+			<artifactId>embedded-cassandra</artifactId>
 		</dependency>
 
 	</dependencies>

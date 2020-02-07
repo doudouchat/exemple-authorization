@@ -11,15 +11,11 @@
 
 	<logger name="com.exemple.authorization.resource" level="DEBUG" />
 
-	<logger name="ACHILLES_DDL_SCRIPT">
-		<level value="DEBUG" />
-	</logger>
-
 	<logger name="com.datastax.oss.driver">
 		<level value="INFO" />
 	</logger>
 
-	<logger name="info.archinnov.achilles">
+	<logger name="com.github.nosan.embedded">
 		<level value="INFO" />
 	</logger>
 

@@ -230,12 +230,13 @@
 				<scope>test</scope>
 			</dependency>
 
-			<!-- ACHILLE -->
+			<!-- CASSANDRA EMBEDDED -->
+			<!-- https://nosan.github.io/embedded-cassandra -->
 
 			<dependency>
-				<groupId>info.archinnov</groupId>
-				<artifactId>achilles-embedded</artifactId>
-				<version>6.0.4</version>
+				<groupId>com.github.nosan</groupId>
+				<artifactId>embedded-cassandra</artifactId>
+				<version>3.0.2</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -636,6 +637,24 @@
 		</plugins>
 	</build>
 
+	<profiles>
 
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+
+			<properties>
+
+				<cassandra-version>3.11.4</cassandra-version>
+
+			</properties>
+
+		</profile>
+
+	</profiles>
 
 </project>
