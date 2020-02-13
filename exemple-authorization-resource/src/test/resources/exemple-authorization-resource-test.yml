@@ -4,3 +4,4 @@ authorization:
          addresses: localhost
          port: ${cassandra.nativeTransportPort}
          local_data_center: datacenter1
+         version: ${cassandra-version}

@@ -1,5 +1,5 @@
 CREATE KEYSPACE test 
   WITH REPLICATION = { 
-   'class' : 'NetworkTopologyStrategy', 
-   'datacenter1' : 1
+   'class' : 'SimpleStrategy', 
+   'replication_factor' : 1 
 } ;

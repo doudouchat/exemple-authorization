@@ -34,7 +34,6 @@
 		<hazelcast.port>5705</hazelcast.port>
 		<zmp.clientPort>10024</zmp.clientPort>
 
-
 	</properties>
 
 	<dependencyManagement>
@@ -286,22 +285,6 @@
 	</build>
 
 	<profiles>
-
-		<profile>
-			<id>windows</id>
-			<activation>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-
-			<properties>
-
-				<cassandra-version>3.11.4</cassandra-version>
-
-			</properties>
-
-		</profile>
 
 		<profile>
 			<id>authorization</id>
