@@ -1,7 +1,5 @@
 package com.exemple.authorization.resource.core;
 
-import java.util.Arrays;
-
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -38,9 +36,11 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
         EmbeddedCassandraFactory cassandraFactory = new EmbeddedCassandraFactory();
         cassandraFactory.setArtifact(Artifact.ofVersion(version));
         cassandraFactory.setPort(port);
-        cassandraFactory.getJvmOptions().addAll(Arrays.asList("-Xms64m", "-Xmx64m"));
+        cassandraFactory.getEnvironmentVariables().put("MAX_HEAP_SIZE", "64M");
+        cassandraFactory.getEnvironmentVariables().put("HEAP_NEWSIZE", "12m");
         cassandraFactory.getConfigProperties().put("num_tokens", 1);
         cassandraFactory.getConfigProperties().put("initial_token", 0);
+        cassandraFactory.getConfigProperties().put("hinted_handoff_enabled", false);
 
         return cassandraFactory.create();
     }
