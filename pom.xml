@@ -46,7 +46,7 @@
 		<org.slf4j-version>1.7.30</org.slf4j-version>
 		<datastax-version>4.4.0</datastax-version>
 		<groovy-version>3.0.0</groovy-version>
-		<cassandra-version>3.11.5</cassandra-version>
+		<cassandra-version>3.11.6</cassandra-version>
 		<zookeeper-version>3.5.7</zookeeper-version>
 		<!-- SONAR -->
 
@@ -636,25 +636,5 @@
 
 		</plugins>
 	</build>
-
-	<profiles>
-
-		<profile>
-			<id>windows</id>
-			<activation>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-
-			<properties>
-
-				<cassandra-version>3.11.4</cassandra-version>
-
-			</properties>
-
-		</profile>
-
-	</profiles>
 
 </project>
