@@ -24,6 +24,15 @@ public class FeatureTestConfiguration extends FeatureConfiguration {
     @Value("${authorization.kafka.embedded.dir}")
     private String logDir;
 
+    public FeatureTestConfiguration(@Value("${authorization.kafka.bootstrap-servers}") String bootstrapServers,
+            @Value("${authorization.certificat.location}") String certificateLocation,
+            @Value("${authorization.certificat.alias}") String certificateAlias,
+            @Value("${authorization.certificat.password}") String certificatePassword) {
+
+        super(bootstrapServers, certificateLocation, certificateAlias, certificatePassword);
+
+    }
+
     @Bean
     @Override
     public Clock clock() {

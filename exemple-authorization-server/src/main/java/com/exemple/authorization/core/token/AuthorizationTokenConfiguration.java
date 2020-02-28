@@ -30,20 +30,23 @@ public class AuthorizationTokenConfiguration {
 
     public static final String TOKEN_BLACK_LIST = "token.black_list";
 
-    @Value("${authorization.certificat.location}")
-    private String location;
+    private final String location;
 
-    @Value("${authorization.certificat.alias}")
-    private String alias;
+    private final String alias;
 
-    @Value("${authorization.certificat.password}")
-    private String password;
+    private final String password;
 
     private final ResourceLoader resourceLoader;
 
     private final HazelcastInstance hazelcastInstance;
 
-    public AuthorizationTokenConfiguration(ResourceLoader resourceLoader, HazelcastInstance hazelcastInstance) {
+    public AuthorizationTokenConfiguration(ResourceLoader resourceLoader, HazelcastInstance hazelcastInstance,
+            @Value("${authorization.certificat.location}") String location, @Value("${authorization.certificat.alias}") String alias,
+            @Value("${authorization.certificat.password}") String password) {
+
+        this.location = location;
+        this.alias = alias;
+        this.password = password;
         this.resourceLoader = resourceLoader;
         this.hazelcastInstance = hazelcastInstance;
     }

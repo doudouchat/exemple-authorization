@@ -19,6 +19,7 @@ import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -32,24 +33,29 @@ import com.exemple.authorization.password.properties.PasswordProperties;
 
 @Configuration
 @ApplicationPath("/ws")
+@ComponentScan(basePackages = { "com.exemple.authorization.disconnection", "com.exemple.authorization.password" })
 @EnableConfigurationProperties(PasswordProperties.class)
 public class FeatureConfiguration extends ResourceConfig {
 
     public static final String APP_HEADER = "app";
 
-    @Value("${authorization.kafka.bootstrap-servers}")
-    private String bootstrapServers;
+    private final String bootstrapServers;
 
-    @Value("${authorization.certificat.location}")
-    private String certificateLocation;
+    private final String certificateLocation;
 
-    @Value("${authorization.certificat.alias}")
-    private String certificateAlias;
+    private final String certificateAlias;
 
-    @Value("${authorization.certificat.password}")
-    private String certificatePassword;
+    private final String certificatePassword;
 
-    public FeatureConfiguration() {
+    public FeatureConfiguration(@Value("${authorization.kafka.bootstrap-servers}") String bootstrapServers,
+            @Value("${authorization.certificat.location}") String certificateLocation,
+            @Value("${authorization.certificat.alias}") String certificateAlias,
+            @Value("${authorization.certificat.password}") String certificatePassword) {
+
+        this.bootstrapServers = bootstrapServers;
+        this.certificateLocation = certificateLocation;
+        this.certificateAlias = certificateAlias;
+        this.certificatePassword = certificatePassword;
 
         // Resources
         packages(

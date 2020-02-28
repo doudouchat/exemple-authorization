@@ -19,8 +19,12 @@ import com.hazelcast.core.HazelcastInstance;
 @Configuration
 public class HazelcastHttpSessionConfiguration {
 
-    @Value("${authorization.hazelcast.port}")
-    private int port;
+    private final int port;
+
+    public HazelcastHttpSessionConfiguration(@Value("${authorization.hazelcast.port}") int port) {
+
+        this.port = port;
+    }
 
     @Bean
     public HazelcastInstance hazelcastInstance() {

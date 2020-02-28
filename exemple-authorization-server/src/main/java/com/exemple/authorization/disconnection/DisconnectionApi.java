@@ -16,7 +16,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.impl.PublicClaims;
@@ -32,8 +31,12 @@ public class DisconnectionApi {
     @Context
     private ContainerRequestContext servletContext;
 
-    @Autowired
-    private HazelcastInstance hazelcastInstance;
+    private final HazelcastInstance hazelcastInstance;
+
+    public DisconnectionApi(HazelcastInstance hazelcastInstance) {
+
+        this.hazelcastInstance = hazelcastInstance;
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

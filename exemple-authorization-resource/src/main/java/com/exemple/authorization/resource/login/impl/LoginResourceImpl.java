@@ -21,6 +21,7 @@ public class LoginResourceImpl implements LoginResource {
     private final ConcurrentMap<String, LoginMapper> mappers;
 
     public LoginResourceImpl(CqlSession session) {
+
         this.session = session;
         this.mappers = new ConcurrentHashMap<>();
     }
