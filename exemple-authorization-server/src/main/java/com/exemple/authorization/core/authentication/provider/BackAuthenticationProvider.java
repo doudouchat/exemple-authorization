@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BackAuthenticationProvider extends DaoAuthenticationProvider {
 
-    private Map<String, User> users = new HashMap<>();
+    private final Map<String, User> users = new HashMap<>();
 
     public BackAuthenticationProvider() {
 

@@ -13,14 +13,20 @@ import com.datastax.oss.driver.api.core.CqlSession;
 @Configuration
 public class ResourceCassandraConfiguration {
 
-    @Value("${authorization.resource.cassandra.addresses}")
-    private String[] addresses;
+    private final String[] addresses;
 
-    @Value("${authorization.resource.cassandra.port}")
-    private int port;
+    private final int port;
 
-    @Value("${authorization.resource.cassandra.local_data_center}")
-    private String localDataCenter;
+    private final String localDataCenter;
+
+    public ResourceCassandraConfiguration(@Value("${authorization.resource.cassandra.addresses}") String[] addresses,
+            @Value("${authorization.resource.cassandra.port}") int port,
+            @Value("${authorization.resource.cassandra.local_data_center}") String localDataCenter) {
+
+        this.addresses = addresses.clone();
+        this.port = port;
+        this.localDataCenter = localDataCenter;
+    }
 
     @Bean
     public CqlSession session() {

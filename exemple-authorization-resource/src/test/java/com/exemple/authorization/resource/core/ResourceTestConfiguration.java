@@ -30,6 +30,13 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
     @Value("${authorization.resource.cassandra.version}")
     private String version;
 
+    public ResourceTestConfiguration(@Value("${authorization.resource.cassandra.addresses}") String[] addresses,
+            @Value("${authorization.resource.cassandra.port}") int port,
+            @Value("${authorization.resource.cassandra.local_data_center}") String localDataCenter) {
+
+        super(addresses, port, localDataCenter);
+    }
+
     @Bean(initMethod = "start", destroyMethod = "stop")
     public Cassandra embeddedServer() {
 
