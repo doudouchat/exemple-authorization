@@ -46,7 +46,7 @@
 		<datastax-version>4.5.0</datastax-version>
 		<groovy-version>3.0.1</groovy-version>
 		<cassandra-version>3.11.6</cassandra-version>
-		<zookeeper-version>3.5.7</zookeeper-version>
+
 		<!-- SONAR -->
 
 		<!-- force sonar to use jacoco -->
@@ -155,25 +155,6 @@
 				<version>${datastax-version}</version>
 			</dependency>
 
-			<!-- ZOOKEEPER -->
-
-			<!-- https://zookeeper.apache.org/doc/current/index.html -->
-			<dependency>
-				<groupId>org.apache.zookeeper</groupId>
-				<artifactId>zookeeper</artifactId>
-				<version>${zookeeper-version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-log4j12</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>log4j</groupId>
-						<artifactId>log4j</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-
 			<!-- CURATOR -->
 
 			<!-- https://curator.apache.org -->
@@ -182,12 +163,6 @@
 				<groupId>org.apache.curator</groupId>
 				<artifactId>curator-recipes</artifactId>
 				<version>4.3.0</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.apache.zookeeper</groupId>
-						<artifactId>zookeeper</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 
 			<dependency>
@@ -195,12 +170,6 @@
 				<artifactId>curator-test</artifactId>
 				<version>4.3.0</version>
 				<scope>test</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>org.apache.zookeeper</groupId>
-						<artifactId>zookeeper</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 
 			<!-- COMMONS APACHE -->
@@ -535,21 +504,6 @@
 							<groupId>org.apache.cassandra</groupId>
 							<artifactId>cassandra-all</artifactId>
 							<version>${cassandra-version}</version>
-						</dependency>
-					</dependencies>
-				</plugin>
-
-				<!-- ZOOKEEPER -->
-				<!-- https://code.revelc.net/zookeeper-maven-plugin/index.html -->
-				<plugin>
-					<groupId>net.revelc.code</groupId>
-					<artifactId>zookeeper-maven-plugin</artifactId>
-					<version>1.1.0</version>
-					<dependencies>
-						<dependency>
-							<groupId>org.apache.zookeeper</groupId>
-							<artifactId>zookeeper</artifactId>
-							<version>${zookeeper-version}</version>
 						</dependency>
 					</dependencies>
 				</plugin>

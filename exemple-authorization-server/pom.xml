@@ -114,13 +114,6 @@
 			<artifactId>spring-security-oauth2</artifactId>
 		</dependency>
 
-		<!-- ZOOKEEPER -->
-
-		<dependency>
-			<groupId>org.apache.zookeeper</groupId>
-			<artifactId>zookeeper</artifactId>
-		</dependency>
-
 		<!-- CURATOR -->
 
 		<dependency>
