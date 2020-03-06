@@ -12,8 +12,8 @@
 	<properties>
 
 		<!-- TOMCAT -->
-		<tomcat.container.id>tomcat8x</tomcat.container.id>
-		<tomcat.version>8.5.34</tomcat.version>
+		<tomcat.container.id>tomcat9x</tomcat.container.id>
+		<tomcat.version>9.0.31</tomcat.version>
 
 		<!-- TEST -->
 		<application.log.file>${project.build.testOutputDirectory}/logback.groovy</application.log.file>
