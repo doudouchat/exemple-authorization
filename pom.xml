@@ -52,7 +52,6 @@
 		<!-- force sonar to use jacoco -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<!-- property checked by sonar to locate jacoco UT/IT reports -->
-		<sonar.jacoco.reportPaths>${project.build.directory}/reports/jacoco-ut.exec</sonar.jacoco.reportPaths>
 		<sonar.jacoco.itReportPath>${project.build.directory}/../../target/reports/exemple-authorization.exec</sonar.jacoco.itReportPath>
 
 	</properties>
@@ -457,7 +456,9 @@
 							<phase>process-test-classes</phase>
 							<configuration>
 								<propertyName>jacoco.test.agent.argLine</propertyName>
-								<destFile>${sonar.jacoco.reportPaths}</destFile>
+								<includes>
+									<include>com.exemple.authorization.*</include>
+								</includes>
 							</configuration>
 						</execution>
 						<execution>
@@ -470,6 +471,12 @@
 								<propertyName>jacoco.it.agent.argLine</propertyName>
 								<destFile>${sonar.jacoco.itReportPath}</destFile>
 							</configuration>
+						</execution>
+						<execution>
+							<id>report</id>
+							<goals>
+								<goal>report</goal>
+							</goals>
 						</execution>
 					</executions>
 				</plugin>
@@ -550,11 +557,6 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<configuration>
-					<includes>
-						<include>com.exemple.authorization.*</include>
-					</includes>
-				</configuration>
 			</plugin>
 
 			<!-- HELPER -->
