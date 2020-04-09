@@ -34,6 +34,7 @@
 
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 
@@ -52,7 +53,7 @@
 		<!-- force sonar to use jacoco -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<!-- property checked by sonar to locate jacoco UT/IT reports -->
-		<sonar.jacoco.itReportPath>${project.build.directory}/../../target/reports/exemple-authorization.exec</sonar.jacoco.itReportPath>
+		<sonar.jacoco.itReportPath>${project.build.directory}/../../target/jacoco-it.exec</sonar.jacoco.itReportPath>
 
 	</properties>
 
@@ -470,6 +471,10 @@
 							<configuration>
 								<propertyName>jacoco.it.agent.argLine</propertyName>
 								<destFile>${sonar.jacoco.itReportPath}</destFile>
+								<includes>
+									<include>com.exemple.authorization.*</include>
+								</includes>
+								<classDumpDir>${project.build.directory}/../target/classes</classDumpDir>
 							</configuration>
 						</execution>
 						<execution>
@@ -477,6 +482,19 @@
 							<goals>
 								<goal>report</goal>
 							</goals>
+						</execution>
+						<execution>
+							<id>report-integration</id>
+							<goals>
+								<goal>report-integration</goal>
+							</goals>
+							<configuration>
+								<dataFile>${sonar.jacoco.itReportPath}</dataFile>
+								<outputDirectory>${project.build.directory}/../../target/site/jacoco-it</outputDirectory>
+								<excludes>
+									<exclude>com/exemple/authorization/integration/**</exclude>
+								</excludes>
+							</configuration>
 						</execution>
 					</executions>
 				</plugin>
