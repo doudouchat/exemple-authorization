@@ -474,6 +474,10 @@
 								<includes>
 									<include>com.exemple.authorization.*</include>
 								</includes>
+								<excludes>
+									<exclude>*EnhancerBySpringCGLIB*</exclude>
+									<exclude>*FastClassBySpringCGLIB*</exclude>
+								</excludes>
 								<classDumpDir>${project.build.directory}/../target/classes</classDumpDir>
 							</configuration>
 						</execution>
