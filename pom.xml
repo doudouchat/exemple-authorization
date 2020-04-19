@@ -465,7 +465,7 @@
 						<execution>
 							<id>prepare-jacoco-integration-agent</id>
 							<goals>
-								<goal>prepare-agent</goal>
+								<goal>prepare-agent-integration</goal>
 							</goals>
 							<phase>pre-integration-test</phase>
 							<configuration>
@@ -478,7 +478,7 @@
 									<exclude>*EnhancerBySpringCGLIB*</exclude>
 									<exclude>*FastClassBySpringCGLIB*</exclude>
 								</excludes>
-								<classDumpDir>${project.build.directory}/../target/classes</classDumpDir>
+								<classDumpDir>${project.build.outputDirectory}</classDumpDir>
 							</configuration>
 						</execution>
 						<execution>
