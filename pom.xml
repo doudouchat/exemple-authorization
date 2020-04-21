@@ -477,6 +477,7 @@
 								<excludes>
 									<exclude>*EnhancerBySpringCGLIB*</exclude>
 									<exclude>*FastClassBySpringCGLIB*</exclude>
+									<exclude>*__MapperGenerated*</exclude>
 								</excludes>
 								<classDumpDir>${project.build.outputDirectory}</classDumpDir>
 							</configuration>
@@ -486,19 +487,6 @@
 							<goals>
 								<goal>report</goal>
 							</goals>
-						</execution>
-						<execution>
-							<id>report-integration</id>
-							<goals>
-								<goal>report-integration</goal>
-							</goals>
-							<configuration>
-								<dataFile>${sonar.jacoco.itReportPath}</dataFile>
-								<outputDirectory>${project.build.directory}/../../target/site/jacoco-it</outputDirectory>
-								<excludes>
-									<exclude>com/exemple/authorization/integration/**</exclude>
-								</excludes>
-							</configuration>
 						</execution>
 					</executions>
 				</plugin>
