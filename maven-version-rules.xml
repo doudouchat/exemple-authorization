@@ -7,7 +7,7 @@
 	<rules>
 		<rule groupId="org.springframework.security.oauth" artifactId="spring-security-oauth2" comparisonMethod="maven">
 			<ignoreVersions>
-				<ignoreVersion type="regex">2.4.0.RELEASE</ignoreVersion>
+				<ignoreVersion type="regex">2.4.(?:-?\d+).RELEASE</ignoreVersion>
 			</ignoreVersions>
 		</rule>
 	</rules>
