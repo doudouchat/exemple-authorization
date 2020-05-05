@@ -1,3 +1,3 @@
 USE test;
 
-INSERT INTO login (login) VALUES ('jean.dupond@gmail.com');
+INSERT INTO login (username) VALUES ('jean.dupond@gmail.com');

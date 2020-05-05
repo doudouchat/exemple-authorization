@@ -53,7 +53,7 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
 
     private String accessTokenBack;
 
-    private String login;
+    private String username;
 
     @Autowired
     private LoginResource resource;
@@ -100,18 +100,18 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
     @Test
     public void passwordSuccess() {
 
-        login = "jean.dupond@gmail.com";
+        username = "jean.dupond@gmail.com";
 
         LoginEntity account = new LoginEntity();
-        account.setLogin(login);
+        account.setUsername(username);
         account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
         account.setRoles(new HashSet<>(Arrays.asList("ROLE_1", "ROLE_2")));
 
-        Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(account));
+        Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.of(account));
 
         Map<String, String> params = new HashMap<>();
         params.put("grant_type", "password");
-        params.put("username", login);
+        params.put("username", username);
         params.put("password", "123");
         params.put("client_id", "test_user");
         params.put("redirect_uri", "xxx");
@@ -133,18 +133,18 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
     private Object[][] passwordFailure() {
 
         LoginEntity account1 = new LoginEntity();
-        account1.setLogin("jean.dupond@gmail.com");
+        account1.setUsername("jean.dupond@gmail.com");
         account1.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
         account1.setRoles(new HashSet<>(Arrays.asList("ROLE_1", "ROLE_2")));
         account1.setDisabled(true);
 
         LoginEntity account2 = new LoginEntity();
-        account2.setLogin("jean.dupond@gmail.com");
+        account2.setUsername("jean.dupond@gmail.com");
         account2.setPassword("{bcrypt}" + BCrypt.hashpw("124", BCrypt.gensalt()));
         account2.setRoles(new HashSet<>(Arrays.asList("ROLE_1", "ROLE_2")));
 
         LoginEntity account3 = new LoginEntity();
-        account3.setLogin("jean.dupond@gmail.com");
+        account3.setUsername("jean.dupond@gmail.com");
         account3.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
         account3.setRoles(new HashSet<>(Arrays.asList("ROLE_1", "ROLE_2")));
         account3.setAccountLocked(true);
@@ -200,8 +200,8 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
         JWTPartsParser parser = new JWTParser();
         Payload payload = parser.parsePayload(response.getBody().print());
 
-        assertThat(payload.getClaim("user_name").asString(), is(this.login));
-        assertThat(payload.getSubject(), is(this.login));
+        assertThat(payload.getClaim("user_name").asString(), is(this.username));
+        assertThat(payload.getSubject(), is(this.username));
         assertThat(payload.getClaim("aud").asArray(String.class), arrayContainingInAnyOrder("app1"));
         assertThat(payload.getClaim("authorities").asArray(String.class), arrayContainingInAnyOrder("ROLE_2", "ROLE_1"));
         assertThat(payload.getClaim("scope").asArray(String.class), arrayContainingInAnyOrder("account:read", "account:update"));
@@ -212,11 +212,11 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
     public void refreshToken() {
 
         LoginEntity account = new LoginEntity();
-        account.setLogin(login);
+        account.setUsername(username);
         account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
         account.setRoles(new HashSet<>(Arrays.asList("ROLE_1", "ROLE_2")));
 
-        Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(account));
+        Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.of(account));
 
         Map<String, String> params = new HashMap<>();
         params.put("grant_type", "refresh_token");

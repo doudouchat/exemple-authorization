@@ -114,15 +114,15 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
         String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
                 .withClaim("client_id", "clientId1").sign(algorithm);
 
-        String login = "jean.dupond@gmail.com";
+        String username = "jean.dupond@gmail.com";
 
         LoginEntity account = new LoginEntity();
-        account.setLogin(login);
+        account.setUsername(username);
 
         Map<String, Object> newPassword = new HashMap<>();
-        newPassword.put("login", login);
+        newPassword.put("login", username);
 
-        Mockito.when(loginResource.get(Mockito.eq(login))).thenReturn(Optional.of(account));
+        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(account));
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
@@ -136,7 +136,7 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    private String login;
+    private String username;
 
     private String token;
 
@@ -146,15 +146,15 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
         String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_TRUSTED_CLIENT" }).withAudience("app1", "app2")
                 .withClaim("client_id", "clientId1").sign(algorithm);
 
-        login = "jean.dupond@gmail.com";
+        username = "jean.dupond@gmail.com";
 
         LoginEntity account = new LoginEntity();
-        account.setLogin(login);
+        account.setUsername(username);
 
         Map<String, Object> newPassword = new HashMap<>();
-        newPassword.put("login", login);
+        newPassword.put("login", username);
 
-        Mockito.when(loginResource.get(Mockito.eq(login))).thenReturn(Optional.of(account));
+        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(account));
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app1")
                 .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
@@ -185,7 +185,7 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
         JWTPartsParser parser = new JWTParser();
         Payload payload = parser.parsePayload(response.getBody().print());
 
-        assertThat(payload.getSubject(), is(this.login));
+        assertThat(payload.getSubject(), is(this.username));
         assertThat(payload.getClaim("aud").asArray(String.class), arrayContainingInAnyOrder("app1", "app2"));
         assertThat(payload.getClaim("authorities").asArray(String.class), arrayContainingInAnyOrder("ROLE_TRUSTED_CLIENT"));
         assertThat(payload.getClaim("scope").asArray(String.class), arrayContainingInAnyOrder("login:read", "login:update"));

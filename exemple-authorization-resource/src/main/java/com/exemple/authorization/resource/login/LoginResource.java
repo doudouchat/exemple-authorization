@@ -6,6 +6,6 @@ import com.exemple.authorization.resource.login.model.LoginEntity;
 
 public interface LoginResource {
 
-    Optional<LoginEntity> get(String login);
+    Optional<LoginEntity> get(String username);
 
 }

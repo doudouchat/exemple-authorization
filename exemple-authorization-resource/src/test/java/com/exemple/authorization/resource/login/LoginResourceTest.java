@@ -40,7 +40,7 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
     public void get() {
 
         LoginEntity login = resource.get("jean.dupond@gmail.com").get();
-        assertThat(login.getLogin(), is("jean.dupond@gmail.com"));
+        assertThat(login.getUsername(), is("jean.dupond@gmail.com"));
         assertThat(login.getPassword(), is(nullValue()));
         assertThat(login.getRoles(), is(empty()));
         assertThat(login.isDisabled(), is(false));

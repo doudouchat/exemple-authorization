@@ -50,7 +50,7 @@ public class AuthorizationImplicitTest extends AbstractTestNGSpringContextTests 
 
     private String accessToken;
 
-    private String login;
+    private String username;
 
     @Autowired
     private LoginResource resource;
@@ -110,15 +110,15 @@ public class AuthorizationImplicitTest extends AbstractTestNGSpringContextTests 
     @Test(dependsOnMethods = "credentials")
     public void login() {
 
-        login = "jean.dupond@gmail.com";
+        username = "jean.dupond@gmail.com";
 
         LoginEntity account = new LoginEntity();
-        account.setLogin(login);
+        account.setUsername(username);
         account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
 
-        Mockito.when(resource.get(Mockito.eq(login))).thenReturn(Optional.of(account));
+        Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.of(account));
 
-        Response response = requestSpecification.header("Authorization", "Bearer " + accessToken).formParams("username", login, "password", "123")
+        Response response = requestSpecification.header("Authorization", "Bearer " + accessToken).formParams("username", username, "password", "123")
                 .post(restTemplate.getRootUri() + "/login");
         xAuthToken = response.getHeader("X-Auth-Token");
 
@@ -155,8 +155,8 @@ public class AuthorizationImplicitTest extends AbstractTestNGSpringContextTests 
         JWTPartsParser parser = new JWTParser();
         Payload payload = parser.parsePayload(response.getBody().print());
 
-        assertThat(payload.getClaim("user_name").asString(), is(this.login));
-        assertThat(payload.getSubject(), is(this.login));
+        assertThat(payload.getClaim("user_name").asString(), is(this.username));
+        assertThat(payload.getSubject(), is(this.username));
         assertThat(payload.getClaim("aud").asArray(String.class), arrayContainingInAnyOrder("app1"));
         assertThat(payload.getClaim("authorities"), instanceOf(NullClaim.class));
         assertThat(payload.getClaim("scope").asArray(String.class), arrayContainingInAnyOrder("account:read", "account:update"));

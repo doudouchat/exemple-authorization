@@ -8,6 +8,6 @@ import com.exemple.authorization.resource.login.model.LoginEntity;
 public interface LoginDao {
 
     @Select
-    LoginEntity findByLogin(String login);
+    LoginEntity findByUsername(String username);
 
 }

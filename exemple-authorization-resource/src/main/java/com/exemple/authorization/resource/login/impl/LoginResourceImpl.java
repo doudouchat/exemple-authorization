@@ -27,9 +27,9 @@ public class LoginResourceImpl implements LoginResource {
     }
 
     @Override
-    public Optional<LoginEntity> get(String login) {
+    public Optional<LoginEntity> get(String username) {
 
-        return Optional.ofNullable(get().findByLogin(login));
+        return Optional.ofNullable(get().findByUsername(username));
     }
 
     private LoginDao get() {

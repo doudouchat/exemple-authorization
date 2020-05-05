@@ -7,7 +7,7 @@ CREATE KEYSPACE IF NOT EXISTS test
 USE test;
 
 CREATE TABLE IF NOT EXISTS login (
-	login text PRIMARY KEY,
+	username text PRIMARY KEY,
 	password text,
 	disabled boolean,
 	account_locked boolean,
