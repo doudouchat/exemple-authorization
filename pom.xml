@@ -44,7 +44,7 @@
 		<org.springframework.boot-version>2.2.7.RELEASE</org.springframework.boot-version>
 		<org.springframework.kafka-version>2.4.6.RELEASE</org.springframework.kafka-version>
 		<org.slf4j-version>1.7.30</org.slf4j-version>
-		<datastax-version>4.6.0</datastax-version>
+		<datastax-version>4.6.1</datastax-version>
 		<groovy-version>3.0.3</groovy-version>
 		<cassandra-version>3.11.6</cassandra-version>
 
