@@ -133,6 +133,14 @@
 			<artifactId>groovy</artifactId>
 		</dependency>
 
+		<!-- CURATOR -->
+
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-test</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
 		<!-- HAMCREST -->
 
 		<dependency>
@@ -238,21 +246,6 @@
 					</executions>
 				</plugin>
 
-				<!-- ZOOKEEPER -->
-				<!-- https://code.revelc.net/zookeeper-maven-plugin/index.html -->
-				<plugin>
-					<groupId>net.revelc.code</groupId>
-					<artifactId>zookeeper-maven-plugin</artifactId>
-					<version>1.1.0</version>
-					<dependencies>
-						<dependency>
-							<groupId>org.apache.zookeeper</groupId>
-							<artifactId>zookeeper</artifactId>
-							<version>3.5.7</version>
-						</dependency>
-					</dependencies>
-				</plugin>
-
 				<!-- TEST INTEGRATION -->
 				<!-- http://maven.apache.org/surefire/maven-failsafe-plugin/ -->
 				<plugin>
@@ -340,8 +333,7 @@
 										<portName>cassandra.stopPort</portName>
 										<portName>cassandra.nativeTransportPort</portName>
 										<portName>hazelcast.port</portName>
-										<portName>zmp.clientPort</portName>
-										<portName>zmp.shutdownPort</portName>
+										<portName>zookeeper.port</portName>
 										<portName>kafka.port</portName>
 									</portNames>
 								</configuration>
@@ -416,21 +408,6 @@
 							</dependency>
 
 						</dependencies>
-					</plugin>
-
-					<!-- ZOOKEEPER -->
-					<plugin>
-						<groupId>net.revelc.code</groupId>
-						<artifactId>zookeeper-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>run-zookeeper</id>
-								<goals>
-									<goal>start</goal>
-									<goal>stop</goal>
-								</goals>
-							</execution>
-						</executions>
 					</plugin>
 
 					<!-- CARGO -->
