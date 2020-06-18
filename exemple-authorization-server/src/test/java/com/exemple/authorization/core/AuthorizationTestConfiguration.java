@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.osjava.sj.SimpleJndi;
 import org.osjava.sj.loader.JndiLoader;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +37,7 @@ import com.google.common.collect.Sets;
         HazelcastHttpSessionConfiguration.class, SwaggerConfiguration.class, AuthorizationClientTestConfiguration.class,
         FeatureTestConfiguration.class })
 @ComponentScan(basePackageClasses = AuthorizationResourceKeyspace.class)
-@EnableAutoConfiguration
+@EnableAutoConfiguration(exclude = CassandraAutoConfiguration.class)
 public class AuthorizationTestConfiguration extends AuthorizationPropertyConfiguration {
 
     @Bean
