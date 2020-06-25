@@ -8,7 +8,7 @@ authorization:
       port: ${hazelcast.port}
       member: 127.0.0.1:${hazelcast.port}
    zookeeper:
-      host: 127.0.0.1:${zmp.clientPort}
+      host: 127.0.0.1:${zookeeper.port}
    certificat:
       location: file:${project.parent.basedir}/docker/authorization/mytest.jks
       alias: mytest
@@ -17,7 +17,7 @@ authorization:
       bootstrap-servers: localhost:${kafka.port}
 application:
    zookeeper:
-      host: 127.0.0.1:${zmp.clientPort}
+      host: 127.0.0.1:${zookeeper.port}
 security:
    oauth2:
       client:
@@ -25,3 +25,7 @@ security:
          clientSecret: secret
       resource:
          tokenInfoUri: ${authorization.host}:${authorization.port}/${authorization.contextpath}/oauth/check_token
+test:
+   embedded:
+      zookeeper:
+         port: ${zookeeper.port}
