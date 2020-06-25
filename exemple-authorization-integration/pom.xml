@@ -13,7 +13,7 @@
 
 		<!-- TOMCAT -->
 		<tomcat.container.id>tomcat9x</tomcat.container.id>
-		<tomcat.version>9.0.33</tomcat.version>
+		<tomcat.version>9.0.36</tomcat.version>
 
 		<!-- TEST -->
 		<application.log.file>${project.build.testOutputDirectory}/logback.groovy</application.log.file>
