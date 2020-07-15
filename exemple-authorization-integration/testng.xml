@@ -16,4 +16,9 @@
 			<package name="com.exemple.authorization.integration.password" />
 		</packages>
 	</test>
+	<test name="swagger">
+		<packages>
+			<package name="com.exemple.authorization.integration.swagger" />
+		</packages>
+	</test>
 </suite>
