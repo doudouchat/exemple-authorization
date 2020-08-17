@@ -44,7 +44,7 @@
 		<org.springframework.boot-version>2.3.3.RELEASE</org.springframework.boot-version>
 		<org.springframework.kafka-version>2.5.5.RELEASE</org.springframework.kafka-version>
 		<org.slf4j-version>1.7.30</org.slf4j-version>
-		<datastax-version>4.7.2</datastax-version>
+		<datastax-version>4.8.0</datastax-version>
 		<groovy-version>3.0.5</groovy-version>
 		<cassandra-version>3.11.7</cassandra-version>
 
@@ -153,6 +153,12 @@
 				<groupId>com.datastax.oss</groupId>
 				<artifactId>java-driver-mapper-runtime</artifactId>
 				<version>${datastax-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.datastax.oss</groupId>
+				<artifactId>native-protocol</artifactId>
+				<version>1.4.11</version>
 			</dependency>
 
 			<!-- CURATOR -->
