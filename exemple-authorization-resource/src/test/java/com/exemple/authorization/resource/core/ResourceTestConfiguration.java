@@ -1,5 +1,7 @@
 package com.exemple.authorization.resource.core;
 
+import java.io.FileNotFoundException;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -30,11 +32,10 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
     @Value("${authorization.resource.cassandra.version}")
     private String version;
 
-    public ResourceTestConfiguration(@Value("${authorization.resource.cassandra.addresses}") String[] addresses,
-            @Value("${authorization.resource.cassandra.port}") int port,
-            @Value("${authorization.resource.cassandra.local_data_center}") String localDataCenter) {
+    public ResourceTestConfiguration(@Value("${authorization.resource.cassandra.resource_configuration}") String cassandraResource)
+            throws FileNotFoundException {
 
-        super(addresses, port, localDataCenter);
+        super(cassandraResource);
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")
