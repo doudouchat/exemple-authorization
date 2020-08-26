@@ -1,9 +1,7 @@
 authorization:
    resource:
       cassandra:
-         addresses: ${cassandra.host}
-         port: ${cassandra.nativeTransportPort}
-         local_data_center: datacenter1
+         resource_configuration: file:${project.build.testOutputDirectory}/cassandra.conf
    hazelcast:
       port: ${hazelcast.port}
       member: 127.0.0.1:${hazelcast.port}
