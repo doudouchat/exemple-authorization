@@ -1,9 +1,7 @@
 authorization:
    resource:
       cassandra:
-         addresses: 172.17.0.1
-         port: 9042
-         local_data_center: datacenter1
+         resource_configuration: file:/usr/local/tomcat/etc/cassandra.conf
    hazelcast:
       port: 5705
       member: 127.0.0.1:5705
