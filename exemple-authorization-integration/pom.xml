@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>exemple</groupId>
 			<artifactId>exemple-service-api-integration</artifactId>
-			<version>1.0.1</version>
+			<version>${exemple-service-version}</version>
 		</dependency>
 
 		<!-- APPLICATION -->
@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>exemple</groupId>
 			<artifactId>exemple-service-application</artifactId>
-			<version>1.0.1</version>
+			<version>${exemple-service-version}</version>
 			<scope>test</scope>
 		</dependency>
 
