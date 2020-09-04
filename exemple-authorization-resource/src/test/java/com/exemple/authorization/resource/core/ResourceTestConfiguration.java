@@ -46,9 +46,6 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
         cassandraFactory.setPort(port);
         cassandraFactory.getEnvironmentVariables().put("MAX_HEAP_SIZE", "64M");
         cassandraFactory.getEnvironmentVariables().put("HEAP_NEWSIZE", "12m");
-        cassandraFactory.getConfigProperties().put("num_tokens", 1);
-        cassandraFactory.getConfigProperties().put("initial_token", 0);
-        cassandraFactory.getConfigProperties().put("hinted_handoff_enabled", false);
 
         return cassandraFactory.create();
     }
