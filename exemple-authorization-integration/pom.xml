@@ -30,7 +30,7 @@
 		<sonar.coverage.exclusions>**/*.java</sonar.coverage.exclusions>
 
 		<cassandra.host>127.0.0.1</cassandra.host>
-		<cassandra.nativeTransportPort>9042</cassandra.nativeTransportPort>
+		<cassandra.port>9042</cassandra.port>
 		<hazelcast.port>5705</hazelcast.port>
 		<zmp.clientPort>10024</zmp.clientPort>
 
@@ -327,11 +327,7 @@
 										<portName>application.jmx.port</portName>
 										<portName>cargo.rmi.port</portName>
 										<portName>cargo.ajp.port</portName>
-										<portName>cassandra.rpcPort</portName>
-										<portName>cassandra.jmxPort</portName>
-										<portName>cassandra.storagePort</portName>
-										<portName>cassandra.stopPort</portName>
-										<portName>cassandra.nativeTransportPort</portName>
+										<portName>cassandra.port</portName>
 										<portName>hazelcast.port</portName>
 										<portName>zookeeper.port</portName>
 										<portName>kafka.port</portName>
@@ -375,41 +371,6 @@
 						</executions>
 					</plugin>
 
-					<!-- CASSANDRA -->
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>cassandra-maven-plugin</artifactId>
-						<configuration>
-							<script>${project.basedir}/src/test/resources/cassandra/schema.cql</script>
-							<cqlScript>${project.basedir}/src/test/resources/cassandra/exec.cql</cqlScript>
-							<logLevel>INFO</logLevel>
-							<cqlVersion>3.4.5</cqlVersion>
-							<startNativeTransport>true</startNativeTransport>
-							<addTestClasspath>true</addTestClasspath>
-							<systemPropertyVariables>
-								<cassandra.unsafesystem>true</cassandra.unsafesystem>
-							</systemPropertyVariables>
-						</configuration>
-						<executions>
-							<execution>
-								<id>start cassandra</id>
-								<goals>
-									<goal>start</goal>
-									<goal>cql-exec</goal>
-									<goal>stop</goal>
-								</goals>
-							</execution>
-						</executions>
-						<dependencies>
-							<dependency>
-								<groupId>org.codehaus.groovy</groupId>
-								<artifactId>groovy</artifactId>
-								<version>${groovy-version}</version>
-							</dependency>
-
-						</dependencies>
-					</plugin>
-
 					<!-- CARGO -->
 					<plugin>
 						<groupId>org.codehaus.cargo</groupId>
@@ -437,6 +398,11 @@
 							</deployables>
 							<configuration>
 								<properties>
+									<cargo.resource.resource.spring>
+										cargo.resource.name=spring.config.location|
+										cargo.resource.type=java.lang.String|
+										cargo.resource.parameters=factory=com.exemple.service.api.integration.core.PrimitivesAndStringFactory;value=${authorization.path}
+									</cargo.resource.resource.spring>
 									<cargo.resource.resource.authorization>
 										cargo.resource.name=${authorization.name}|
 										cargo.resource.type=java.lang.String|

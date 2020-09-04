@@ -48,6 +48,7 @@ logger("org.apache.cassandra", WARN)
 logger("com.datastax.oss.driver", INFO)
 logger("com.hazelcast", INFO)
 logger("org.apache.zookeeper", INFO)
+logger("com.github.nosan.embedded.cassandra.EmbeddedCassandra", INFO)
 logger("org.springframework.boot", INFO)
 
 logger("com.exemple", DEBUG)
