@@ -13,6 +13,11 @@ authorization:
       password: mypass
    kafka:
       bootstrap-servers: localhost:${kafka.port}
+   embedded:
+      cassandra:
+         port: ${cassandra.port}
+         version: ${cassandra-version}
+         scripts: ${project.build.testOutputDirectory}/cassandra/schema.cql, ${project.build.testOutputDirectory}/cassandra/exec.cql
 application:
    zookeeper:
       host: 127.0.0.1:${zookeeper.port}

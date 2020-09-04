@@ -6,6 +6,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Import;
 
+import com.exemple.authorization.core.embedded.CassandraConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
 import com.exemple.service.application.core.ApplicationConfiguration;
 
@@ -15,7 +16,7 @@ public class AuthorizationServerApplication extends SpringBootServletInitializer
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(AuthorizationServerApplication.class);
+        return application.sources(CassandraConfiguration.class, AuthorizationServerApplication.class);
     }
 
 }

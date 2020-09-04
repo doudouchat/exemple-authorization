@@ -221,7 +221,6 @@
 				<groupId>com.github.nosan</groupId>
 				<artifactId>embedded-cassandra</artifactId>
 				<version>3.0.3</version>
-				<scope>test</scope>
 			</dependency>
 
 			<!-- LOGGING -->
@@ -515,21 +514,6 @@
 					<configuration>
 						<failOnError>false</failOnError>
 					</configuration>
-				</plugin>
-
-				<!-- CASSANDRA -->
-				<!-- http://www.mojohaus.org/cassandra-maven-plugin/index.html -->
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>cassandra-maven-plugin</artifactId>
-					<version>3.6</version>
-					<dependencies>
-						<dependency>
-							<groupId>org.apache.cassandra</groupId>
-							<artifactId>cassandra-all</artifactId>
-							<version>${cassandra-version}</version>
-						</dependency>
-					</dependencies>
 				</plugin>
 
 				<!-- HELPER -->
