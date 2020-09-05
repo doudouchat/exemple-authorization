@@ -47,6 +47,8 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
         cassandraFactory.getEnvironmentVariables().put("MAX_HEAP_SIZE", "64M");
         cassandraFactory.getEnvironmentVariables().put("HEAP_NEWSIZE", "12m");
 
+        cassandraFactory.getConfigProperties().put("disk_failure_policy", "stop_paranoid");
+
         return cassandraFactory.create();
     }
 
