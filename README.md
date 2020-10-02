@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/doudouchat/exemple-authorization.svg?branch=master)](https://travis-ci.org/doudouchat/exemple-authorization)
+[![Build Status](https://travis-ci.com/doudouchat/exemple-authorization.svg?branch=master)](https://travis-ci.com/doudouchat/exemple-authorization)
 [![codecov](https://codecov.io/gh/doudouchat/exemple-authorization/graph/badge.svg)](https://codecov.io/gh/doudouchat/exemple-authorization) 
 
 # exemple-authorization
