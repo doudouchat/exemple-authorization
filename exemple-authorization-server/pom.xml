@@ -101,6 +101,13 @@
 			<artifactId>spring-session-hazelcast</artifactId>
 		</dependency>
 
+		<!-- HAZELCAST -->
+
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+		</dependency>
+
 		<!-- SPRING KAFKA -->
 
 		<dependency>
