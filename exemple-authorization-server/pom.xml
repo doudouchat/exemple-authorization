@@ -43,12 +43,6 @@
 			<groupId>exemple</groupId>
 			<artifactId>exemple-authorization-resource</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.codehaus.groovy</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<!-- APPLICATION -->
