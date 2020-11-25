@@ -1,26 +1,37 @@
 package com.exemple.authorization.core.embedded;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ResourceUtils;
 
-import com.github.nosan.embedded.cassandra.EmbeddedCassandraFactory;
-import com.github.nosan.embedded.cassandra.api.Cassandra;
-import com.github.nosan.embedded.cassandra.api.connection.CassandraConnection;
-import com.github.nosan.embedded.cassandra.api.connection.CqlSessionCassandraConnectionFactory;
-import com.github.nosan.embedded.cassandra.api.cql.CqlDataSet;
-import com.github.nosan.embedded.cassandra.artifact.Artifact;
-import com.github.nosan.embedded.cassandra.commons.io.FileSystemResource;
-import com.github.nosan.embedded.cassandra.commons.io.Resource;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
+import com.github.nosan.embedded.cassandra.Cassandra;
+import com.github.nosan.embedded.cassandra.CassandraBuilder;
+import com.github.nosan.embedded.cassandra.commons.FileSystemResource;
+import com.github.nosan.embedded.cassandra.commons.Resource;
+import com.github.nosan.embedded.cassandra.commons.logging.Slf4jLogger;
+import com.github.nosan.embedded.cassandra.cql.CqlScript;
+import com.github.nosan.embedded.cassandra.cql.ResourceCqlScript;
 
 @Configuration
 @ConditionalOnProperty(value = { "port", "version" }, prefix = "authorization.embedded.cassandra")
 public class CassandraConfiguration {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CassandraConfiguration.class);
+
+    private final File cassandraResource;
 
     private final int port;
 
@@ -28,36 +39,51 @@ public class CassandraConfiguration {
 
     private final Resource[] scripts;
 
-    public CassandraConfiguration(@Value("${authorization.embedded.cassandra.port}") int port,
-            @Value("${authorization.embedded.cassandra.version}") String version,
-            @Value("${authorization.embedded.cassandra.scripts}") String... scripts) {
+    public CassandraConfiguration(@Value("${authorization.resource.cassandra.resource_configuration}") String cassandraResource,
+            @Value("${authorization.embedded.cassandra.port}") int port, @Value("${authorization.embedded.cassandra.version}") String version,
+            @Value("${authorization.embedded.cassandra.scripts}") String... scripts) throws FileNotFoundException {
+        this.cassandraResource = ResourceUtils.getFile(cassandraResource);
         this.port = port;
         this.version = version;
-        this.scripts = Arrays.stream(scripts).map(FileSystemResource::new).toArray(Resource[]::new);
+        this.scripts = Arrays.stream(scripts).map(File::new).map(FileSystemResource::new).toArray(Resource[]::new);
     }
 
-    @Bean(initMethod = "start", destroyMethod = "stop")
+    @Bean
     public Cassandra embeddedCassandra() {
-        EmbeddedCassandraFactory cassandraFactory = new EmbeddedCassandraFactory();
-        cassandraFactory.setArtifact(Artifact.ofVersion(version));
-        cassandraFactory.setPort(port);
-        cassandraFactory.getEnvironmentVariables().put("MAX_HEAP_SIZE", "64M");
-        cassandraFactory.getEnvironmentVariables().put("HEAP_NEWSIZE", "12m");
 
-        cassandraFactory.getConfigProperties().put("disk_failure_policy", "stop_paranoid");
+        return new CassandraBuilder()
 
-        return cassandraFactory.create();
+                .version(version)
+
+                .addEnvironmentVariable("MAX_HEAP_SIZE", "64M").addEnvironmentVariable("HEAP_NEWSIZE", "12m")
+
+                .addConfigProperty("native_transport_port", port).addConfigProperty("disk_failure_policy", "stop_paranoid")
+
+                .logger(new Slf4jLogger(LoggerFactory.getLogger("Cassandra")))
+
+                .build();
     }
 
     @PostConstruct
     public void initKeyspace() {
 
-        CqlSessionCassandraConnectionFactory cassandraConnectionFactory = new CqlSessionCassandraConnectionFactory();
+        LOG.info("STARTING EMBEDDED CASSANDRA");
+        embeddedCassandra().start();
 
-        try (CassandraConnection connection = cassandraConnectionFactory.create(embeddedCassandra())) {
+        DriverConfigLoader loader = DriverConfigLoader.fromFile(cassandraResource);
 
-            CqlDataSet.ofResources(scripts).forEachStatement(connection::execute);
+        try (CqlSession session = CqlSession.builder().withConfigLoader(loader).build()) {
+            Arrays.stream(scripts).map(ResourceCqlScript::new).forEach((CqlScript script) -> script.forEachStatement(session::execute));
         }
+
+    }
+
+    @PreDestroy
+    public void shutdownCassandra() {
+
+        LOG.info("SHUTDOWN EMBEDDED CASSANDRA");
+        embeddedCassandra().stop();
+
     }
 
 }
