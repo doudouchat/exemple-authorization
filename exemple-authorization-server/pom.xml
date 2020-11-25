@@ -121,6 +121,13 @@
 			<artifactId>spring-security-oauth2</artifactId>
 		</dependency>
 
+		<!-- NIMBUS -->
+
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+		</dependency>
+
 		<!-- CURATOR -->
 
 		<dependency>
