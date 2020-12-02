@@ -4,6 +4,7 @@
 	<test name="ut core">
 		<packages>
 			<package name="com.exemple.authorization.core.swagger" />
+			<package name="com.exemple.authorization.core.token" />
 		</packages>
 		<classes>
 			<class name="com.exemple.authorization.core.AuthorizationServerApplicationTest" />
