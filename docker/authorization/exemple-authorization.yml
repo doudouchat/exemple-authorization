@@ -2,9 +2,6 @@ authorization:
    resource:
       cassandra:
          resource_configuration: file:/usr/local/tomcat/etc/cassandra.conf
-   hazelcast:
-      port: 5705
-      member: 127.0.0.1:5705
    zookeeper:
       host: 172.17.0.1:10024
    certificat:
