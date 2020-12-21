@@ -1,7 +1,4 @@
 authorization:
-   hazelcast:
-      port: ${hazelcast.port}
-      member: 127.0.0.1:${hazelcast.port}
    zookeeper:
       host: 127.0.0.1:${zmp.clientPort}
       port: ${zmp.clientPort}
@@ -22,3 +19,6 @@ authorization:
          port: ${kafka.port}
    password:
       expiryTime: 60
+   embedded:
+      hazelcast:
+         port: ${hazelcast.port}
