@@ -2,6 +2,7 @@ package com.exemple.authorization.core.embedded;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.Duration;
 import java.util.Arrays;
 
 import javax.annotation.PostConstruct;
@@ -39,12 +40,16 @@ public class CassandraConfiguration {
 
     private final Resource[] scripts;
 
+    private final int startupTimeout;
+
     public CassandraConfiguration(@Value("${authorization.resource.cassandra.resource_configuration}") String cassandraResource,
             @Value("${authorization.embedded.cassandra.port}") int port, @Value("${authorization.embedded.cassandra.version}") String version,
+            @Value("${authorization.embedded.cassandra.startup_timeout:120}") int startupTimeout,
             @Value("${authorization.embedded.cassandra.scripts}") String... scripts) throws FileNotFoundException {
         this.cassandraResource = ResourceUtils.getFile(cassandraResource);
         this.port = port;
         this.version = version;
+        this.startupTimeout = startupTimeout;
         this.scripts = Arrays.stream(scripts).map(File::new).map(FileSystemResource::new).toArray(Resource[]::new);
     }
 
@@ -55,11 +60,13 @@ public class CassandraConfiguration {
 
                 .version(version)
 
-                .addEnvironmentVariable("MAX_HEAP_SIZE", "64M").addEnvironmentVariable("HEAP_NEWSIZE", "12m")
+                .addEnvironmentVariable("MAX_HEAP_SIZE", "64M").addEnvironmentVariable("HEAP_NEWSIZE", "12M")
 
                 .addConfigProperty("native_transport_port", port).addConfigProperty("disk_failure_policy", "stop_paranoid")
 
                 .logger(new Slf4jLogger(LoggerFactory.getLogger("Cassandra")))
+
+                .startupTimeout(Duration.ofSeconds(startupTimeout))
 
                 .build();
     }
