@@ -19,6 +19,10 @@ jobs:
             path: ~/.m2
             key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
             restore-keys: ${{ runner.os }}-m2
+      -  name: maven-settings-xml-action
+         uses: whelk-io/maven-settings-xml-action@v14
+         with:
+            repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
       - name: Checkout exemple service
         uses: actions/checkout@v2
         with:
