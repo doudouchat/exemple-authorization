@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.util.Arrays;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +52,7 @@ public class CassandraConfiguration {
         this.scripts = Arrays.stream(scripts).map(File::new).map(FileSystemResource::new).toArray(Resource[]::new);
     }
 
-    @Bean
+    @Bean(destroyMethod = "stop")
     public Cassandra embeddedCassandra() {
 
         return new CassandraBuilder()
@@ -82,14 +81,6 @@ public class CassandraConfiguration {
         try (CqlSession session = CqlSession.builder().withConfigLoader(loader).build()) {
             Arrays.stream(scripts).map(ResourceCqlScript::new).forEach((CqlScript script) -> script.forEachStatement(session::execute));
         }
-
-    }
-
-    @PreDestroy
-    public void shutdownCassandra() {
-
-        LOG.info("SHUTDOWN EMBEDDED CASSANDRA");
-        embeddedCassandra().stop();
 
     }
 
