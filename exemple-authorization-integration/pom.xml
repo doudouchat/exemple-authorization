@@ -141,6 +141,22 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<!-- CASSANDRA EMBEDDED -->
+
+		<dependency>
+			<groupId>com.github.nosan</groupId>
+			<artifactId>embedded-cassandra</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- YAML -->
+
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- HAMCREST -->
 
 		<dependency>
@@ -309,6 +325,25 @@
 
 				<plugins>
 
+					<!-- DEPENDENCIES -->
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-dependencies</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<includeScope>provided</includeScope>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
 					<!-- HELPER -->
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
@@ -381,6 +416,9 @@
 									<dependency>
 										<groupId>exemple</groupId>
 										<artifactId>exemple-service-api-integration</artifactId>
+									</dependency>
+									<dependency>
+										<location>${project.build.directory}/dependency</location>
 									</dependency>
 								</dependencies>
 							</container>

@@ -1,8 +1,12 @@
 package com.exemple.authorization.integration.core;
 
+import java.io.File;
+import java.util.Arrays;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +15,17 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.exemple.authorization.core.client.AuthorizationClientBuilder;
 import com.exemple.authorization.core.client.AuthorizationClientConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.core.ApplicationConfiguration;
 import com.exemple.service.application.detail.ApplicationDetailService;
+import com.github.nosan.embedded.cassandra.commons.FileSystemResource;
+import com.github.nosan.embedded.cassandra.commons.Resource;
+import com.github.nosan.embedded.cassandra.cql.CqlScript;
+import com.github.nosan.embedded.cassandra.cql.ResourceCqlScript;
 import com.google.common.collect.Sets;
 
 @Configuration
@@ -38,6 +47,16 @@ public class IntegrationTestConfiguration {
     @Autowired
     private AuthorizationClientBuilder authorizationClientBuilder;
 
+    @Autowired
+    private CqlSession session;
+
+    private final Resource[] scripts;
+
+    public IntegrationTestConfiguration(@Value("${cassandra.embedded.scripts:}") String... scripts) {
+        this.scripts = Arrays.stream(scripts).map(File::new).map(FileSystemResource::new).toArray(Resource[]::new);
+
+    }
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
 
@@ -52,6 +71,10 @@ public class IntegrationTestConfiguration {
 
     @PostConstruct
     public void initSchema() {
+
+        // INIT KEYSPACE
+
+        Arrays.stream(scripts).map(ResourceCqlScript::new).forEach((CqlScript script) -> script.forEachStatement(session::execute));
 
         // APP
 

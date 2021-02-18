@@ -31,6 +31,7 @@ import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.service.application.common.model.ApplicationDetail;
 import com.exemple.service.application.detail.ApplicationDetailService;
+import com.github.nosan.boot.autoconfigure.embedded.cassandra.EmbeddedCassandraAutoConfiguration;
 import com.google.common.collect.Sets;
 
 @Configuration
@@ -38,7 +39,7 @@ import com.google.common.collect.Sets;
         HazelcastHttpSessionConfiguration.class, SwaggerConfiguration.class, AuthorizationClientTestConfiguration.class,
         FeatureTestConfiguration.class, HazelcastConfiguration.class })
 @ComponentScan(basePackageClasses = AuthorizationResourceKeyspace.class)
-@EnableAutoConfiguration(exclude = CassandraAutoConfiguration.class)
+@EnableAutoConfiguration(exclude = { CassandraAutoConfiguration.class, EmbeddedCassandraAutoConfiguration.class })
 public class AuthorizationTestConfiguration extends AuthorizationPropertyConfiguration {
 
     @Bean

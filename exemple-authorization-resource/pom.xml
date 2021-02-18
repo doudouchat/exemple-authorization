@@ -59,7 +59,6 @@
 		<dependency>
 			<groupId>com.github.nosan</groupId>
 			<artifactId>embedded-cassandra</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
