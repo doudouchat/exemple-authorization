@@ -26,10 +26,9 @@ security:
          clientSecret: secret
       resource:
          tokenInfoUri: ${authorization.host}:${authorization.port}/${authorization.contextpath}/oauth/check_token
-test:
+zookeeper:
    embedded:
-      zookeeper:
-         port: ${zookeeper.port}
+      port: ${zookeeper.port}
 cassandra:
    embedded:
       config-properties:
