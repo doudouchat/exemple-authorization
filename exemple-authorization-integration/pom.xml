@@ -133,14 +133,6 @@
 			<artifactId>groovy</artifactId>
 		</dependency>
 
-		<!-- CURATOR -->
-
-		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-test</artifactId>
-			<scope>compile</scope>
-		</dependency>
-
 		<!-- HAMCREST -->
 
 		<dependency>

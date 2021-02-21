@@ -11,6 +11,9 @@
 	<packaging>war</packaging>
 
 	<dependencies>
+
+		<!-- AUTHORIZATION SERVER -->
+
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>exemple-authorization-server</artifactId>
@@ -23,6 +26,14 @@
 		<dependency>
 			<groupId>com.github.nosan</groupId>
 			<artifactId>embedded-cassandra</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- CURATOR -->
+
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-test</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
