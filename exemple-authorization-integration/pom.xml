@@ -141,22 +141,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- CASSANDRA EMBEDDED -->
-
-		<dependency>
-			<groupId>com.github.nosan</groupId>
-			<artifactId>embedded-cassandra</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- YAML -->
-
-		<dependency>
-			<groupId>org.yaml</groupId>
-			<artifactId>snakeyaml</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- HAMCREST -->
 
 		<dependency>
@@ -314,7 +298,7 @@
 
 				<dependency>
 					<groupId>${project.groupId}</groupId>
-					<artifactId>exemple-authorization-server</artifactId>
+					<artifactId>exemple-authorization-server-embedded</artifactId>
 					<version>${project.version}</version>
 					<type>war</type>
 				</dependency>
@@ -324,25 +308,6 @@
 			<build>
 
 				<plugins>
-
-					<!-- DEPENDENCIES -->
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-dependencies</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<configuration>
-									<includeScope>provided</includeScope>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
 
 					<!-- HELPER -->
 					<plugin>
@@ -417,16 +382,13 @@
 										<groupId>exemple</groupId>
 										<artifactId>exemple-service-api-integration</artifactId>
 									</dependency>
-									<dependency>
-										<location>${project.build.directory}/dependency</location>
-									</dependency>
 								</dependencies>
 							</container>
 							<ignoreFailures>true</ignoreFailures>
 							<deployables>
 								<deployable>
 									<groupId>${project.groupId}</groupId>
-									<artifactId>exemple-authorization-server</artifactId>
+									<artifactId>exemple-authorization-server-embedded</artifactId>
 									<type>war</type>
 									<properties>
 										<context>/${authorization.contextpath}</context>
