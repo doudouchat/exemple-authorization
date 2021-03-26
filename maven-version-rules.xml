@@ -10,5 +10,10 @@
 				<ignoreVersion type="regex">2.(4|5).(?:-?\d+).RELEASE</ignoreVersion>
 			</ignoreVersions>
 		</rule>
+		<rule groupId="org.apache.tomcat" comparisonMethod="maven">
+			<ignoreVersions>
+				<ignoreVersion type="regex">10.(.*)</ignoreVersion>
+			</ignoreVersions>
+		</rule>
 	</rules>
 </ruleset>

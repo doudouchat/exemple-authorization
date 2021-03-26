@@ -64,6 +64,16 @@
 				<version>5.4.5</version>
 			</dependency>
 
+			<!-- TOMCAT -->
+
+			<dependency>
+				<groupId>org.apache.tomcat</groupId>
+				<artifactId>tomcat</artifactId>
+				<version>${tomcat.version}</version>
+				<type>pom</type>
+				<scope>provided</scope>
+			</dependency>
+
 		</dependencies>
 
 	</dependencyManagement>
