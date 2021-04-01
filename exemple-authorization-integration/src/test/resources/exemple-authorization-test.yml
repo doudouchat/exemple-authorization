@@ -33,7 +33,7 @@ cassandra:
    embedded:
       config-properties:
          native_transport_port: ${cassandra.port}
-      startup-timeout: 240s
+      startup-timeout: 600s
       version: ${cassandra-version}
       logger: Cassandra
       environment-variables:
