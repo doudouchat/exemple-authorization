@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.exemple.authorization.application.common.model.ApplicationDetail;
+import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.common.security.AuthorizationContextSecurity;
 import com.exemple.authorization.password.model.NewPassword;
 import com.exemple.authorization.password.properties.PasswordProperties;
-import com.exemple.service.application.common.model.ApplicationDetail;
-import com.exemple.service.application.detail.ApplicationDetailService;
 
 @Component
 public class AccessTokenBuilder {

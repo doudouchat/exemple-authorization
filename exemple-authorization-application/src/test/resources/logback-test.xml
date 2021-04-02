@@ -1,0 +1,21 @@
+<configuration>
+
+	<!-- console -->
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d %-5p: %C - %m%n</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<logger name="com.exemple.service.application" level="DEBUG" />
+
+	<logger name="org.apache.zookeeper" level="INFO" />
+
+	<!-- Niveau general pour l'application -->
+
+	<root level="WARN">
+		<appender-ref ref="console" />
+	</root>
+
+</configuration>

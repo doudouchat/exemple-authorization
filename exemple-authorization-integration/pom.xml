@@ -28,6 +28,7 @@
 
 		<!-- SONAR -->
 		<sonar.coverage.exclusions>**/*.java</sonar.coverage.exclusions>
+		<sonar.exclusions>**/common/PrimitivesAndStringFactory.java</sonar.exclusions>
 
 		<cassandra.host>127.0.0.1</cassandra.host>
 		<cassandra.port>9042</cassandra.port>
@@ -80,20 +81,12 @@
 
 	<dependencies>
 
-		<!-- API INTEGRATION -->
-
-		<dependency>
-			<groupId>exemple</groupId>
-			<artifactId>exemple-service-api-integration</artifactId>
-			<version>${exemple-service-version}</version>
-		</dependency>
-
 		<!-- APPLICATION -->
 
 		<dependency>
 			<groupId>exemple</groupId>
-			<artifactId>exemple-service-application</artifactId>
-			<version>${exemple-service-version}</version>
+			<artifactId>exemple-authorization-application</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -148,6 +141,26 @@
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-all</artifactId>
+		</dependency>
+
+		<!-- COMMONS APACHE -->
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- REST ASSURED -->
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured-all</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
 		</dependency>
 
 		<!-- TEST -->
@@ -381,8 +394,8 @@
 							<container>
 								<dependencies>
 									<dependency>
-										<groupId>exemple</groupId>
-										<artifactId>exemple-service-api-integration</artifactId>
+										<groupId>${project.groupId}</groupId>
+										<artifactId>${project.artifactId}</artifactId>
 									</dependency>
 								</dependencies>
 							</container>
@@ -403,12 +416,12 @@
 									<cargo.resource.resource.spring>
 										cargo.resource.name=spring.config.location|
 										cargo.resource.type=java.lang.String|
-										cargo.resource.parameters=factory=com.exemple.service.api.integration.core.PrimitivesAndStringFactory;value=${authorization.path}
+										cargo.resource.parameters=factory=com.exemple.authorization.integration.common.PrimitivesAndStringFactory;value=${authorization.path}
 									</cargo.resource.resource.spring>
 									<cargo.resource.resource.authorization>
 										cargo.resource.name=${authorization.name}|
 										cargo.resource.type=java.lang.String|
-										cargo.resource.parameters=factory=com.exemple.service.api.integration.core.PrimitivesAndStringFactory;value=${authorization.path}
+										cargo.resource.parameters=factory=com.exemple.authorization.integration.common.PrimitivesAndStringFactory;value=${authorization.path}
 									</cargo.resource.resource.authorization>
 								</properties>
 							</configuration>

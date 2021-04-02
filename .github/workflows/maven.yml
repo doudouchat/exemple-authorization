@@ -25,13 +25,6 @@ jobs:
             path: ~/.embedded-cassandra
             key: ${{ runner.os }}-embedded-cassandra-${{ hashFiles('**/CHANGES.txt') }}
             restore-keys: ${{ runner.os }}-embedded-cassandra
-      - name: Checkout exemple service
-        uses: actions/checkout@v2
-        with:
-            path: exemple-service
-            repository: doudouchat/exemple-service
-      -  name: Build exemple service
-         run: mvn -f ${{ github.workspace }}/exemple-service clean install -Dmaven.test.skip=true
       -  name: Build with Maven
          run: mvn clean verify -Pauthorization,it
       -  uses: codecov/codecov-action@v1

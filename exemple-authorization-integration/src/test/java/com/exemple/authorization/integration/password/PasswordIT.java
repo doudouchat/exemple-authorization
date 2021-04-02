@@ -12,8 +12,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
+import com.exemple.authorization.integration.common.JsonRestTemplate;
 import com.exemple.authorization.integration.core.IntegrationTestConfiguration;
-import com.exemple.service.api.integration.core.JsonRestTemplate;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;

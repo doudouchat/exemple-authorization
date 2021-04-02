@@ -16,12 +16,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.exemple.authorization.application.common.model.ApplicationDetail;
+import com.exemple.authorization.application.core.ApplicationConfiguration;
+import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.client.AuthorizationClientBuilder;
 import com.exemple.authorization.core.client.AuthorizationClientConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
-import com.exemple.service.application.common.model.ApplicationDetail;
-import com.exemple.service.application.core.ApplicationConfiguration;
-import com.exemple.service.application.detail.ApplicationDetailService;
 import com.github.nosan.embedded.cassandra.commons.FileSystemResource;
 import com.github.nosan.embedded.cassandra.commons.Resource;
 import com.github.nosan.embedded.cassandra.cql.CqlScript;

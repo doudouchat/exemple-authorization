@@ -19,6 +19,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jndi.JndiObjectFactoryBean;
 
+import com.exemple.authorization.application.common.model.ApplicationDetail;
+import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.authentication.AuthenticationConfiguration;
 import com.exemple.authorization.core.client.AuthorizationClientTestConfiguration;
 import com.exemple.authorization.core.embedded.HazelcastConfiguration;
@@ -29,8 +31,6 @@ import com.exemple.authorization.core.session.HazelcastHttpSessionConfiguration;
 import com.exemple.authorization.core.swagger.SwaggerConfiguration;
 import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
-import com.exemple.service.application.common.model.ApplicationDetail;
-import com.exemple.service.application.detail.ApplicationDetailService;
 import com.github.nosan.boot.autoconfigure.embedded.cassandra.EmbeddedCassandraAutoConfiguration;
 import com.google.common.collect.Sets;
 
