@@ -6,8 +6,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Import;
 
+import com.exemple.authorization.application.core.ApplicationConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
-import com.exemple.service.application.core.ApplicationConfiguration;
 
 @SpringBootApplication(exclude = CassandraAutoConfiguration.class)
 @Import({ ApplicationConfiguration.class, ResourceConfiguration.class })

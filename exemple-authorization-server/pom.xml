@@ -49,8 +49,8 @@
 
 		<dependency>
 			<groupId>exemple</groupId>
-			<artifactId>exemple-service-application</artifactId>
-			<version>${exemple-service-version}</version>
+			<artifactId>exemple-authorization-application</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<!-- SPRING BOOT -->

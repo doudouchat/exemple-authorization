@@ -1,0 +1,10 @@
+application:
+   zookeeper:
+      host: 127.0.0.1:${zmp.clientPort}
+      port: ${zmp.clientPort}
+      sessionTimeout: 30000
+      connectionTimeout: 10000
+      retry: 3
+      sleepMsBetweenRetries: 1000
+      ttlMs:
+         product: 30000

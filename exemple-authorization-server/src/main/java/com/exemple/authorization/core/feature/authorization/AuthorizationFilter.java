@@ -15,11 +15,11 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 
 import com.auth0.jwt.JWT;
+import com.exemple.authorization.application.common.model.ApplicationDetail;
+import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.common.security.AuthorizationContextSecurity;
 import com.exemple.authorization.core.feature.FeatureConfiguration;
 import com.exemple.authorization.core.resource.keyspace.AuthorizationResourceKeyspace;
-import com.exemple.service.application.common.model.ApplicationDetail;
-import com.exemple.service.application.detail.ApplicationDetailService;
 
 @Priority(Priorities.AUTHENTICATION)
 public class AuthorizationFilter implements ContainerRequestFilter {
