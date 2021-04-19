@@ -57,7 +57,7 @@ public class DisconnectionApi {
         hazelcastInstance.getMap(AuthorizationTokenConfiguration.TOKEN_BLACK_LIST)
                 .put(payload.getId(), payload.getExpiresAt(),
                         ChronoUnit.SECONDS.between(LocalDateTime.now(),
-                                Instant.ofEpochSecond(payload.getExpiresAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime()),
+                                Instant.ofEpochMilli(payload.getExpiresAt().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime()),
                         TimeUnit.SECONDS);
     }
 
