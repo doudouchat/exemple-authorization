@@ -43,7 +43,7 @@
 		<!-- VERSION -->
 
 		<org.springframework-version>5.2.14.RELEASE</org.springframework-version>
-		<org.springframework.boot-version>2.3.9.RELEASE</org.springframework.boot-version>
+		<org.springframework.boot-version>2.3.10.RELEASE</org.springframework.boot-version>
 		<org.springframework.kafka-version>2.6.7</org.springframework.kafka-version>
 		<org.slf4j-version>1.7.30</org.slf4j-version>
 		<datastax-version>4.11.0</datastax-version>
