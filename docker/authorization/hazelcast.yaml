@@ -2,3 +2,5 @@ hazelcast-client:
    network:
       cluster-members:
       - 172.17.0.1:5706
+   classNames:
+   - org.springframework.session.hazelcast.Hazelcast4SessionUpdateEntryProcessor

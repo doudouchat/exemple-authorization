@@ -101,6 +101,11 @@ public class IntegrationTestConfiguration {
 
         authorizationClientBuilder
 
+                .withClient("test").secret(password).authorizedGrantTypes("client_credentials").redirectUris("xxx").scopes("account")
+                .autoApprove("account").authorities("ROLE_APP").resourceIds("exemple").additionalInformation("keyspace=test")
+
+                .and()
+
                 .withClient("test_user").secret(password).authorizedGrantTypes("password", "authorization_code", "refresh_token").redirectUris("xxx")
                 .scopes("account").autoApprove("account").authorities("ROLE_APP").resourceIds("exemple").additionalInformation("keyspace=test")
 

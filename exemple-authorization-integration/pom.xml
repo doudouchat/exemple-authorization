@@ -98,6 +98,12 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 			<classifier>classes</classifier>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.session</groupId>
+					<artifactId>spring-session-hazelcast</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- SPRING BOOT -->

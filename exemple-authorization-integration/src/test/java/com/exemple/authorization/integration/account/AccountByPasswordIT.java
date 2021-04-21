@@ -19,7 +19,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
 @ContextConfiguration(classes = IntegrationTestConfiguration.class)
-public class AccountIT extends AbstractTestNGSpringContextTests {
+public class AccountByPasswordIT extends AbstractTestNGSpringContextTests {
 
     private String accessToken = null;
 
