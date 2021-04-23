@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
@@ -18,6 +19,7 @@ public class HazelcastConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(HazelcastConfiguration.class);
 
     @Bean
+    @Primary
     public HazelcastInstance hazelcastInstance(@Value("${authorization.embedded.hazelcast.port}") int port) {
 
         LOG.info("STARTING EMBEDDED HAZELCAST");
@@ -26,6 +28,7 @@ public class HazelcastConfiguration {
         config.getNetworkConfig().setPort(port);
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
+        config.getUserCodeDeploymentConfig().setEnabled(true);
 
         return Hazelcast.newHazelcastInstance(config);
     }
