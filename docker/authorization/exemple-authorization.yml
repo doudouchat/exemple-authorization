@@ -10,6 +10,8 @@ authorization:
       password: mypass
    kafka:
       bootstrap-servers: localhost:10025
+   hazelcast:
+      addresses: 172.17.0.1:5706
 application:
    zookeeper:
       host: 172.17.0.1:10024
