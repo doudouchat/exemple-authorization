@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -43,7 +44,7 @@ public class AuthorizationTokenConfiguration {
 
     private final KeyStoreKeyFactory keyStoreKeyFactory;
 
-    public AuthorizationTokenConfiguration(ResourceLoader resourceLoader, HazelcastInstance hazelcastInstance,
+    public AuthorizationTokenConfiguration(ResourceLoader resourceLoader, @Qualifier("client") HazelcastInstance hazelcastInstance,
             @Value("${authorization.certificat.location}") String location, @Value("${authorization.certificat.alias}") String alias,
             @Value("${authorization.certificat.password}") String password) {
 

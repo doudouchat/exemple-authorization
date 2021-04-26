@@ -4,14 +4,22 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.session.MapSession;
-import org.springframework.session.Session;
-import org.springframework.session.hazelcast.Hazelcast4SessionUpdateEntryProcessor;
+import org.springframework.session.hazelcast.Hazelcast4IndexedSessionRepository;
+import org.springframework.session.hazelcast.Hazelcast4PrincipalNameExtractor;
+import org.springframework.session.hazelcast.HazelcastSessionSerializer;
+import org.springframework.session.hazelcast.config.annotation.SpringSessionHazelcastInstance;
 import org.springframework.session.hazelcast.config.annotation.web.http.EnableHazelcastHttpSession;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.config.AttributeConfig;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.IndexConfig;
+import com.hazelcast.config.IndexType;
+import com.hazelcast.config.SerializerConfig;
+import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
 @EnableHazelcastHttpSession
@@ -24,12 +32,32 @@ public class HazelcastHttpSessionConfiguration {
     }
 
     @Bean
-    public HazelcastInstance client(@Value("${authorization.hazelcast.addresses}") String[] addresses) {
+    @SpringSessionHazelcastInstance
+    public HazelcastInstance hazelcastInstance() {
+
+        Config config = new Config();
+        config.setClusterName("authorization-cluster");
+
+        AttributeConfig attributeConfig = new AttributeConfig().setName(Hazelcast4IndexedSessionRepository.PRINCIPAL_NAME_ATTRIBUTE)
+                .setExtractorClassName(Hazelcast4PrincipalNameExtractor.class.getName());
+
+        config.getMapConfig(Hazelcast4IndexedSessionRepository.DEFAULT_SESSION_MAP_NAME).addAttributeConfig(attributeConfig)
+                .addIndexConfig(new IndexConfig(IndexType.HASH, Hazelcast4IndexedSessionRepository.PRINCIPAL_NAME_ATTRIBUTE));
+
+        SerializerConfig serializerConfig = new SerializerConfig();
+        serializerConfig.setImplementation(new HazelcastSessionSerializer()).setTypeClass(MapSession.class);
+        config.getSerializationConfig().addSerializerConfig(serializerConfig);
+
+        return Hazelcast.newHazelcastInstance(config);
+    }
+
+    @Bean
+    public HazelcastInstance client(@Value("${authorization.hazelcast.cluster}") String cluster,
+            @Value("${authorization.hazelcast.addresses}") String[] addresses) {
         ClientConfig clientConfig = new ClientConfig();
+        clientConfig.setClusterName(cluster);
 
         clientConfig.getNetworkConfig().addAddress(addresses);
-        clientConfig.getUserCodeDeploymentConfig().setEnabled(true).addClass(Session.class).addClass(MapSession.class)
-                .addClass(Hazelcast4SessionUpdateEntryProcessor.class);
 
         return HazelcastClient.newHazelcastClient(clientConfig);
     }

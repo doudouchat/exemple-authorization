@@ -23,7 +23,6 @@ import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.authentication.AuthenticationConfiguration;
 import com.exemple.authorization.core.client.AuthorizationClientTestConfiguration;
-import com.exemple.authorization.core.embedded.HazelcastConfiguration;
 import com.exemple.authorization.core.feature.FeatureTestConfiguration;
 import com.exemple.authorization.core.property.AuthorizationPropertyConfiguration;
 import com.exemple.authorization.core.resource.keyspace.AuthorizationResourceKeyspace;
@@ -37,7 +36,7 @@ import com.google.common.collect.Sets;
 @Configuration
 @Import({ AuthorizationConfiguration.class, AuthenticationConfiguration.class, AuthorizationTokenConfiguration.class,
         HazelcastHttpSessionConfiguration.class, SwaggerConfiguration.class, AuthorizationClientTestConfiguration.class,
-        FeatureTestConfiguration.class, HazelcastConfiguration.class })
+        FeatureTestConfiguration.class })
 @ComponentScan(basePackageClasses = AuthorizationResourceKeyspace.class)
 @EnableAutoConfiguration(exclude = { CassandraAutoConfiguration.class, EmbeddedCassandraAutoConfiguration.class })
 public class AuthorizationTestConfiguration extends AuthorizationPropertyConfiguration {

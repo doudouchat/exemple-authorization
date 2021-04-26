@@ -1,4 +1,0 @@
-authorization:
-   embedded:
-      hazelcast:
-         port: ${hazelcast.port}
