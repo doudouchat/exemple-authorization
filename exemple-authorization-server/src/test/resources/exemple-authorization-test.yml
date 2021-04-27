@@ -17,8 +17,5 @@ authorization:
       embedded:
          dir: ${kafka.broker.logs-dir}
          port: ${kafka.port}
-   hazelcast:
-      addresses: localhost:5701
-      cluster: "authorization-cluster"
    password:
       expiryTime: 60

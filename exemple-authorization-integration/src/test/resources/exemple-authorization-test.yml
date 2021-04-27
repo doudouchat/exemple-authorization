@@ -10,9 +10,6 @@ authorization:
       password: mypass
    kafka:
       bootstrap-servers: localhost:${kafka.port}
-   hazelcast:
-      addresses: localhost:5701
-      cluster: "authorization-cluster"
 application:
    zookeeper:
       host: 127.0.0.1:${zookeeper.port}

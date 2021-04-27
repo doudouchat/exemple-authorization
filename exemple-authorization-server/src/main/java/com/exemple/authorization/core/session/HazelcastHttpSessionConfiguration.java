@@ -1,6 +1,5 @@
 package com.exemple.authorization.core.session;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.session.MapSession;
@@ -35,8 +34,7 @@ public class HazelcastHttpSessionConfiguration {
     @SpringSessionHazelcastInstance
     public HazelcastInstance hazelcastInstance() {
 
-        Config config = new Config();
-        config.setClusterName("authorization-cluster");
+        Config config = Config.load();
 
         AttributeConfig attributeConfig = new AttributeConfig().setName(Hazelcast4IndexedSessionRepository.PRINCIPAL_NAME_ATTRIBUTE)
                 .setExtractorClassName(Hazelcast4PrincipalNameExtractor.class.getName());
@@ -52,13 +50,8 @@ public class HazelcastHttpSessionConfiguration {
     }
 
     @Bean
-    public HazelcastInstance client(@Value("${authorization.hazelcast.cluster}") String cluster,
-            @Value("${authorization.hazelcast.addresses}") String[] addresses) {
-        ClientConfig clientConfig = new ClientConfig();
-        clientConfig.setClusterName(cluster);
-
-        clientConfig.getNetworkConfig().addAddress(addresses);
-
+    public HazelcastInstance client() {
+        ClientConfig clientConfig = ClientConfig.load();
         return HazelcastClient.newHazelcastClient(clientConfig);
     }
 
