@@ -47,7 +47,7 @@
 		<org.springframework.kafka-version>2.7.0</org.springframework.kafka-version>
 		<org.slf4j-version>1.7.30</org.slf4j-version>
 		<datastax-version>4.11.0</datastax-version>
-		<groovy-version>3.0.7</groovy-version>
+		<groovy-version>3.0.8</groovy-version>
 		<cassandra-version>3.11.9</cassandra-version>
 
 		<!-- SONAR -->
