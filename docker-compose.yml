@@ -7,7 +7,7 @@ services:
     - test
     - authorization
     environment:
-    - "CATALINA_OPTS=-Dlogging.config=file:/usr/local/tomcat/etc/logback.groovy -Dhazelcast.client.config=/usr/local/tomcat/etc/hazelcast.yaml"
+    - "CATALINA_OPTS=-Dlogging.config=file:/usr/local/tomcat/etc/logback.groovy -Dhazelcast.config=/usr/local/tomcat/etc/hazelcast.yaml -Dhazelcast.client.config=/usr/local/tomcat/etc/hazelcast-client.yaml"
     - "JAVA_OPTS=-Xms256m -Xmx512m -XX:MetaspaceSize=128m"
     ports:
     - 8090:8080

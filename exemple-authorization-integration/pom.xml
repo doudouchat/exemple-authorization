@@ -398,6 +398,10 @@
 						<artifactId>cargo-maven3-plugin</artifactId>
 						<configuration>
 							<container>
+								<systemProperties>
+									<hazelcast.config>${project.build.testOutputDirectory}/hazelcast.yaml</hazelcast.config>
+									<hazelcast.client.config>${project.build.testOutputDirectory}/hazelcast-client.yaml</hazelcast.client.config>
+								</systemProperties>
 								<dependencies>
 									<dependency>
 										<groupId>${project.groupId}</groupId>
