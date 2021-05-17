@@ -186,11 +186,9 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
         Payload payload = parser.parsePayload(response.getBody().print());
 
         assertThat(payload.getSubject(), is(this.username));
-        assertThat(payload.getClaim("aud").asArray(String.class), arrayContainingInAnyOrder("app1", "app2"));
         assertThat(payload.getClaim("authorities").asArray(String.class), arrayContainingInAnyOrder("ROLE_TRUSTED_CLIENT"));
         assertThat(payload.getClaim("scope").asArray(String.class), arrayContainingInAnyOrder("login:read", "login:update"));
         assertThat(payload.getExpiresAt(), is(Date.from(Instant.now(clock).plusSeconds(expiryTime))));
-        assertThat(payload.getClaim("singleUse").asBoolean(), is(true));
         assertThat(payload.getId(), is(notNullValue()));
 
     }

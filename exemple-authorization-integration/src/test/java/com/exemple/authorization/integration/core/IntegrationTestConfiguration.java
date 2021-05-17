@@ -105,13 +105,16 @@ public class IntegrationTestConfiguration {
 
         authorizationClientBuilder
 
-                .withClient("test").secret(password).authorizedGrantTypes("client_credentials").redirectUris("xxx").scopes("account")
-                .autoApprove("account").authorities("ROLE_APP").resourceIds("exemple").additionalInformation("keyspace=test")
+                .withClient("test").secret(password).authorizedGrantTypes("client_credentials").redirectUris("xxx")
+                .scopes("account", "login:update", "login:head").autoApprove("account", "login:update", "login:head").authorities("ROLE_APP")
+                .resourceIds("exemple").additionalInformation("keyspace=test")
 
                 .and()
 
                 .withClient("test_user").secret(password).authorizedGrantTypes("password", "authorization_code", "refresh_token").redirectUris("xxx")
-                .scopes("account").autoApprove("account").authorities("ROLE_APP").resourceIds("exemple").additionalInformation("keyspace=test")
+                .scopes("account", "login:head", "login:update", "login:read", "login:delete")
+                .autoApprove("account", "login:head", "login:update", "login:read", "login:delete").authorities("ROLE_APP").resourceIds("exemple")
+                .additionalInformation("keyspace=test")
 
                 .and()
 

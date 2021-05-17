@@ -16,6 +16,11 @@
 			<package name="com.exemple.authorization.integration.back" />
 		</packages>
 	</test>
+	<test name="login">
+		<packages>
+			<package name="com.exemple.authorization.integration.login" />
+		</packages>
+	</test>
 	<test name="password">
 		<packages>
 			<package name="com.exemple.authorization.integration.password" />

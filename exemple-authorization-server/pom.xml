@@ -141,6 +141,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- BCRYPT -->
+
+		<dependency>
+			<groupId>org.mindrot</groupId>
+			<artifactId>jbcrypt</artifactId>
+		</dependency>
+
 		<!-- CASSANDRA EMBEDDED -->
 
 		<dependency>
@@ -194,14 +201,6 @@
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
-		</dependency>
-
-		<!-- BCRYPT -->
-
-		<dependency>
-			<groupId>org.mindrot</groupId>
-			<artifactId>jbcrypt</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- JWT TOKEN -->

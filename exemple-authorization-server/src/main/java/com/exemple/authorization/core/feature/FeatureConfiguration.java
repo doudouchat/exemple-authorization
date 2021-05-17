@@ -33,7 +33,7 @@ import com.exemple.authorization.password.properties.PasswordProperties;
 
 @Configuration
 @ApplicationPath("/ws")
-@ComponentScan(basePackages = { "com.exemple.authorization.disconnection", "com.exemple.authorization.password" })
+@ComponentScan(basePackages = { "com.exemple.authorization.disconnection", "com.exemple.authorization.password", "com.exemple.authorization.login" })
 @EnableConfigurationProperties(PasswordProperties.class)
 public class FeatureConfiguration extends ResourceConfig {
 
@@ -59,6 +59,8 @@ public class FeatureConfiguration extends ResourceConfig {
 
         // Resources
         packages(
+                // login feature
+                "com.exemple.authorization.login",
                 // password feature
                 "com.exemple.authorization.password",
                 // disconnection feature
