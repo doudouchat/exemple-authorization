@@ -50,11 +50,11 @@ public class ApplicationDetailServiceImpl implements ApplicationDetailService {
     }
 
     @Override
-    public void put(String application, ApplicationDetail detail) {
+    public void put(String application, JsonNode detail) {
 
         LOG.debug("Put detail {} for application {}", detail, application);
 
-        createDetail(application, MAPPER.convertValue(detail, JsonNode.class));
+        createDetail(application, detail);
 
     }
 

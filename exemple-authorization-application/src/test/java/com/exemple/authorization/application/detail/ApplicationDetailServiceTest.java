@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +17,14 @@ import org.testng.annotations.Test;
 import com.exemple.authorization.application.common.exception.NotFoundApplicationException;
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.core.ApplicationTestConfiguration;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 
 @ContextConfiguration(classes = { ApplicationTestConfiguration.class })
 public class ApplicationDetailServiceTest extends AbstractTestNGSpringContextTests {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private ApplicationDetailService service;
@@ -26,12 +32,13 @@ public class ApplicationDetailServiceTest extends AbstractTestNGSpringContextTes
     @Test
     public void put() {
 
-        ApplicationDetail detail = new ApplicationDetail();
-        detail.setKeyspace("keyspace1");
-        detail.setExpiryTimePassword(100L);
-        detail.setClientIds(Sets.newHashSet("clientId1"));
+        Map<String, Object> detail = new HashMap<>();
+        detail.put("authorization_keyspace", "keyspace1");
+        detail.put("expiryTimePassword", 100L);
+        detail.put("authorization_clientIds", Sets.newHashSet("clientId1"));
+        detail.put("other", "other");
 
-        service.put("app", detail);
+        service.put("app", MAPPER.convertValue(detail, JsonNode.class));
 
     }
 

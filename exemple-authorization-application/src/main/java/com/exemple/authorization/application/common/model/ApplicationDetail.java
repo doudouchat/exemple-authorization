@@ -3,10 +3,14 @@ package com.exemple.authorization.application.common.model;
 import java.util.Collections;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ApplicationDetail {
 
+    @JsonProperty("authorization_keyspace")
     private String keyspace;
 
+    @JsonProperty("authorization_clientIds")
     private Set<String> clientIds;
 
     private Long expiryTimePassword;

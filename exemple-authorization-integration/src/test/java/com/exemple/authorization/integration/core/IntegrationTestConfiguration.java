@@ -22,6 +22,8 @@ import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.client.AuthorizationClientBuilder;
 import com.exemple.authorization.core.client.AuthorizationClientConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.nosan.embedded.cassandra.commons.FileSystemResource;
 import com.github.nosan.embedded.cassandra.commons.Resource;
 import com.github.nosan.embedded.cassandra.cql.CqlScript;
@@ -40,6 +42,8 @@ public class IntegrationTestConfiguration {
     public static final String APP_USER = "test";
 
     public static final String APP_ADMIN = "admin";
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private ApplicationDetailService applicationDetailService;
@@ -82,7 +86,7 @@ public class IntegrationTestConfiguration {
         detail.setKeyspace("test");
         detail.setClientIds(Sets.newHashSet("test", "test_user"));
 
-        applicationDetailService.put("test", detail);
+        applicationDetailService.put("test", MAPPER.convertValue(detail, JsonNode.class));
 
         // ADMIN
 
@@ -90,7 +94,7 @@ public class IntegrationTestConfiguration {
         adminDetail.setKeyspace("test");
         adminDetail.setClientIds(Sets.newHashSet("admin"));
 
-        applicationDetailService.put("admin", adminDetail);
+        applicationDetailService.put("admin", MAPPER.convertValue(adminDetail, JsonNode.class));
 
     }
 
