@@ -9,8 +9,12 @@ services:
     environment:
     - "CATALINA_OPTS=-Dlogging.config=file:/usr/local/tomcat/etc/logback.groovy -Dhazelcast.config=/usr/local/tomcat/etc/hazelcast.yaml -Dhazelcast.client.config=/usr/local/tomcat/etc/hazelcast-client.yaml"
     - "JAVA_OPTS=-Xms256m -Xmx512m -XX:MetaspaceSize=128m"
+    - "JPDA_ADDRESS=8000"
+    - "JPDA_TRANSPORT=dt_socket"
+    entrypoint: /usr/local/tomcat/bin/catalina.sh jpda run
     ports:
     - 8090:8080
+    - 9090:8000
     volumes:
     - ./docker/authorization:/usr/local/tomcat/etc
     healthcheck:
