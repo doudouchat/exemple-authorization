@@ -51,11 +51,9 @@ public class AccessTokenBuilder {
 
                 .withArrayClaim("scope", new String[] { "login:update", "login:read" })
 
-                .withSubject(newPassword.getLogin()).withExpiresAt(expiresAt).withClaim("singleUse", Boolean.TRUE)
+                .withSubject(newPassword.getLogin()).withExpiresAt(expiresAt)
 
                 .withClaim("client_id", securityContext.getAuthentication().getOAuth2Request().getClientId())
-
-                .withAudience(securityContext.getAuthentication().getOAuth2Request().getResourceIds().toArray(new String[0]))
 
                 .withArrayClaim("authorities",
                         securityContext.getAuthentication().getOAuth2Request().getAuthorities().stream().map(GrantedAuthority::getAuthority)

@@ -1,9 +1,12 @@
 package com.exemple.authorization.common.security;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.Optional;
 
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
@@ -22,12 +25,14 @@ public class AuthorizationContextSecurity implements SecurityContext {
 
     @Override
     public Principal getUserPrincipal() {
-        return () -> authentication.getPrincipal().toString();
+        return () -> ObjectUtils.defaultIfNull(payload.getSubject(), authentication.getPrincipal().toString());
     }
 
     @Override
     public boolean isUserInRole(String role) {
-        return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch((String authority) -> authority.equals(role));
+        return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch((String authority) -> authority.equals(role))
+                || Optional.ofNullable(payload.getClaim("scope").asList(String.class)).orElseGet(Collections::emptyList).stream()
+                        .anyMatch((String scope) -> scope.equals(role));
     }
 
     @Override

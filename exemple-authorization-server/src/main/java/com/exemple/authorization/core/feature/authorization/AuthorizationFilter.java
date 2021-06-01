@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
+import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 
@@ -61,7 +62,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
                 authorizationResourceKeyspace.initKeyspace(applicationDetail.getKeyspace());
 
-            } catch (InvalidTokenException e) {
+            } catch (OAuth2Exception e) {
 
                 requestContext.abortWith(build(e));
             }
@@ -69,9 +70,9 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     }
 
-    private static Response build(InvalidTokenException e) {
+    private static Response build(OAuth2Exception e) {
 
-        return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        return Response.status(e.getHttpErrorCode()).entity(e.getMessage()).build();
     }
 
 }

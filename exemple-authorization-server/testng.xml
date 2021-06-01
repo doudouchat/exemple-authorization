@@ -40,4 +40,9 @@
 			<package name="com.exemple.authorization.disconnection" />
 		</packages>
 	</test>
+	<test name="ut login">
+		<packages>
+			<package name="com.exemple.authorization.login" />
+		</packages>
+	</test>
 </suite>

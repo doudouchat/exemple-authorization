@@ -186,11 +186,9 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
         Payload payload = parser.parsePayload(response.getBody().print());
 
         assertThat(payload.getSubject(), is(this.username));
-        assertThat(payload.getClaim("aud").asArray(String.class), arrayContainingInAnyOrder("app1", "app2"));
         assertThat(payload.getClaim("authorities").asArray(String.class), arrayContainingInAnyOrder("ROLE_TRUSTED_CLIENT"));
         assertThat(payload.getClaim("scope").asArray(String.class), arrayContainingInAnyOrder("login:read", "login:update"));
         assertThat(payload.getExpiresAt(), is(Date.from(Instant.now(clock).plusSeconds(expiryTime))));
-        assertThat(payload.getClaim("singleUse").asBoolean(), is(true));
         assertThat(payload.getId(), is(notNullValue()));
 
     }
@@ -211,25 +209,25 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
 
         return new Object[][] {
                 // not authorities to access
-                { "Authorization", "Bearer " + accessToken1 },
+                { "Authorization", "Bearer " + accessToken1, HttpStatus.FORBIDDEN },
                 // token is expired
-                { "Authorization", "Bearer " + accessToken2 },
+                { "Authorization", "Bearer " + accessToken2, HttpStatus.UNAUTHORIZED },
                 // not bearer
-                { "Authorization", accessToken3 },
+                { "Authorization", accessToken3, HttpStatus.FORBIDDEN },
                 // not token
-                { "Header", "Bearer " + accessToken3 },
+                { "Header", "Bearer " + accessToken3, HttpStatus.FORBIDDEN },
                 // auhorities is empty
-                { "Authorization", "Bearer " + accessToken4 },
+                { "Authorization", "Bearer " + accessToken4, HttpStatus.FORBIDDEN },
                 // token no recognized
-                { "Authorization", "Bearer toto" },
+                { "Authorization", "Bearer toto", HttpStatus.UNAUTHORIZED },
                 // bad client id
-                { "Authorization", "Bearer " + accessToken5 }
+                { "Authorization", "Bearer " + accessToken5, HttpStatus.UNAUTHORIZED }
 
         };
     }
 
     @Test(dataProvider = "passwordFailureForbidden")
-    public void passwordFailureForbidden(String header, String headerValue) {
+    public void passwordFailureForbidden(String header, String headerValue, HttpStatus expectedStatus) {
 
         String login = "jean.dupond@gmail.com";
 
@@ -239,7 +237,7 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
         Response response = requestSpecification.contentType(ContentType.JSON).header(header, headerValue).header("app", "app").body(newPassword)
                 .post(restTemplate.getRootUri() + "/ws/v1/new_password");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN.value()));
+        assertThat(response.getStatusCode(), is(expectedStatus.value()));
 
     }
 
