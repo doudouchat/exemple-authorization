@@ -13,3 +13,15 @@ authorization:
 application:
    zookeeper:
       host: 172.17.0.1:10024
+management:
+   endpoints:
+      web:
+         exposure:
+            include:
+             - info
+             - health
+   endpoint:
+      info:
+         enabled: true
+      health:
+         enabled: true

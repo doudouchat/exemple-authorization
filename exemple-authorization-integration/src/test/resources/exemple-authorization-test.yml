@@ -13,6 +13,18 @@ authorization:
 application:
    zookeeper:
       host: 127.0.0.1:${zookeeper.port}
+management:
+   endpoints:
+      web:
+         exposure:
+            include:
+             - info
+             - health
+   endpoint:
+      info:
+         enabled: true
+      health:
+         enabled: true
 spring:
    security:
       oauth2:
