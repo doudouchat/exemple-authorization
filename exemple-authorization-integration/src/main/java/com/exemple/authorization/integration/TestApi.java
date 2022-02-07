@@ -32,7 +32,7 @@ public class TestApi {
     }
 
     @PostMapping("/account")
-    @PreAuthorize("#oauth2.hasScope('login:update')")
+    @PreAuthorize("hasAuthority('login:update')")
     public void post() {
 
     }

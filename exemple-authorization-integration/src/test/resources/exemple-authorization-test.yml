@@ -13,13 +13,14 @@ authorization:
 application:
    zookeeper:
       host: 127.0.0.1:${zookeeper.port}
-security:
-   oauth2:
-      client:
-         clientId: resource
-         clientSecret: secret
-      resource:
-         tokenInfoUri: ${authorization.host}:${authorization.port}/${authorization.contextpath}/oauth/check_token
+spring:
+   security:
+      oauth2:
+         resourceserver:
+           opaque-token:
+              introspection-uri: ${authorization.host}:${authorization.port}/${authorization.contextpath}/oauth/check_token
+              client-id: resource
+              client-secret: secret
 zookeeper:
    embedded:
       port: ${zookeeper.port}
