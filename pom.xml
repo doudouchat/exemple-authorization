@@ -94,14 +94,6 @@
 				<version>1.1.1.RELEASE</version>
 			</dependency>
 
-			<!-- NIMBUS -->
-
-			<dependency>
-				<groupId>com.nimbusds</groupId>
-				<artifactId>nimbus-jose-jwt</artifactId>
-				<version>9.9.3</version>
-			</dependency>
-
 			<!-- SPRING KAFKA -->
 			<!-- https://spring.io/projects/spring-kafka -->
 
