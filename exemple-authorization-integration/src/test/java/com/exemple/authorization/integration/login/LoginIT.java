@@ -3,7 +3,6 @@ package com.exemple.authorization.integration.login;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -87,26 +86,6 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "create")
-    public void get() {
-
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
-
-                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
-
-                .header("Authorization", "Bearer " + accessToken)
-
-                .get(LoginIT.URL + "/" + USERNAME);
-
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
-
-        assertThat(response.jsonPath().get("password"), is(nullValue()));
-        assertThat(response.jsonPath().getString("username"), is(nullValue()));
-        assertThat(response.jsonPath().getString("disabled"), is("false"));
-        assertThat(response.jsonPath().getString("accountLocked"), is("false"));
-
-    }
-
-    @Test(dependsOnMethods = "create")
     public void head() {
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
@@ -121,7 +100,7 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
 
     }
 
-    @Test(dependsOnMethods = "get")
+    @Test(dependsOnMethods = "head")
     public void disable() {
 
         Map<String, Object> body = new HashMap<>();
@@ -171,7 +150,7 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
 
                 .header("Authorization", "Bearer " + accessToken)
 
-                .get(LoginIT.URL + "/" + USERNAME);
+                .head(LoginIT.URL + "/" + USERNAME);
 
         assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));
 
