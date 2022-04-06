@@ -28,7 +28,6 @@ import com.github.nosan.embedded.cassandra.commons.FileSystemResource;
 import com.github.nosan.embedded.cassandra.commons.Resource;
 import com.github.nosan.embedded.cassandra.cql.CqlScript;
 import com.github.nosan.embedded.cassandra.cql.ResourceCqlScript;
-import com.google.common.collect.Sets;
 
 @Configuration
 @Import({ ResourceConfiguration.class, ApplicationConfiguration.class, AuthorizationClientConfiguration.class })
@@ -82,17 +81,20 @@ public class IntegrationTestConfiguration {
 
         // APP
 
-        ApplicationDetail detail = new ApplicationDetail();
-        detail.setKeyspace("test");
-        detail.setClientIds(Sets.newHashSet("test", "test_user"));
+        ApplicationDetail detail = ApplicationDetail.builder()
+                .keyspace("test")
+                .clientId("test")
+                .clientId("test_user")
+                .build();
 
         applicationDetailService.put("test", MAPPER.convertValue(detail, JsonNode.class));
 
         // ADMIN
 
-        ApplicationDetail adminDetail = new ApplicationDetail();
-        adminDetail.setKeyspace("test");
-        adminDetail.setClientIds(Sets.newHashSet("admin"));
+        ApplicationDetail adminDetail = ApplicationDetail.builder()
+                .keyspace("test")
+                .clientId("admin")
+                .build();
 
         applicationDetailService.put("admin", MAPPER.convertValue(adminDetail, JsonNode.class));
 

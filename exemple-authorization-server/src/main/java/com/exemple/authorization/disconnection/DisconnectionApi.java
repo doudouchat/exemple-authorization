@@ -25,19 +25,18 @@ import com.exemple.authorization.common.security.AuthorizationContextSecurity;
 import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
 import com.hazelcast.core.HazelcastInstance;
 
+import lombok.RequiredArgsConstructor;
+
 @Path("/v1/disconnection")
 @Component
+@RequiredArgsConstructor
 public class DisconnectionApi {
 
     @Context
     private ContainerRequestContext servletContext;
 
+    @Qualifier("client")
     private final HazelcastInstance hazelcastInstance;
-
-    public DisconnectionApi(@Qualifier("client") HazelcastInstance hazelcastInstance) {
-
-        this.hazelcastInstance = hazelcastInstance;
-    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

@@ -31,8 +31,11 @@ import com.exemple.authorization.password.token.AccessTokenBuilder;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.login.model.LoginEntity;
 
+import lombok.RequiredArgsConstructor;
+
 @Path("/v1/new_password")
 @Component
+@RequiredArgsConstructor
 public class NewPasswordApi {
 
     @Context
@@ -43,13 +46,6 @@ public class NewPasswordApi {
     private final KafkaTemplate<String, Map<String, Object>> template;
 
     private final AccessTokenBuilder accessTokenBuilder;
-
-    public NewPasswordApi(LoginResource loginResource, KafkaTemplate<String, Map<String, Object>> template, AccessTokenBuilder accessTokenBuilder) {
-
-        this.loginResource = loginResource;
-        this.template = template;
-        this.accessTokenBuilder = accessTokenBuilder;
-    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

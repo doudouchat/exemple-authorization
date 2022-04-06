@@ -31,7 +31,6 @@ import com.exemple.authorization.core.swagger.SwaggerConfiguration;
 import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.github.nosan.boot.autoconfigure.embedded.cassandra.EmbeddedCassandraAutoConfiguration;
-import com.google.common.collect.Sets;
 
 @Configuration
 @Import({ AuthorizationConfiguration.class, AuthenticationConfiguration.class, AuthorizationTokenConfiguration.class,
@@ -51,9 +50,10 @@ public class AuthorizationTestConfiguration extends AuthorizationPropertyConfigu
 
         ApplicationDetailService service = Mockito.mock(ApplicationDetailService.class);
 
-        ApplicationDetail detail = new ApplicationDetail();
-        detail.setKeyspace("test");
-        detail.setClientIds(Sets.newHashSet("clientId1"));
+        ApplicationDetail detail = ApplicationDetail.builder()
+                .keyspace("test")
+                .clientId("clientId1")
+                .build();
 
         Mockito.when(service.get(Mockito.anyString())).thenReturn(detail);
 

@@ -10,15 +10,13 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.authorization.core.authentication.account.AccountDetailsService;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class AccountAuthenticationProvider extends DaoAuthenticationProvider {
 
     private final AccountDetailsService accountDetailsService;
-
-    public AccountAuthenticationProvider(AccountDetailsService accountDetailsService) {
-
-        this.accountDetailsService = accountDetailsService;
-    }
 
     @PostConstruct
     protected void init() {

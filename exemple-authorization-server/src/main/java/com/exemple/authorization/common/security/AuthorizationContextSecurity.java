@@ -12,16 +12,16 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
 import com.auth0.jwt.interfaces.Payload;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public class AuthorizationContextSecurity implements SecurityContext {
 
     private final OAuth2Authentication authentication;
 
     private final Payload payload;
-
-    public AuthorizationContextSecurity(OAuth2Authentication authentication, Payload payload) {
-        this.authentication = authentication;
-        this.payload = payload;
-    }
 
     @Override
     public Principal getUserPrincipal() {
@@ -43,13 +43,5 @@ public class AuthorizationContextSecurity implements SecurityContext {
     @Override
     public String getAuthenticationScheme() {
         return SecurityContext.BASIC_AUTH;
-    }
-
-    public OAuth2Authentication getAuthentication() {
-        return authentication;
-    }
-
-    public Payload getPayload() {
-        return payload;
     }
 }

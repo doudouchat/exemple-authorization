@@ -43,21 +43,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @Path("/v1/logins")
 @OpenAPIDefinition(tags = @Tag(name = "login"))
 @Component
+@RequiredArgsConstructor
 public class LoginApi {
 
     private final LoginResource loginResource;
 
     @Context
     private ContainerRequestContext servletContext;
-
-    public LoginApi(LoginResource loginResource) {
-
-        this.loginResource = loginResource;
-    }
 
     @HEAD
     @Path("/{username}")

@@ -16,7 +16,8 @@ public class ResourceCassandraConfiguration {
 
     private final File cassandraResource;
 
-    public ResourceCassandraConfiguration(@Value("${authorization.resource.cassandra.resource_configuration}") String cassandraResource)
+    public ResourceCassandraConfiguration(
+            @Value("${authorization.resource.cassandra.resource_configuration}") String cassandraResource)
             throws FileNotFoundException {
         this.cassandraResource = ResourceUtils.getFile(cassandraResource);
     }

@@ -17,18 +17,18 @@ import com.exemple.authorization.core.client.AuthorizationClientService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AuthorizationClientServiceImpl implements AuthorizationClientService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthorizationClientServiceImpl.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    @Qualifier("authorizationClientCuratorFramework")
     private final CuratorFramework client;
-
-    public AuthorizationClientServiceImpl(@Qualifier("authorizationClientCuratorFramework") CuratorFramework client) {
-        this.client = client;
-    }
 
     @Override
     public ClientDetails get(String clientId) {

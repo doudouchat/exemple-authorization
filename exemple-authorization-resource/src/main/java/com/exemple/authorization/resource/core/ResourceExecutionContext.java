@@ -2,15 +2,15 @@ package com.exemple.authorization.resource.core;
 
 import org.springframework.util.Assert;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ResourceExecutionContext {
 
     private static ThreadLocal<ResourceExecutionContext> executionContext = new ThreadLocal<>();
 
     private String keyspace;
-
-    private ResourceExecutionContext() {
-
-    }
 
     public static ResourceExecutionContext get() {
 

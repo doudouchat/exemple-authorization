@@ -8,19 +8,15 @@ import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class AuthorizationClientBuilder extends ClientDetailsServiceBuilder<AuthorizationClientBuilder> {
 
     private final AuthorizationClientService service;
 
-    private final Map<String, ClientDetails> clientDetails;
-
-    public AuthorizationClientBuilder(AuthorizationClientService service) {
-
-        this.service = service;
-        this.clientDetails = new HashMap<>();
-
-    }
+    private final Map<String, ClientDetails> clientDetails = new HashMap<>();
 
     @Override
     protected void addClient(String clientId, ClientDetails value) {
