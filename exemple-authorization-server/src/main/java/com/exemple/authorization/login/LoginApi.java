@@ -11,14 +11,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -122,27 +119,6 @@ public class LoginApi {
         }
 
         return response;
-
-    }
-
-    @GET
-    @Path("/{username}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Operation(tags = "login")
-    @ApiResponses(value = {
-
-            @ApiResponse(description = "Login Data", responseCode = "200"), @ApiResponse(description = "Login is not found", responseCode = "404"),
-            @ApiResponse(description = "Login is not accessible", responseCode = "403")
-
-    })
-    @RolesAllowed("login:read")
-    public LoginModel get(@PathParam("username") String username) {
-
-        checkIfUsernameHasRight(username, servletContext.getSecurityContext());
-
-        LoginEntity entity = loginResource.get(username).orElseThrow(NotFoundException::new);
-
-        return toLoginModel(entity);
 
     }
 
@@ -266,19 +242,6 @@ public class LoginApi {
         entity.setRoles(resource.getRoles());
 
         return entity;
-
-    }
-
-    private static LoginModel toLoginModel(LoginEntity resource) {
-
-        LoginModel model = new LoginModel();
-        model.setAccountLocked(resource.isAccountLocked());
-        model.setDisabled(resource.isDisabled());
-        model.setPassword(resource.getPassword());
-        model.setUsername(resource.getUsername());
-        model.setRoles(resource.getRoles());
-
-        return model;
 
     }
 

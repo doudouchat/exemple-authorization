@@ -3,7 +3,6 @@ package com.exemple.authorization.login;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 
 import java.net.URI;
@@ -34,7 +33,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.authorization.common.JsonNodeUtils;
 import com.exemple.authorization.common.LoggingFilter;
 import com.exemple.authorization.core.AuthorizationTestConfiguration;
-import com.exemple.authorization.login.model.LoginModel;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.login.exception.UsernameAlreadyExistsException;
 import com.exemple.authorization.resource.login.model.LoginEntity;
@@ -132,111 +130,6 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         // And check mock
 
         Mockito.verify(loginResource).get(Mockito.eq(username));
-
-    }
-
-    @Test
-    public void get() {
-
-        // Given user_name
-
-        String username = "jean.dupond@gmail.com";
-
-        // And mock service
-
-        LoginEntity entity = new LoginEntity();
-        entity.setUsername(username);
-        entity.setPassword("mdp123");
-        entity.setDisabled(true);
-        entity.setAccountLocked(true);
-        entity.setRoles(new HashSet<>(Arrays.asList("role1", "role2")));
-
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(entity));
-
-        // And token
-
-        String accessToken = JWT.create().withSubject(username).withArrayClaim("scope", new String[] { "login:read" })
-                .withClaim("client_id", "clientId1").sign(algorithm);
-
-        // When perform get
-
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .get(restTemplate.getRootUri() + URL + "/" + username);
-
-        // Then check status
-
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
-
-        // And check body
-
-        LoginModel actualLogin = response.as(LoginModel.class);
-
-        assertThat(actualLogin.getUsername(), is(nullValue()));
-        assertThat(actualLogin.getPassword(), is(nullValue()));
-        assertThat(actualLogin.getRoles(), containsInAnyOrder("role1", "role2"));
-        assertThat(actualLogin.isDisabled(), is(true));
-        assertThat(actualLogin.isAccountLocked(), is(true));
-
-        // And check mock
-
-        Mockito.verify(loginResource).get(Mockito.eq(username));
-
-    }
-
-    @Test
-    public void getNotFound() {
-
-        // Given user_name
-
-        String username = "jean.dupond@gmail.com";
-
-        // And mock service
-
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.empty());
-
-        // And token
-
-        String accessToken = JWT.create().withSubject(username).withArrayClaim("scope", new String[] { "login:read" })
-                .withClaim("client_id", "clientId1").sign(algorithm);
-
-        // When perform get
-
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .get(restTemplate.getRootUri() + URL + "/" + username);
-
-        // Then check status
-
-        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));
-
-        // And check mock
-
-        Mockito.verify(loginResource).get(Mockito.eq(username));
-
-    }
-
-    @Test
-    public void getForbidden() {
-
-        // Given user_name
-
-        String username = "jean.dupond@gmail.com";
-
-        // And token
-
-        String accessToken = JWT.create().withSubject("jean.dupont@gmail.com").withArrayClaim("scope", new String[] { "login:read" })
-                .withClaim("client_id", "clientId1").sign(algorithm);
-
-        // When perform get
-
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .get(restTemplate.getRootUri() + URL + "/" + username);
-
-        // Then check status
-
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN.value()));
-
-        // And check mock
-        Mockito.verify(loginResource, Mockito.never()).get(Mockito.any());
 
     }
 
