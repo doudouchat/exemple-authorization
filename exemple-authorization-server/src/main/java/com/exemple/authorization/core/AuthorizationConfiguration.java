@@ -17,8 +17,11 @@ import com.exemple.authorization.core.authentication.account.AccountDetailsServi
 import com.exemple.authorization.core.client.AuthorizationClientBuilder;
 import com.exemple.authorization.core.resource.keyspace.AuthorizationResourceKeyspace;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableAuthorizationServer
+@RequiredArgsConstructor
 public class AuthorizationConfiguration extends AuthorizationServerConfigurerAdapter {
 
     private final AuthenticationManager authenticationManager;
@@ -32,18 +35,6 @@ public class AuthorizationConfiguration extends AuthorizationServerConfigurerAda
     private final AuthorizationResourceKeyspace authorizationResourceKeyspace;
 
     private final AccountDetailsService accountDetailsService;
-
-    public AuthorizationConfiguration(AuthenticationManager authenticationManager, TokenStore tokenStore, TokenEnhancer tokenEnhancer,
-            AuthorizationClientBuilder authorizationClientBuilder, AuthorizationResourceKeyspace authorizationResourceKeyspace,
-            AccountDetailsService accountDetailsService) {
-
-        this.authenticationManager = authenticationManager;
-        this.tokenStore = tokenStore;
-        this.tokenEnhancer = tokenEnhancer;
-        this.authorizationClientBuilder = authorizationClientBuilder;
-        this.authorizationResourceKeyspace = authorizationResourceKeyspace;
-        this.accountDetailsService = accountDetailsService;
-    }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {

@@ -49,6 +49,7 @@
 		<datastax-version>4.12.0</datastax-version>
 		<groovy-version>3.0.8</groovy-version>
 		<cassandra-version>3.11.9</cassandra-version>
+		<lombok.version>1.18.22</lombok.version>
 
 		<!-- SONAR -->
 
@@ -234,6 +235,15 @@
 				<version>1.28</version>
 			</dependency>
 
+			<!-- LOMBOK -->
+
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+				<scope>provided</scope>
+			</dependency>
+
 			<!-- MOCKITO -->
 
 			<dependency>
@@ -389,6 +399,13 @@
 			<artifactId>snakeyaml</artifactId>
 		</dependency>
 
+		<!-- LOMBOK -->
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
 		<!-- TESTNG -->
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -413,6 +430,15 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.8.1</version>
+					<configuration>
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+								<version>${lombok.version}</version>
+							</path>
+						</annotationProcessorPaths>
+					</configuration>
 				</plugin>
 
 				<!-- RESSOURCES -->

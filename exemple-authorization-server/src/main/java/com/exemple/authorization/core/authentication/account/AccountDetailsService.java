@@ -13,15 +13,13 @@ import org.springframework.stereotype.Service;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.login.model.LoginEntity;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AccountDetailsService implements UserDetailsService {
 
     private final LoginResource loginResource;
-
-    public AccountDetailsService(LoginResource loginResource) {
-
-        this.loginResource = loginResource;
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) {

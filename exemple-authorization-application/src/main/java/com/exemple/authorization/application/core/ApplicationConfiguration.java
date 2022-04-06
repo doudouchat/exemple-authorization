@@ -10,33 +10,29 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @ComponentScan(basePackages = "com.exemple.authorization.application")
+@RequiredArgsConstructor
 public class ApplicationConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfiguration.class);
 
+    @Value("${application.zookeeper.host}")
     private final String address;
 
+    @Value("${application.zookeeper.sessionTimeout:30000}")
     private final int sessionTimeout;
 
+    @Value("${application.zookeeper.connectionTimeout:10000}")
     private final int connectionTimeout;
 
+    @Value("${application.zookeeper.retry:3}")
     private final int retry;
 
+    @Value("${application.zookeeper.sleepMsBetweenRetries:1000}")
     private final int sleepMsBetweenRetries;
-
-    public ApplicationConfiguration(@Value("${application.zookeeper.host}") String address,
-            @Value("${application.zookeeper.sessionTimeout:30000}") int sessionTimeout,
-            @Value("${application.zookeeper.connectionTimeout:10000}") int connectionTimeout, @Value("${application.zookeeper.retry:3}") int retry,
-            @Value("${application.zookeeper.sleepMsBetweenRetries:1000}") int sleepMsBetweenRetries) {
-
-        this.address = address;
-        this.sessionTimeout = sessionTimeout;
-        this.connectionTimeout = connectionTimeout;
-        this.retry = retry;
-        this.sleepMsBetweenRetries = sleepMsBetweenRetries;
-    }
 
     @Bean(initMethod = "start", destroyMethod = "close")
     public CuratorFramework applicationCuratorFramework() {

@@ -93,6 +93,11 @@
 				<configuration>
 					<annotationProcessorPaths>
 						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+						<path>
 							<groupId>com.datastax.oss</groupId>
 							<artifactId>java-driver-mapper-processor</artifactId>
 							<version>${datastax-version}</version>

@@ -20,8 +20,11 @@ import com.exemple.authorization.core.authentication.provider.AccountAuthenticat
 import com.exemple.authorization.core.authentication.provider.BackAuthenticationProvider;
 import com.exemple.authorization.core.resource.keyspace.AuthorizationResourceKeyspace;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @ComponentScan(basePackages = "com.exemple.authorization.core.authentication")
+@RequiredArgsConstructor
 public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
 
     private final DefaultTokenServices tokenServices;
@@ -31,15 +34,6 @@ public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
     private final BackAuthenticationProvider backAuthenticationProvider;
 
     private final AuthorizationResourceKeyspace authorizationResourceKeyspace;
-
-    public AuthenticationConfiguration(AccountAuthenticationProvider accountAuthenticationProvider,
-            BackAuthenticationProvider backAuthenticationProvider, DefaultTokenServices tokenServices,
-            AuthorizationResourceKeyspace authorizationResourceKeyspace) {
-        this.accountAuthenticationProvider = accountAuthenticationProvider;
-        this.backAuthenticationProvider = backAuthenticationProvider;
-        this.tokenServices = tokenServices;
-        this.authorizationResourceKeyspace = authorizationResourceKeyspace;
-    }
 
     @Autowired
     public void globalUserDetails(final AuthenticationManagerBuilder auth) {

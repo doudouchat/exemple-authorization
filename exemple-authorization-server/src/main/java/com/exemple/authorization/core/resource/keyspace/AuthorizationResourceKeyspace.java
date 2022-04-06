@@ -7,14 +7,13 @@ import org.springframework.stereotype.Component;
 import com.exemple.authorization.core.client.AuthorizationClientService;
 import com.exemple.authorization.resource.core.ResourceExecutionContext;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class AuthorizationResourceKeyspace {
 
     private final AuthorizationClientService authorizationClientService;
-
-    public AuthorizationResourceKeyspace(AuthorizationClientService authorizationClientService) {
-        this.authorizationClientService = authorizationClientService;
-    }
 
     public void initKeyspace(String keyspace) {
 

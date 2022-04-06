@@ -7,14 +7,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nimbusds.jose.jwk.JWKSet;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 public class JwkSetApi {
 
     private final JWKSet jwkSet;
-
-    public JwkSetApi(JWKSet jwkSet) {
-        this.jwkSet = jwkSet;
-    }
 
     @GetMapping("/.well-known/jwks.json")
     public Map<String, Object> publicKeys() {

@@ -2,28 +2,19 @@ package com.exemple.authorization.login.model;
 
 import javax.validation.constraints.NotBlank;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.jackson.Jacksonized;
+
+@Builder
+@Getter
+@Jacksonized
 public class CopyLoginModel {
 
     @NotBlank
-    private String toUsername;
+    private final String toUsername;
 
     @NotBlank
-    private String fromUsername;
-
-    public String getToUsername() {
-        return toUsername;
-    }
-
-    public void setToUsername(String toUsername) {
-        this.toUsername = toUsername;
-    }
-
-    public String getFromUsername() {
-        return fromUsername;
-    }
-
-    public void setFromUsername(String fromUsername) {
-        this.fromUsername = fromUsername;
-    }
+    private final String fromUsername;
 
 }

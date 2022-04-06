@@ -18,7 +18,10 @@ import com.exemple.authorization.common.security.AuthorizationContextSecurity;
 import com.exemple.authorization.password.model.NewPassword;
 import com.exemple.authorization.password.properties.PasswordProperties;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class AccessTokenBuilder {
 
     private final Algorithm algorithm;
@@ -28,15 +31,6 @@ public class AccessTokenBuilder {
     private final PasswordProperties passwordProperties;
 
     private final Clock clock;
-
-    public AccessTokenBuilder(Algorithm algorithm, ApplicationDetailService applicationDetailService, PasswordProperties passwordProperties,
-            Clock clock) {
-
-        this.algorithm = algorithm;
-        this.applicationDetailService = applicationDetailService;
-        this.passwordProperties = passwordProperties;
-        this.clock = clock;
-    }
 
     public String createAccessToken(NewPassword newPassword, String app, AuthorizationContextSecurity securityContext) {
 
