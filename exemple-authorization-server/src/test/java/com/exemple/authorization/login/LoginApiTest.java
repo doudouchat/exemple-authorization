@@ -329,69 +329,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void delete() {
-
-        // Given user_name
-
-        String username = "jean.dupond@gmail.com";
-
-        // And mock service
-
-        Mockito.doNothing().when(loginResource).delete(Mockito.eq(username));
-
-        // And token
-
-        String accessToken = JWT.create().withSubject(username).withArrayClaim("scope", new String[] { "login:delete" })
-                .withClaim("client_id", "clientId1").sign(algorithm);
-
-        // When perform get
-
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .delete(restTemplate.getRootUri() + URL + "/" + username);
-
-        // Then check status
-
-        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
-
-        // And check mock
-
-        Mockito.verify(loginResource).delete(Mockito.eq(username));
-
-    }
-
-    @Test
-    public void deleteForbidden() {
-
-        // Given user_name
-
-        String username = "jean.dupond@gmail.com";
-
-        // And mock service
-
-        Mockito.doNothing().when(loginResource).delete(Mockito.eq(username));
-
-        // And token
-
-        String accessToken = JWT.create().withSubject("jean.dupont@gmail.com").withArrayClaim("scope", new String[] { "login:delete" })
-                .withClaim("client_id", "clientId1").sign(algorithm);
-
-        // When perform get
-
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .delete(restTemplate.getRootUri() + URL + "/" + username);
-
-        // Then check status
-
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN.value()));
-
-        // And check mock
-
-        Mockito.verify(loginResource, Mockito.never()).delete(Mockito.any());
-
-    }
-
-    @Test
-    public void copy() throws UsernameAlreadyExistsException {
+    public void move() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -422,7 +360,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         login.put("toUsername", "jean.dupont@gmail.com");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .body(login).post(restTemplate.getRootUri() + URL + "/copy");
+                .body(login).post(restTemplate.getRootUri() + URL + "/move");
 
         // Then check status
 
@@ -446,10 +384,14 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         Mockito.verify(loginResource).get(Mockito.eq(username));
 
+        // And check mock
+
+        Mockito.verify(loginResource).delete(Mockito.eq(username));
+
     }
 
     @Test
-    public void copyFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException {
+    public void moveFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -472,7 +414,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         login.put("toUsername", "jean.dupont@gmail.com");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .body(login).post(restTemplate.getRootUri() + URL + "/copy");
+                .body(login).post(restTemplate.getRootUri() + URL + "/move");
 
         // Then check status
 
@@ -496,7 +438,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void copyFailsBecauseUsernameNotFound() throws UsernameAlreadyExistsException {
+    public void moveFailsBecauseUsernameNotFound() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -518,7 +460,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         login.put("toUsername", "jean.dupont@gmail.com");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .body(login).post(restTemplate.getRootUri() + URL + "/copy");
+                .body(login).post(restTemplate.getRootUri() + URL + "/move");
 
         // Then check status
 
@@ -542,7 +484,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void copyFailsBecauseForbidden() throws UsernameAlreadyExistsException {
+    public void moveFailsBecauseForbidden() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -560,7 +502,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         login.put("toUsername", "jean.dupont@gmail.com");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .body(login).post(restTemplate.getRootUri() + URL + "/copy");
+                .body(login).post(restTemplate.getRootUri() + URL + "/move");
 
         // Then check status
 
