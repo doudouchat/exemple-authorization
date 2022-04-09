@@ -9,7 +9,6 @@ import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
@@ -119,20 +118,8 @@ public class LoginApi {
 
     }
 
-    @DELETE
-    @Path("/{username}")
-    @Operation(tags = "login")
-    @RolesAllowed("login:delete")
-    public void delete(@NotNull @PathParam("username") String username) {
-
-        checkIfUsernameHasRight(username, servletContext.getSecurityContext());
-
-        loginResource.delete(username);
-
-    }
-
     @POST
-    @Path("/copy")
+    @Path("/move")
     @Operation(tags = "login")
     @ApiResponses(value = {
 
@@ -156,6 +143,8 @@ public class LoginApi {
         } catch (UsernameAlreadyExistsException e) {
             throw new LoginAlreadyExistsException(e.getUsername(), "/toUsername");
         }
+
+        loginResource.delete(copy.getFromUsername());
 
         UriBuilder builder = uriInfo.getBaseUriBuilder();
         builder.path("v1/logins/" + copy.getToUsername());

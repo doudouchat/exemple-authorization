@@ -87,6 +87,27 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "connection")
+    public void changeUsernameFailsBecauseUsernameAlreadyExists() {
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("toUsername", USERNAME);
+        body.put("fromUsername", USERNAME);
+
+        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
+
+                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
+
+                .header("Authorization", "Bearer " + accessToken)
+
+                .body(body).post(LoginUpdateUsernameIT.URL + "/move");
+
+        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(response.jsonPath().getList("code"), contains(is("username")));
+        assertThat(response.jsonPath().getList("path"), contains(is("/toUsername")));
+
+    }
+
+    @Test(dependsOnMethods = "changeUsernameFailsBecauseUsernameAlreadyExists")
     public void changeUsername() {
 
         String username = UUID.randomUUID() + "@gmail.com";
@@ -101,7 +122,7 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
 
                 .header("Authorization", "Bearer " + accessToken)
 
-                .body(body).post(LoginUpdateUsernameIT.URL + "/copy");
+                .body(body).post(LoginUpdateUsernameIT.URL + "/move");
 
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED.value()));
 
@@ -118,26 +139,16 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
         assertThat(response.jsonPath().getString("access_token"), is(notNullValue()));
 
-    }
-
-    @Test(dependsOnMethods = "connection")
-    public void changeUsernameFailsBecauseUsernameAlreadyExists() {
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("toUsername", USERNAME);
-        body.put("fromUsername", USERNAME);
-
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
+        response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
 
                 .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
 
                 .header("Authorization", "Bearer " + accessToken)
 
-                .body(body).post(LoginUpdateUsernameIT.URL + "/copy");
+                .head(LoginIT.URL + "/" + USERNAME);
 
-        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
-        assertThat(response.jsonPath().getList("code"), contains(is("username")));
-        assertThat(response.jsonPath().getList("path"), contains(is("/toUsername")));
+        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));
 
     }
+
 }

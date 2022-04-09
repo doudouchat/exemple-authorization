@@ -130,29 +130,4 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
 
     }
-
-    @Test(dependsOnMethods = "disable")
-    public void delete() {
-
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
-
-                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
-
-                .header("Authorization", "Bearer " + accessToken)
-
-                .delete(LoginIT.URL + "/" + USERNAME);
-
-        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
-
-        response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
-
-                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
-
-                .header("Authorization", "Bearer " + accessToken)
-
-                .head(LoginIT.URL + "/" + USERNAME);
-
-        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));
-
-    }
 }
