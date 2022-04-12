@@ -52,7 +52,6 @@ public class LoginDisconnectionIT extends AbstractTestNGSpringContextTests {
 
         Map<String, Object> body = new HashMap<>();
         body.put("password", "mdp");
-        body.put("roles", new String[] { "ROLE_ACCOUNT" });
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
 

@@ -1,13 +1,9 @@
 package com.exemple.authorization.resource.login;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,7 +51,6 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         login.setPassword("mdp123");
         login.setDisabled(true);
         login.setAccountLocked(true);
-        login.setRoles(new HashSet<>(Arrays.asList("role1", "role2")));
 
         // When perform
 
@@ -66,7 +61,6 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         LoginEntity actualLogin = resource.get(username).get();
         assertThat(actualLogin.getUsername(), is(username));
         assertThat(actualLogin.getPassword(), is("mdp123"));
-        assertThat(actualLogin.getRoles(), containsInAnyOrder("role1", "role2"));
         assertThat(actualLogin.isDisabled(), is(true));
         assertThat(actualLogin.isAccountLocked(), is(true));
     }
@@ -81,7 +75,6 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         login.setPassword("mdp123");
         login.setDisabled(true);
         login.setAccountLocked(true);
-        login.setRoles(new HashSet<>(Arrays.asList("role1", "role2")));
 
         // When perform
 
@@ -95,7 +88,6 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         LoginEntity login = resource.get("jean.dupond@gmail.com").get();
         assertThat(login.getUsername(), is("jean.dupond@gmail.com"));
         assertThat(login.getPassword(), is(nullValue()));
-        assertThat(login.getRoles(), is(empty()));
         assertThat(login.isDisabled(), is(false));
         assertThat(login.isAccountLocked(), is(false));
     }
@@ -112,7 +104,6 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         login.setPassword("mdp123");
         login.setDisabled(true);
         login.setAccountLocked(true);
-        login.setRoles(new HashSet<>(Arrays.asList("role1", "role2")));
 
         resource.save(login);
 
@@ -121,7 +112,6 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         login.setPassword("mdp124");
         login.setDisabled(false);
         login.setAccountLocked(false);
-        login.setRoles(new HashSet<>(Arrays.asList("role1", "role3")));
 
         resource.update(login);
 
@@ -130,7 +120,6 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         LoginEntity actualLogin = resource.get(username).get();
         assertThat(actualLogin.getUsername(), is(username));
         assertThat(actualLogin.getPassword(), is("mdp124"));
-        assertThat(actualLogin.getRoles(), containsInAnyOrder("role1", "role3"));
         assertThat(actualLogin.isDisabled(), is(false));
         assertThat(actualLogin.isAccountLocked(), is(false));
     }

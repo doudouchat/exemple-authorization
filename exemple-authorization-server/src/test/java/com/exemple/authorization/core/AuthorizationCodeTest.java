@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -135,7 +134,6 @@ public class AuthorizationCodeTest extends AbstractTestNGSpringContextTests {
         LoginEntity account = new LoginEntity();
         account.setUsername(username);
         account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-        account.setRoles(Collections.singleton("ROLE_ACCOUNT"));
 
         Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.of(account));
 
@@ -182,6 +180,12 @@ public class AuthorizationCodeTest extends AbstractTestNGSpringContextTests {
         accessToken = response.jsonPath().getString("access_token");
         assertThat(accessToken, is(notNullValue()));
         assertThat(state, is("123"));
+
+        JWTPartsParser parser = new JWTParser();
+        Payload payload = parser.parsePayload(response.getBody().print());
+
+        assertThat(payload.getSubject(), is(this.username));
+        assertThat(payload.getClaim("authorities").asArray(String.class), arrayContainingInAnyOrder("ROLE_ACCOUNT"));
 
     }
 
@@ -262,7 +266,6 @@ public class AuthorizationCodeTest extends AbstractTestNGSpringContextTests {
         LoginEntity account = new LoginEntity();
         account.setUsername(username);
         account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-        account.setRoles(Collections.singleton("ROLE_ACCOUNT"));
 
         Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.of(account));
 

@@ -6,9 +6,7 @@ import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
@@ -105,7 +103,6 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
         LoginEntity account = new LoginEntity();
         account.setUsername(username);
         account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-        account.setRoles(new HashSet<>(Arrays.asList("ROLE_1", "ROLE_2")));
 
         Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.of(account));
 
@@ -135,18 +132,15 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
         LoginEntity account1 = new LoginEntity();
         account1.setUsername("jean.dupond@gmail.com");
         account1.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-        account1.setRoles(new HashSet<>(Arrays.asList("ROLE_1", "ROLE_2")));
         account1.setDisabled(true);
 
         LoginEntity account2 = new LoginEntity();
         account2.setUsername("jean.dupond@gmail.com");
         account2.setPassword("{bcrypt}" + BCrypt.hashpw("124", BCrypt.gensalt()));
-        account2.setRoles(new HashSet<>(Arrays.asList("ROLE_1", "ROLE_2")));
 
         LoginEntity account3 = new LoginEntity();
         account3.setUsername("jean.dupond@gmail.com");
         account3.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-        account3.setRoles(new HashSet<>(Arrays.asList("ROLE_1", "ROLE_2")));
         account3.setAccountLocked(true);
 
         return new Object[][] {
@@ -203,7 +197,7 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
         assertThat(payload.getClaim("user_name").asString(), is(this.username));
         assertThat(payload.getSubject(), is(this.username));
         assertThat(payload.getClaim("aud").asArray(String.class), arrayContainingInAnyOrder("app1"));
-        assertThat(payload.getClaim("authorities").asArray(String.class), arrayContainingInAnyOrder("ROLE_2", "ROLE_1"));
+        assertThat(payload.getClaim("authorities").asArray(String.class), arrayContainingInAnyOrder("ROLE_ACCOUNT"));
         assertThat(payload.getClaim("scope").asArray(String.class), arrayContainingInAnyOrder("account:read", "account:update"));
 
     }
@@ -214,7 +208,6 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
         LoginEntity account = new LoginEntity();
         account.setUsername(username);
         account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-        account.setRoles(new HashSet<>(Arrays.asList("ROLE_1", "ROLE_2")));
 
         Mockito.when(resource.get(Mockito.eq(username))).thenReturn(Optional.of(account));
 

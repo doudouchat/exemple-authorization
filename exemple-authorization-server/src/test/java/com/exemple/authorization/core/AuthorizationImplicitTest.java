@@ -2,7 +2,6 @@ package com.exemple.authorization.core;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -26,7 +25,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.auth0.jwt.impl.JWTParser;
-import com.auth0.jwt.impl.NullClaim;
 import com.auth0.jwt.interfaces.JWTPartsParser;
 import com.auth0.jwt.interfaces.Payload;
 import com.exemple.authorization.common.LoggingFilter;
@@ -158,7 +156,7 @@ public class AuthorizationImplicitTest extends AbstractTestNGSpringContextTests 
         assertThat(payload.getClaim("user_name").asString(), is(this.username));
         assertThat(payload.getSubject(), is(this.username));
         assertThat(payload.getClaim("aud").asArray(String.class), arrayContainingInAnyOrder("app1"));
-        assertThat(payload.getClaim("authorities"), instanceOf(NullClaim.class));
+        assertThat(payload.getClaim("authorities").asArray(String.class), arrayContainingInAnyOrder("ROLE_ACCOUNT"));
         assertThat(payload.getClaim("scope").asArray(String.class), arrayContainingInAnyOrder("account:read", "account:update"));
 
     }

@@ -1,9 +1,6 @@
 
 package com.exemple.authorization.resource.login.model;
 
-import java.util.Collections;
-import java.util.Set;
-
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
@@ -25,7 +22,5 @@ public class LoginEntity {
     private boolean disabled;
 
     private boolean accountLocked;
-
-    private Set<String> roles = Collections.emptySet();
 
 }

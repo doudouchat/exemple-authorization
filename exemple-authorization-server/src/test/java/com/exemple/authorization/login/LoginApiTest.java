@@ -1,7 +1,6 @@
 package com.exemple.authorization.login;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 
@@ -9,7 +8,6 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
@@ -176,7 +174,6 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         assertThat(entity.getValue().getUsername(), is(username));
         assertThat(entity.getValue().getPassword(), startsWith("{bcrypt}"));
         assertThat(BCrypt.checkpw("mdp123", entity.getValue().getPassword().substring("{bcrypt}".length())), is(true));
-        assertThat(entity.getValue().getRoles(), containsInAnyOrder("role1", "role2"));
         assertThat(entity.getValue().isDisabled(), is(true));
         assertThat(entity.getValue().isAccountLocked(), is(true));
 
@@ -246,7 +243,6 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         entity.setPassword("mdp123");
         entity.setDisabled(true);
         entity.setAccountLocked(true);
-        entity.setRoles(new HashSet<>(Arrays.asList("role1", "role2")));
 
         Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(entity));
 
@@ -278,7 +274,6 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         assertThat(actualEntity.getValue().getUsername(), is(username));
         assertThat(actualEntity.getValue().getPassword(), startsWith("{bcrypt}"));
         assertThat(BCrypt.checkpw("mdp124", actualEntity.getValue().getPassword().substring("{bcrypt}".length())), is(true));
-        assertThat(actualEntity.getValue().getRoles(), containsInAnyOrder("role1", "role3"));
         assertThat(actualEntity.getValue().isDisabled(), is(false));
         assertThat(actualEntity.getValue().isAccountLocked(), is(false));
 
@@ -344,7 +339,6 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         entity.setPassword("mdp123");
         entity.setDisabled(true);
         entity.setAccountLocked(true);
-        entity.setRoles(new HashSet<>(Arrays.asList("role1", "role2")));
 
         Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(entity));
 

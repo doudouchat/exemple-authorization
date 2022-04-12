@@ -26,13 +26,13 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "password");
-        params.put("username", "jean.dupont@gmail.com");
-        params.put("password", "123");
-        params.put("client_id", "test_user");
+        params.put("username", "admin");
+        params.put("password", "admin123");
+        params.put("client_id", "back_user");
         params.put("redirect_uri", "xxx");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
-                .basic("test_user", "secret").formParams(params).post("/oauth/token");
+                .basic("back_user", "secret").formParams(params).post("/oauth/token");
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
 
