@@ -24,8 +24,4 @@ public class LoginModel {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final String password;
 
-    private final boolean disabled;
-
-    private final boolean accountLocked;
-
 }

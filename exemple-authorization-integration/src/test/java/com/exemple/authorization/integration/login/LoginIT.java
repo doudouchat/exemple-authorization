@@ -100,31 +100,18 @@ public class LoginIT extends AbstractTestNGSpringContextTests {
 
     }
 
-    @Test(dependsOnMethods = "head")
+    @Test
     public void disable() {
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("password", "mdp");
-        body.put("disabled", true);
-
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
-
-                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
-
-                .header("Authorization", "Bearer " + accessToken)
-
-                .body(body).put(LoginIT.URL + "/" + USERNAME);
-
-        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "password");
-        params.put("username", USERNAME);
+        params.put("username", "jean.dupont@gmail.com");
         params.put("password", "mdp");
         params.put("client_id", "test_user");
         params.put("redirect_uri", "xxx");
 
-        response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth().basic("test_user", "secret")
+        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
+                .basic("test_user", "secret")
                 .formParams(params).post("/oauth/token");
 
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));

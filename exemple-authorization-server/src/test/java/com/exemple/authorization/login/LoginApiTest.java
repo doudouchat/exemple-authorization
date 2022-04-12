@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -151,9 +150,6 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         Map<String, Object> login = new HashMap<>();
         login.put("password", "mdp123");
-        login.put("disabled", true);
-        login.put("accountLocked", true);
-        login.put("roles", Arrays.asList("role1", "role2"));
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
@@ -174,8 +170,6 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         assertThat(entity.getValue().getUsername(), is(username));
         assertThat(entity.getValue().getPassword(), startsWith("{bcrypt}"));
         assertThat(BCrypt.checkpw("mdp123", entity.getValue().getPassword().substring("{bcrypt}".length())), is(true));
-        assertThat(entity.getValue().isDisabled(), is(true));
-        assertThat(entity.getValue().isAccountLocked(), is(true));
 
         // And check mock
 
@@ -255,9 +249,6 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         Map<String, Object> login = new HashMap<>();
         login.put("password", "mdp124");
-        login.put("disabled", false);
-        login.put("accountLocked", false);
-        login.put("roles", Arrays.asList("role1", "role3"));
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
@@ -274,8 +265,8 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         assertThat(actualEntity.getValue().getUsername(), is(username));
         assertThat(actualEntity.getValue().getPassword(), startsWith("{bcrypt}"));
         assertThat(BCrypt.checkpw("mdp124", actualEntity.getValue().getPassword().substring("{bcrypt}".length())), is(true));
-        assertThat(actualEntity.getValue().isDisabled(), is(false));
-        assertThat(actualEntity.getValue().isAccountLocked(), is(false));
+        assertThat(actualEntity.getValue().isDisabled(), is(true));
+        assertThat(actualEntity.getValue().isAccountLocked(), is(true));
 
         // And check mock
 
@@ -306,9 +297,6 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         Map<String, Object> login = new HashMap<>();
         login.put("password", "mdp124");
-        login.put("disabled", false);
-        login.put("accountLocked", false);
-        login.put("roles", Arrays.asList("role1", "role3"));
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
@@ -329,8 +317,6 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         // Given user_name
 
         String username = "jean.dupond@gmail.com";
-
-        // And mock service
 
         // And mock service
 
