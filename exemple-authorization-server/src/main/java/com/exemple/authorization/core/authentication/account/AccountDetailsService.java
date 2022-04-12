@@ -1,9 +1,5 @@
 package com.exemple.authorization.core.authentication.account;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,8 +26,11 @@ public class AccountDetailsService implements UserDetailsService {
         boolean disabled = login.isDisabled();
         boolean accountLocked = login.isAccountLocked();
 
-        List<SimpleGrantedAuthority> roles = login.getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-
-        return new User(username, password, !disabled, true, true, !accountLocked, roles);
+        return User.builder()
+                .username(username)
+                .password(password)
+                .authorities("ROLE_ACCOUNT")
+                .disabled(disabled).accountLocked(accountLocked)
+                .build();
     }
 }

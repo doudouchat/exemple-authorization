@@ -225,7 +225,6 @@ public class LoginApi {
         entity.setDisabled(resource.isDisabled());
         entity.setPassword(resource.getPassword());
         entity.setUsername(resource.getUsername());
-        entity.setRoles(resource.getRoles());
 
         return entity;
 
