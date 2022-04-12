@@ -5,7 +5,8 @@ INSERT INTO login (username, password) VALUES (
 	'{bcrypt}$2a$10$Kd7BZwLmFIfoYDttqaJ6V.Lsp4xe31Qc9ha/gBYFGYgnAMvY758vm'
 );
 
-INSERT INTO login (username, password) VALUES (
+INSERT INTO login (username, password, disabled) VALUES (
 	'jean.dupont@gmail.com', 
-	'{bcrypt}$2a$10$Kd7BZwLmFIfoYDttqaJ6V.Lsp4xe31Qc9ha/gBYFGYgnAMvY758vm'
+	'{bcrypt}$2a$10$Kd7BZwLmFIfoYDttqaJ6V.Lsp4xe31Qc9ha/gBYFGYgnAMvY758vm',
+	true
 );

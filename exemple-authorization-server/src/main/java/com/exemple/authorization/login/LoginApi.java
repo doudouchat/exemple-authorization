@@ -92,7 +92,7 @@ public class LoginApi {
 
             checkIfUsernameHasRight(username, servletContext.getSecurityContext());
 
-            LoginEntity entity = toLoginEntity(source);
+            LoginEntity entity = toLoginEntity(source, origin.get());
             entity.setUsername(username);
             entity.setPassword(encryptPassword(entity.getPassword()));
 
@@ -220,9 +220,12 @@ public class LoginApi {
 
     private static LoginEntity toLoginEntity(LoginModel resource) {
 
-        LoginEntity entity = new LoginEntity();
-        entity.setAccountLocked(resource.isAccountLocked());
-        entity.setDisabled(resource.isDisabled());
+        return toLoginEntity(resource, new LoginEntity());
+
+    }
+
+    private static LoginEntity toLoginEntity(LoginModel resource, LoginEntity entity) {
+
         entity.setPassword(resource.getPassword());
         entity.setUsername(resource.getUsername());
 
