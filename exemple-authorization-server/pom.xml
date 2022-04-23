@@ -17,24 +17,6 @@
 
 	</properties>
 
-	<dependencyManagement>
-
-		<dependencies>
-
-			<!-- SPRING BOOT -->
-
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-dependencies</artifactId>
-				<version>${org.springframework.boot-version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-		</dependencies>
-
-	</dependencyManagement>
-
 	<dependencies>
 
 		<!-- RESOURCE -->
@@ -80,12 +62,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>com.vaadin.external.google</groupId>
-					<artifactId>android-json</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<!-- SPRING SESSION -->
@@ -195,11 +171,6 @@
 
 		<dependency>
 			<groupId>io.rest-assured</groupId>
-			<artifactId>rest-assured-all</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
 		</dependency>
 
@@ -291,15 +262,6 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-
-			<!-- VERSION -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>versions-maven-plugin</artifactId>
-				<configuration>
-					<processDependencyManagement>false</processDependencyManagement>
-				</configuration>
 			</plugin>
 
 			<!-- WAR -->
