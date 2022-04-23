@@ -100,7 +100,7 @@
 						<path>
 							<groupId>com.datastax.oss</groupId>
 							<artifactId>java-driver-mapper-processor</artifactId>
-							<version>${datastax-version}</version>
+							<version>${cassandra-driver.version}</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>

@@ -13,7 +13,6 @@
 
 		<!-- TOMCAT -->
 		<tomcat.container.id>tomcat9x</tomcat.container.id>
-		<tomcat.version>9.0.59</tomcat.version>
 
 		<!-- TEST -->
 		<application.log.file>${project.build.testOutputDirectory}/logback.groovy</application.log.file>
@@ -40,16 +39,6 @@
 	<dependencyManagement>
 
 		<dependencies>
-
-			<!-- SPRING BOOT -->
-
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-dependencies</artifactId>
-				<version>${org.springframework.boot-version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
 
 			<!-- TOMCAT -->
 
@@ -152,11 +141,6 @@
 
 		<dependency>
 			<groupId>io.rest-assured</groupId>
-			<artifactId>rest-assured-all</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
 		</dependency>
 
@@ -187,7 +171,6 @@
 				<plugin>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
-					<version>${org.springframework.boot-version}</version>
 					<configuration>
 						<jvmArguments>${jacoco.it.agent.argLine}
 							-Dlogging.config=file:${application.log.file}</jvmArguments>
@@ -263,7 +246,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>3.0.0-M4</version>
 					<executions>
 						<execution>
 							<goals>
@@ -279,15 +261,6 @@
 		</pluginManagement>
 
 		<plugins>
-
-			<!-- VERSION -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>versions-maven-plugin</artifactId>
-				<configuration>
-					<processDependencyManagement>false</processDependencyManagement>
-				</configuration>
-			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
