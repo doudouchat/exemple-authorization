@@ -171,7 +171,7 @@
 			<dependency>
 				<groupId>com.github.nosan</groupId>
 				<artifactId>embedded-cassandra-spring-boot-starter</artifactId>
-				<version>4.0.8</version>
+				<version>4.1.1</version>
 			</dependency>
 
 			<!-- TESTNG -->
