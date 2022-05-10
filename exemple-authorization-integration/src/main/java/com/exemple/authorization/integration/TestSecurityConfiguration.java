@@ -1,6 +1,7 @@
 package com.exemple.authorization.integration;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,12 +19,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
+import org.springframework.security.oauth2.core.OAuth2TokenIntrospectionClaimNames;
 import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
 import org.springframework.security.oauth2.server.resource.introspection.NimbusOpaqueTokenIntrospector;
-import org.springframework.security.oauth2.server.resource.introspection.OAuth2IntrospectionClaimNames;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
-
-import net.minidev.json.JSONArray;
 
 @EnableWebSecurity
 public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -71,8 +70,8 @@ public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         private Collection<GrantedAuthority> extractAuthorities(OAuth2AuthenticatedPrincipal principal) {
 
-            JSONArray scopes = principal.getAttribute(OAuth2IntrospectionClaimNames.SCOPE);
-            JSONArray authorities = principal.getAttribute("authorities");
+            List<?> scopes = principal.getAttribute(OAuth2TokenIntrospectionClaimNames.SCOPE);
+            List<?> authorities = principal.getAttribute("authorities");
 
             return Stream.concat(scopes.stream(), authorities.stream())
                     .map(String.class::cast)

@@ -41,7 +41,7 @@ public class SwaggerConfigurationTest extends AbstractTestNGSpringContextTests {
     @Test
     public void swagger() {
 
-        Response response = requestSpecification.get(restTemplate.getRootUri() + "/v2/api-docs");
+        Response response = requestSpecification.get(restTemplate.getRootUri() + "/v3/api-docs");
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
 
     }

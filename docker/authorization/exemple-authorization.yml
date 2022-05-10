@@ -25,3 +25,6 @@ management:
          enabled: true
       health:
          enabled: true
+   info:
+      env: 
+         enabled: true
