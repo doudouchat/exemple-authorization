@@ -78,7 +78,7 @@ public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
 
                 .antMatchers("/actuator/**").permitAll()
 
-                .antMatchers("/v2/api-docs/**").permitAll()
+                .antMatchers("/v3/api-docs/**").permitAll()
 
                 .antMatchers("/.well-known/jwks.json").permitAll()
 

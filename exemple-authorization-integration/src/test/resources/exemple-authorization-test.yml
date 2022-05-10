@@ -25,6 +25,9 @@ management:
          enabled: true
       health:
          enabled: true
+   info:
+      env: 
+         enabled: true
 spring:
    security:
       oauth2:

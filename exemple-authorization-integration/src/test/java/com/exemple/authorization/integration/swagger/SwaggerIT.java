@@ -20,7 +20,7 @@ public class SwaggerIT extends AbstractTestNGSpringContextTests {
     @Test
     public void swagger() {
 
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).get("/v2/api-docs");
+        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).get("/v3/api-docs");
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
 
