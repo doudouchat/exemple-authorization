@@ -1,7 +1,8 @@
 package com.exemple.authorization.core.swagger;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -41,8 +41,11 @@ public class SwaggerConfigurationTest extends AbstractTestNGSpringContextTests {
     @Test
     public void swagger() {
 
+        // When perform swagger
         Response response = requestSpecification.get(restTemplate.getRootUri() + "/v3/api-docs");
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
+
+        // Then check status
+        assertThat(response.getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 
     }
 
