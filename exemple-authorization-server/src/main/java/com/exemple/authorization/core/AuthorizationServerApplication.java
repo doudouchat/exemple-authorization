@@ -5,12 +5,14 @@ import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfigurati
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 
 import com.exemple.authorization.application.core.ApplicationConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
 
 @SpringBootApplication(exclude = CassandraAutoConfiguration.class)
 @Import({ ApplicationConfiguration.class, ResourceConfiguration.class })
+@PropertySource("classpath:default.properties")
 public class AuthorizationServerApplication extends SpringBootServletInitializer {
 
     @Override

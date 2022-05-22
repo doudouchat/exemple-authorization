@@ -390,7 +390,7 @@
 									<cargo.resource.resource.spring>
 										cargo.resource.name=spring.config.location|
 										cargo.resource.type=java.lang.String|
-										cargo.resource.parameters=factory=com.exemple.authorization.integration.common.PrimitivesAndStringFactory;value=classpath:default.yml,${authorization.path}
+										cargo.resource.parameters=factory=com.exemple.authorization.integration.common.PrimitivesAndStringFactory;value=${authorization.path}
 									</cargo.resource.resource.spring>
 									<cargo.resource.resource.authorization>
 										cargo.resource.name=${authorization.name}|
