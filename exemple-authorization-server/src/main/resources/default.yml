@@ -1,7 +1,0 @@
-info:
-   version: ${project.version}
-   buildTime: ${maven.build.timestamp}
-spring:
-   jackson:
-      deserialization:
-         FAIL_ON_UNKNOWN_PROPERTIES: true
