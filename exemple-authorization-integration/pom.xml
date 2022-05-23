@@ -392,11 +392,6 @@
 										cargo.resource.type=java.lang.String|
 										cargo.resource.parameters=factory=com.exemple.authorization.integration.common.PrimitivesAndStringFactory;value=${authorization.path}
 									</cargo.resource.resource.spring>
-									<cargo.resource.resource.authorization>
-										cargo.resource.name=${authorization.name}|
-										cargo.resource.type=java.lang.String|
-										cargo.resource.parameters=factory=com.exemple.authorization.integration.common.PrimitivesAndStringFactory;value=${authorization.path}
-									</cargo.resource.resource.authorization>
 								</properties>
 							</configuration>
 						</configuration>
