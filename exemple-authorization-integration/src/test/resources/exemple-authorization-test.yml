@@ -5,7 +5,7 @@ authorization:
    zookeeper:
       host: 127.0.0.1:${zookeeper.port}
    certificat:
-      location: file:${project.parent.basedir}/docker/authorization/mytest.jks
+      location: file:${project.parent.basedir}/certificat/mytest.jks
       alias: mytest
       password: mypass
    kafka:

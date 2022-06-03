@@ -196,6 +196,9 @@
 			<testResource>
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
+				<excludes>
+					<exclude>mytest.jks</exclude>
+				</excludes>
 			</testResource>
 		</testResources>
 

@@ -1,5 +1,0 @@
-hazelcast-client:
-   cluster-name: "dev"
-   network:
-      cluster-members:
-      - 172.17.0.1:5706
