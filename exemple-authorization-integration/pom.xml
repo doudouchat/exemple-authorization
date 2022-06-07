@@ -56,6 +56,15 @@
 
 	<dependencies>
 
+		<!-- RESOURCE -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-authorization-resource</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- APPLICATION -->
 
 		<dependency>
@@ -73,12 +82,14 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 			<classifier>classes</classifier>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.session</groupId>
-					<artifactId>spring-session-hazelcast</artifactId>
-				</exclusion>
-			</exclusions>
+		</dependency>
+
+		<!-- CASSANDRA EMBEDDED -->
+
+		<dependency>
+			<groupId>com.github.nosan</groupId>
+			<artifactId>embedded-cassandra</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- SPRING BOOT -->
@@ -283,9 +294,17 @@
 
 				<dependency>
 					<groupId>${project.groupId}</groupId>
-					<artifactId>exemple-authorization-server-embedded</artifactId>
+					<artifactId>exemple-authorization-server</artifactId>
 					<version>${project.version}</version>
 					<type>war</type>
+				</dependency>
+
+				<!-- CURATOR -->
+
+				<dependency>
+					<groupId>org.apache.curator</groupId>
+					<artifactId>curator-test</artifactId>
+					<scope>provided</scope>
 				</dependency>
 
 			</dependencies>
@@ -356,6 +375,57 @@
 						</executions>
 					</plugin>
 
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-dependencies</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}/dependencies-provided/WEB-INF/lib</outputDirectory>
+									<includeScope>provided</includeScope>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- WAR -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>embedded</id>
+								<phase>pre-integration-test</phase>
+								<configuration>
+									<classifier>embedded</classifier>
+									<failOnMissingWebXml>false</failOnMissingWebXml>
+									<webResources>
+										<resource>
+											<directory>${project.build.directory}/dependencies-provided</directory>
+											<includes>
+												<include>**/*.jar</include>
+											</includes>
+										</resource>
+									</webResources>
+									<overlays>
+										<overlay>
+											<groupId>${project.groupId}</groupId>
+											<artifactId>exemple-authorization-server</artifactId>
+										</overlay>
+									</overlays>
+								</configuration>
+								<goals>
+									<goal>war</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
 					<!-- CARGO -->
 					<plugin>
 						<groupId>org.codehaus.cargo</groupId>
@@ -377,7 +447,8 @@
 							<deployables>
 								<deployable>
 									<groupId>${project.groupId}</groupId>
-									<artifactId>exemple-authorization-server-embedded</artifactId>
+									<artifactId>${project.artifactId}</artifactId>
+									<classifier>embedded</classifier>
 									<type>war</type>
 									<properties>
 										<context>/${authorization.contextpath}</context>

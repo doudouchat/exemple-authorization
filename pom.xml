@@ -19,7 +19,6 @@
 		<module>exemple-authorization-resource</module>
 		<module>exemple-authorization-application</module>
 		<module>exemple-authorization-server</module>
-		<module>exemple-authorization-server-embedded</module>
 		<module>exemple-authorization-integration</module>
 	</modules>
 
