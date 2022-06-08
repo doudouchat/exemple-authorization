@@ -2,4 +2,4 @@ hazelcast-client:
    cluster-name: "authorization-cluster"
    network:
       cluster-members:
-      - localhost:5701
+      - localhost:${hazelcast.port}
