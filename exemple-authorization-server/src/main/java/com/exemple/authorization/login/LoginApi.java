@@ -84,13 +84,13 @@ public class LoginApi {
     public Response update(@PathParam("username") String username, @Valid @NotNull LoginModel source, @Context UriInfo uriInfo)
             throws UsernameAlreadyExistsException {
 
+        checkIfUsernameHasRight(username, servletContext.getSecurityContext());
+
         Optional<LoginEntity> origin = loginResource.get(username);
 
         Response response;
 
         if (origin.isPresent()) {
-
-            checkIfUsernameHasRight(username, servletContext.getSecurityContext());
 
             LoginEntity entity = toLoginEntity(source, origin.get());
             entity.setUsername(username);

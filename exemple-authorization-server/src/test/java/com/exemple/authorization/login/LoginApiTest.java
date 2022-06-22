@@ -141,7 +141,8 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // And token
 
-        String accessToken = JWT.create().withArrayClaim("scope", new String[] { "login:update" }).withClaim("client_id", "clientId1")
+        String accessToken = JWT.create().withSubject(username).withArrayClaim("scope", new String[] { "login:update" })
+                .withClaim("client_id", "clientId1")
                 .sign(algorithm);
 
         // When perform post
@@ -189,7 +190,8 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // And token
 
-        String accessToken = JWT.create().withArrayClaim("scope", new String[] { "login:update" }).withClaim("client_id", "clientId1")
+        String accessToken = JWT.create().withSubject(username).withArrayClaim("scope", new String[] { "login:update" })
+                .withClaim("client_id", "clientId1")
                 .sign(algorithm);
 
         // When perform post
@@ -305,7 +307,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // And check mock
         Mockito.verify(loginResource, Mockito.never()).update(Mockito.any());
-        Mockito.verify(loginResource).get(Mockito.eq(username));
+        Mockito.verify(loginResource, Mockito.never()).get(Mockito.any());
 
     }
 

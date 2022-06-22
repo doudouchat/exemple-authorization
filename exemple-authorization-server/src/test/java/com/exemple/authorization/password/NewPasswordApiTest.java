@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -12,9 +13,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +29,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.KafkaMessageListenerContainer;
+import org.springframework.kafka.listener.MessageListener;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.kafka.test.utils.ContainerTestUtils;
+import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -31,8 +46,6 @@ import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.impl.JWTParser;
-import com.auth0.jwt.interfaces.JWTPartsParser;
 import com.auth0.jwt.interfaces.Payload;
 import com.exemple.authorization.common.LoggingFilter;
 import com.exemple.authorization.core.AuthorizationTestConfiguration;
@@ -67,12 +80,21 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
     private Algorithm algorithm;
 
     @Autowired
+    private EmbeddedKafkaBroker embeddedKafkaBroker;
+
+    @Autowired
     private Clock clock;
 
     @Value("${authorization.password.expiryTime}")
     private long expiryTime;
 
     private RequestSpecification requestSpecification;
+
+    private KafkaMessageListenerContainer<String, Map<String, Object>> container;
+
+    private BlockingQueue<ConsumerRecord<String, Map<String, Object>>> records;
+
+    private String username = "jean.dupond@gmail.com";
 
     @BeforeClass
     private void init() throws Exception {
@@ -97,6 +119,33 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
 
     }
 
+    @BeforeClass
+    public void createConsumer() throws Exception {
+
+        records = new LinkedBlockingQueue<>();
+
+        Map<String, Object> consumerProperties = KafkaTestUtils.consumerProps("group_consumer_test", "false", embeddedKafkaBroker);
+        DefaultKafkaConsumerFactory<String, Map<String, Object>> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProperties,
+                new StringDeserializer(), new JsonDeserializer<>(Map.class, false));
+        ContainerProperties containerProperties = new ContainerProperties("new_password");
+        container = new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
+
+        MessageListener<String, Map<String, Object>> listener = records::add;
+
+        container.setupMessageListener(listener);
+
+        container.start();
+
+        ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic());
+    }
+
+    @AfterClass
+    private void closeConsumer() {
+
+        container.stop();
+
+    }
+
     @BeforeMethod
     private void before() {
 
@@ -107,12 +156,10 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void password() {
+    public void password() throws InterruptedException {
 
         String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
                 .withClaim("client_id", "clientId1").sign(algorithm);
-
-        String username = "jean.dupond@gmail.com";
 
         LoginEntity account = new LoginEntity();
         account.setUsername(username);
@@ -132,19 +179,52 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
         assertThat(testFilter.context.isSecure(), is(true));
         assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
 
+        // And check message
+        ConsumerRecord<String, Map<String, Object>> received = records.poll(60, TimeUnit.SECONDS);
+        assertThat(received, is(notNullValue()));
+        assertThat(received.value().get("token"), is(notNullValue()));
+
+        // And check token
+        Payload payload = JWT.decode((String) received.value().get("token"));
+
+        assertThat(payload.getSubject(), is(username));
+        assertThat(payload.getClaim("authorities").asArray(String.class), arrayContainingInAnyOrder("ROLE_APP"));
+        assertThat(payload.getClaim("scope").asArray(String.class), arrayContainingInAnyOrder("login:read", "login:update"));
+        assertThat(payload.getExpiresAt(), is(Date.from(Instant.now(clock).plusSeconds(expiryTime))));
+        assertThat(payload.getId(), is(notNullValue()));
     }
 
-    private String username;
+    @Test
+    public void passwordButLoginNotExist() throws InterruptedException {
 
-    private String token;
+        String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
+                .withClaim("client_id", "clientId1").sign(algorithm);
+
+        Map<String, Object> newPassword = new HashMap<>();
+        newPassword.put("login", username);
+
+        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.empty());
+
+        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+                .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
+
+        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+
+        assertThat(testFilter.context.getUserPrincipal().getName(), is("clientId1"));
+        assertThat(testFilter.context.isUserInRole("ROLE_APP"), is(true));
+        assertThat(testFilter.context.isSecure(), is(true));
+        assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
+
+        // And check message
+        ConsumerRecord<String, Map<String, Object>> received = records.poll(2, TimeUnit.SECONDS);
+        assertThat(received, is(nullValue()));
+    }
 
     @Test
-    public void passwordTrustedClient() {
+    public void passwordTrustedClient() throws InterruptedException {
 
         String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_TRUSTED_CLIENT" }).withAudience("app1", "app2")
                 .withClaim("client_id", "clientId1").sign(algorithm);
-
-        username = "jean.dupond@gmail.com";
 
         LoginEntity account = new LoginEntity();
         account.setUsername(username);
@@ -160,35 +240,23 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
         assertThat(response.jsonPath().getString("token"), is(notNullValue()));
 
-        token = response.jsonPath().getString("token");
-
         assertThat(testFilter.context.getUserPrincipal().getName(), is("clientId1"));
         assertThat(testFilter.context.isUserInRole("ROLE_TRUSTED_CLIENT"), is(true));
         assertThat(testFilter.context.isSecure(), is(true));
         assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
 
-    }
+        // And check message
+        ConsumerRecord<String, Map<String, Object>> received = records.poll(2, TimeUnit.SECONDS);
+        assertThat(received, is(nullValue()));
 
-    @Test(dependsOnMethods = "passwordTrustedClient")
-    public void checkToken() {
-
-        Map<String, String> params = new HashMap<>();
-        params.put("token", token);
-
-        Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
-                .post(restTemplate.getRootUri() + "/oauth/check_token");
-
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
-
-        JWTPartsParser parser = new JWTParser();
-        Payload payload = parser.parsePayload(response.getBody().print());
+        // And check token
+        Payload payload = JWT.decode(response.jsonPath().getString("token"));
 
         assertThat(payload.getSubject(), is(this.username));
         assertThat(payload.getClaim("authorities").asArray(String.class), arrayContainingInAnyOrder("ROLE_TRUSTED_CLIENT"));
         assertThat(payload.getClaim("scope").asArray(String.class), arrayContainingInAnyOrder("login:read", "login:update"));
         assertThat(payload.getExpiresAt(), is(Date.from(Instant.now(clock).plusSeconds(expiryTime))));
         assertThat(payload.getId(), is(notNullValue()));
-
     }
 
     @DataProvider(name = "passwordFailureForbidden")

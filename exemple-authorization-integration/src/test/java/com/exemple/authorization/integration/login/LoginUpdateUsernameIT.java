@@ -28,8 +28,6 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
 
     private static final String USERNAME = UUID.randomUUID() + "@gmail.com";
 
-    private String accessAppToken = null;
-
     private String accessToken = null;
 
     @BeforeClass
@@ -38,13 +36,29 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "client_credentials");
 
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth().basic("test", "secret")
+        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth().basic("admin", "secret")
                 .formParams(params).post("/oauth/token");
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
 
-        accessAppToken = response.jsonPath().getString("access_token");
+        String accessAppToken = response.jsonPath().getString("access_token");
         assertThat(accessAppToken, is(notNullValue()));
+
+        Map<String, Object> newPassword = new HashMap<>();
+        newPassword.put("login", USERNAME);
+
+        response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
+
+                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_ADMIN)
+
+                .header("Authorization", "Bearer " + accessAppToken)
+
+                .body(newPassword).post("/ws/v1/new_password");
+
+        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
+
+        accessToken = response.jsonPath().getString("token");
+        assertThat(accessToken, is(notNullValue()));
 
     }
 
@@ -56,9 +70,9 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
 
-                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
+                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_ADMIN)
 
-                .header("Authorization", "Bearer " + accessAppToken)
+                .header("Authorization", "Bearer " + accessToken)
 
                 .body(body).put(LoginUpdateUsernameIT.URL + "/" + USERNAME);
 

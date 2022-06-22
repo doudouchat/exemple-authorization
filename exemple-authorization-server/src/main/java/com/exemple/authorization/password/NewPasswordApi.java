@@ -1,6 +1,6 @@
 package com.exemple.authorization.password;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
@@ -29,7 +29,6 @@ import com.exemple.authorization.core.feature.FeatureConfiguration;
 import com.exemple.authorization.password.model.NewPassword;
 import com.exemple.authorization.password.token.AccessTokenBuilder;
 import com.exemple.authorization.resource.login.LoginResource;
-import com.exemple.authorization.resource.login.model.LoginEntity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -55,29 +54,20 @@ public class NewPasswordApi {
 
         AuthorizationContextSecurity securityContext = (AuthorizationContextSecurity) servletContext.getSecurityContext();
 
-        Map<String, Object> data = new HashMap<>();
-
-        loginResource.get(newPassword.getLogin()).ifPresent((LoginEntity login) -> {
-
-            String accessToken = accessTokenBuilder.createAccessToken(newPassword, app, securityContext);
-
-            data.put("token", accessToken);
-
-            if (!securityContext.isUserInRole("ROLE_TRUSTED_CLIENT")) {
-
-                Message<Map<String, Object>> message = MessageBuilder.withPayload(data).setHeader(KafkaHeaders.TOPIC, "new_password").build();
-                template.send(message);
-
-            }
-
-        });
-
         if (!securityContext.isUserInRole("ROLE_TRUSTED_CLIENT")) {
+
+            if (loginResource.get(newPassword.getLogin()).isPresent()) {
+                String accessToken = accessTokenBuilder.createAccessToken(newPassword, app, securityContext);
+                Message<Map<String, String>> message = MessageBuilder.withPayload(Collections.singletonMap("token", accessToken))
+                        .setHeader(KafkaHeaders.TOPIC, "new_password").build();
+                template.send(message);
+            }
 
             return Response.status(Status.NO_CONTENT).build();
         }
 
-        return Response.status(Status.OK).entity(data).build();
+        String accessToken = accessTokenBuilder.createAccessToken(newPassword, app, securityContext);
+        return Response.status(Status.OK).entity(Collections.singletonMap("token", accessToken)).build();
 
     }
 
