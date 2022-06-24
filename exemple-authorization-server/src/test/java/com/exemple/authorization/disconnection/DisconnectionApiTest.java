@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.mindrot.jbcrypt.BCrypt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,11 +33,11 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@Slf4j
 public class DisconnectionApiTest extends AbstractTestNGSpringContextTests {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DisconnectionApiTest.class);
 
     @Autowired
     private TestRestTemplate restTemplate;

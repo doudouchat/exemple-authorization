@@ -21,8 +21,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
 import org.mindrot.jbcrypt.BCrypt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -47,11 +45,11 @@ import com.exemple.authorization.core.client.AuthorizationClientBuilder;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@Slf4j
 public class AuthorizationCredentialsTest extends AbstractTestNGSpringContextTests {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AuthorizationCredentialsTest.class);
 
     @Autowired
     private TestRestTemplate restTemplate;

@@ -3,8 +3,6 @@ package com.exemple.authorization.core;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -19,11 +17,11 @@ import com.exemple.authorization.common.LoggingFilter;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@Slf4j
 public class AuthorizationServerApplicationTest extends AbstractTestNGSpringContextTests {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AuthorizationServerApplicationTest.class);
 
     @Autowired
     private TestRestTemplate restTemplate;

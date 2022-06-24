@@ -12,8 +12,6 @@ import java.util.Optional;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -36,11 +34,11 @@ import com.exemple.authorization.resource.login.model.LoginEntity;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@Slf4j
 public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AuthorizationPasswordTest.class);
 
     @Autowired
     private TestRestTemplate restTemplate;

@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.output.NullOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.restassured.RestAssured;
 import io.restassured.config.HttpClientConfig;
@@ -26,7 +24,9 @@ import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
 import io.restassured.specification.RequestSpecification;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class JsonRestTemplate {
 
     public static final int TIMEOUT_CONNECTION = 3_000_000;
@@ -35,8 +35,6 @@ public final class JsonRestTemplate {
 
     public static final String APPLICATION_URL = System.getProperty("application.host", "http://localhost") + ":"
             + System.getProperty("application.port", "8080") + "/" + System.getProperty("application.contextpath", "ExempleService");
-
-    private static final Logger LOG = LoggerFactory.getLogger(JsonRestTemplate.class);
 
     private static final RestAssuredConfig CONFIG;
 

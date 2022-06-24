@@ -8,8 +8,6 @@ import java.util.List;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.curator.shaded.com.google.common.collect.ImmutableList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -26,11 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@Slf4j
 public class SwaggerConfigurationTest extends AbstractTestNGSpringContextTests {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SwaggerConfigurationTest.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 

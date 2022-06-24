@@ -5,8 +5,6 @@ import java.nio.charset.StandardCharsets;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.zookeeper.CreateMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +16,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ApplicationDetailServiceImpl implements ApplicationDetailService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ApplicationDetailServiceImpl.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
