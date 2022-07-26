@@ -27,7 +27,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
-import com.auth0.jwt.impl.PublicClaims;
+import com.auth0.jwt.RegisteredClaims;
 import com.hazelcast.core.HazelcastInstance;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -66,7 +66,7 @@ public class AuthorizationTokenConfiguration {
         converter.setKeyPair(this.keyStoreKeyFactory.getKeyPair(alias));
         converter.setJwtClaimsSetVerifier((Map<String, Object> claims) -> {
 
-            Object jti = claims.get(PublicClaims.JWT_ID);
+            Object jti = claims.get(RegisteredClaims.JWT_ID);
             if (jti != null && hazelcastInstance.getMap(TOKEN_BLACK_LIST).containsKey(jti.toString())) {
                 throw new InvalidTokenException(jti + " has been excluded");
             }

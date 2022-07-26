@@ -19,7 +19,7 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import com.auth0.jwt.impl.PublicClaims;
+import com.auth0.jwt.RegisteredClaims;
 import com.auth0.jwt.interfaces.Payload;
 import com.exemple.authorization.common.security.AuthorizationContextSecurity;
 import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
@@ -47,11 +47,11 @@ public class DisconnectionApi {
         Payload payload = ((AuthorizationContextSecurity) servletContext.getSecurityContext()).getPayload();
 
         if (payload.getId() == null) {
-            throw new BadRequestException(PublicClaims.JWT_ID + " is required in accessToken");
+            throw new BadRequestException(RegisteredClaims.JWT_ID + " is required in accessToken");
         }
 
         if (payload.getExpiresAt() == null) {
-            throw new BadRequestException(PublicClaims.EXPIRES_AT + " is required in accessToken");
+            throw new BadRequestException(RegisteredClaims.EXPIRES_AT + " is required in accessToken");
         }
 
         hazelcastInstance.getMap(AuthorizationTokenConfiguration.TOKEN_BLACK_LIST)
