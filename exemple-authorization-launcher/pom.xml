@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>exemple</groupId>
+		<artifactId>exemple-authorization</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>exemple-authorization-launcher</artifactId>
+	<packaging>war</packaging>
+
+	<dependencies>
+
+		<!-- SERVER -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-authorization-server</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- SPRING BOOT -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- CURATOR -->
+
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-test</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- CASSANDRA EMBEDDED -->
+
+		<dependency>
+			<groupId>com.github.nosan</groupId>
+			<artifactId>embedded-cassandra-spring-boot-starter</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+
+			<!-- TEST UNITAIRE -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+</project>

@@ -1,4 +1,4 @@
-package com.exemple.authorization.core.embedded;
+package com.exemple.authorization.launcher.embedded;
 
 import org.apache.curator.test.TestingServer;
 import org.springframework.beans.factory.annotation.Value;

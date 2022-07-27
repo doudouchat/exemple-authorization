@@ -8,7 +8,6 @@
 		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>exemple-authorization-server</artifactId>
-	<packaging>war</packaging>
 
 	<properties>
 
@@ -36,11 +35,6 @@
 		</dependency>
 
 		<!-- SPRING BOOT -->
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -115,7 +109,7 @@
 		<dependency>
 			<groupId>org.apache.curator</groupId>
 			<artifactId>curator-test</artifactId>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- BCRYPT -->
@@ -123,13 +117,6 @@
 		<dependency>
 			<groupId>org.mindrot</groupId>
 			<artifactId>jbcrypt</artifactId>
-		</dependency>
-
-		<!-- CASSANDRA EMBEDDED -->
-
-		<dependency>
-			<groupId>com.github.nosan</groupId>
-			<artifactId>embedded-cassandra-spring-boot-starter</artifactId>
 		</dependency>
 
 		<!-- SWAGGER -->
@@ -186,13 +173,6 @@
 	</dependencies>
 
 	<build>
-
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
 
 		<testResources>
 			<testResource>
@@ -260,15 +240,6 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-
-			<!-- WAR -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<attachClasses>true</attachClasses>
-				</configuration>
 			</plugin>
 
 		</plugins>
