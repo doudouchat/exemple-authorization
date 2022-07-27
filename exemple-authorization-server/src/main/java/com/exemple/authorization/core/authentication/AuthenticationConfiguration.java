@@ -23,7 +23,7 @@ import com.exemple.authorization.core.resource.keyspace.AuthorizationResourceKey
 import lombok.RequiredArgsConstructor;
 
 @Configuration
-@ComponentScan(basePackages = "com.exemple.authorization.core.authentication")
+@ComponentScan(basePackages = "com.exemple.authorization.core.authentication", basePackageClasses = AuthorizationResourceKeyspace.class)
 @RequiredArgsConstructor
 public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
 
