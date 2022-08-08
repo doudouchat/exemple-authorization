@@ -40,13 +40,4 @@ zookeeper:
    embedded:
       port: ${zookeeper.port}
 cassandra:
-   embedded:
-      config-properties:
-         native_transport_port: ${cassandra.port}
-      startup-timeout: 600s
-      version: ${cassandra-version}
-      logger: Cassandra
-      environment-variables:
-         MAX_HEAP_SIZE: 64M
-         HEAP_NEWSIZE: 12M
-      scripts: ${project.build.testOutputDirectory}/cassandra/schema.cql, ${project.build.testOutputDirectory}/cassandra/exec.cql
+   scripts: ${project.build.testOutputDirectory}/cassandra/schema.cql, ${project.build.testOutputDirectory}/cassandra/exec.cql
