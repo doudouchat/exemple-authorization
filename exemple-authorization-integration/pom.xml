@@ -31,7 +31,6 @@
 
 		<cassandra.host>127.0.0.1</cassandra.host>
 		<hazelcast.port>5705</hazelcast.port>
-		<zmp.clientPort>10024</zmp.clientPort>
 
 	</properties>
 
@@ -291,14 +290,6 @@
 					<type>war</type>
 				</dependency>
 
-				<!-- CURATOR -->
-
-				<dependency>
-					<groupId>org.apache.curator</groupId>
-					<artifactId>curator-test</artifactId>
-					<scope>provided</scope>
-				</dependency>
-
 			</dependencies>
 
 			<build>
@@ -330,19 +321,6 @@
 									</portNames>
 								</configuration>
 							</execution>
-							<execution>
-								<id>add-source</id>
-								<goals>
-									<goal>add-source</goal>
-								</goals>
-								<phase>pre-integration-test</phase>
-								<configuration>
-									<sources>
-										<source>${project.parent.basedir}/exemple-authorization-server/src/main/java</source>
-										<source>${project.parent.basedir}/exemple-authorization-resource/src/main/java</source>
-									</sources>
-								</configuration>
-							</execution>
 						</executions>
 					</plugin>
 
@@ -368,57 +346,6 @@
 					</plugin>
 
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-dependencies</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}/dependencies-provided/WEB-INF/lib</outputDirectory>
-									<includeScope>provided</includeScope>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!-- WAR -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>embedded</id>
-								<phase>pre-integration-test</phase>
-								<configuration>
-									<classifier>embedded</classifier>
-									<failOnMissingWebXml>false</failOnMissingWebXml>
-									<webResources>
-										<resource>
-											<directory>${project.build.directory}/dependencies-provided</directory>
-											<includes>
-												<include>**/*.jar</include>
-											</includes>
-										</resource>
-									</webResources>
-									<overlays>
-										<overlay>
-											<groupId>${project.groupId}</groupId>
-											<artifactId>exemple-authorization-launcher</artifactId>
-										</overlay>
-									</overlays>
-								</configuration>
-								<goals>
-									<goal>war</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
 						<groupId>io.fabric8</groupId>
 						<artifactId>docker-maven-plugin</artifactId>
 						<executions>
@@ -439,6 +366,31 @@
 												<wait>
 													<log>(?s)Startup complete</log>
 													<time>60000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_zookeeper</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>zookeeper:3.8.0</name>
+											<alias>zookeeper</alias>
+											<run>
+												<ports>
+													<port>${zookeeper.port}:2181</port>
+												</ports>
+												<wait>
+													<time>5000</time>
 												</wait>
 												<log>
 													<date>default</date>
@@ -478,8 +430,7 @@
 							<deployables>
 								<deployable>
 									<groupId>${project.groupId}</groupId>
-									<artifactId>${project.artifactId}</artifactId>
-									<classifier>embedded</classifier>
+									<artifactId>exemple-authorization-launcher</artifactId>
 									<type>war</type>
 									<properties>
 										<context>/${authorization.contextpath}</context>

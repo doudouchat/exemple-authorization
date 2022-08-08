@@ -36,8 +36,5 @@ spring:
               introspection-uri: ${authorization.host}:${authorization.port}/${authorization.contextpath}/oauth/check_token
               client-id: resource
               client-secret: secret
-zookeeper:
-   embedded:
-      port: ${zookeeper.port}
 cassandra:
    scripts: ${project.build.testOutputDirectory}/cassandra/schema.cql, ${project.build.testOutputDirectory}/cassandra/exec.cql
