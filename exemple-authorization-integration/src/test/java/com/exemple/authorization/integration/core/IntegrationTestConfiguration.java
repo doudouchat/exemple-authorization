@@ -1,10 +1,12 @@
 package com.exemple.authorization.integration.core;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
@@ -13,6 +15,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import com.datastax.oss.driver.api.core.CqlSession;
@@ -24,10 +28,8 @@ import com.exemple.authorization.core.client.AuthorizationClientConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.nosan.embedded.cassandra.commons.FileSystemResource;
-import com.github.nosan.embedded.cassandra.commons.Resource;
-import com.github.nosan.embedded.cassandra.cql.CqlScript;
-import com.github.nosan.embedded.cassandra.cql.ResourceCqlScript;
+
+import lombok.SneakyThrows;
 
 @Configuration
 @Import({ ResourceConfiguration.class, ApplicationConfiguration.class, AuthorizationClientConfiguration.class })
@@ -55,7 +57,7 @@ public class IntegrationTestConfiguration {
 
     private final Resource[] scripts;
 
-    public IntegrationTestConfiguration(@Value("${cassandra.embedded.scripts:}") String... scripts) {
+    public IntegrationTestConfiguration(@Value("${cassandra.scripts:}") String... scripts) {
         this.scripts = Arrays.stream(scripts).map(File::new).map(FileSystemResource::new).toArray(Resource[]::new);
 
     }
@@ -77,7 +79,7 @@ public class IntegrationTestConfiguration {
 
         // INIT KEYSPACE
 
-        Arrays.stream(scripts).map(ResourceCqlScript::new).forEach((CqlScript script) -> script.forEachStatement(session::execute));
+        Arrays.stream(scripts).flatMap((Resource script) -> Arrays.stream(splitScript(script))).forEach(session::execute);
 
         // APP
 
@@ -133,6 +135,11 @@ public class IntegrationTestConfiguration {
                 .withClient("resource").secret(password).authorizedGrantTypes("client_credentials").authorities("ROLE_TRUSTED_CLIENT")
 
                 .and().build();
+    }
+
+    @SneakyThrows
+    private static String[] splitScript(Resource script) {
+        return FileUtils.readFileToString(script.getFile(), StandardCharsets.UTF_8).trim().split(";");
     }
 
 }

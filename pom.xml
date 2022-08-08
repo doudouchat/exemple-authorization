@@ -158,20 +158,13 @@
 				<version>31.1-jre</version>
 			</dependency>
 
-			<!-- CASSANDRA EMBEDDED -->
-			<!-- https://nosan.github.io/embedded-cassandra -->
+			<!-- CASSANDRA CONTAINER -->
 
 			<dependency>
-				<groupId>com.github.nosan</groupId>
-				<artifactId>embedded-cassandra</artifactId>
-				<version>4.0.7</version>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>cassandra</artifactId>
+				<version>1.17.3</version>
 				<scope>test</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>com.github.nosan</groupId>
-				<artifactId>embedded-cassandra-spring-boot-starter</artifactId>
-				<version>4.1.1</version>
 			</dependency>
 
 			<!-- TESTNG -->

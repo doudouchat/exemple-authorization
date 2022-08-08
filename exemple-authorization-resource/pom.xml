@@ -62,11 +62,11 @@
 			<artifactId>hamcrest-jackson</artifactId>
 		</dependency>
 
-		<!-- CASSANDRA EMBEDDED -->
+		<!-- CASSANDRA CONTAINER -->
 
 		<dependency>
-			<groupId>com.github.nosan</groupId>
-			<artifactId>embedded-cassandra</artifactId>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>cassandra</artifactId>
 		</dependency>
 
 	</dependencies>
@@ -100,50 +100,6 @@
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
-			</plugin>
-
-			<!-- HELPER -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>reserve-network-port</id>
-						<goals>
-							<goal>reserve-network-port</goal>
-						</goals>
-						<phase>process-resources</phase>
-						<configuration>
-							<portNames>
-								<portName>cassandra.port</portName>
-							</portNames>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>delete_embedded_cassandra</id>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<phase>test</phase>
-						<configuration>
-							<excludeDefaultDirectories>true</excludeDefaultDirectories>
-							<filesets>
-								<fileset>
-									<directory>${java.io.tmpdir}</directory>
-									<includes>
-										<include>apache-cassandra-*/**</include>
-									</includes>
-								</fileset>
-							</filesets>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 
 		</plugins>

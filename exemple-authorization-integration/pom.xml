@@ -30,7 +30,6 @@
 		<sonar.exclusions>**/common/PrimitivesAndStringFactory.java</sonar.exclusions>
 
 		<cassandra.host>127.0.0.1</cassandra.host>
-		<cassandra.port>9042</cassandra.port>
 		<hazelcast.port>5705</hazelcast.port>
 		<zmp.clientPort>10024</zmp.clientPort>
 
@@ -81,14 +80,6 @@
 			<artifactId>exemple-authorization-server</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
-		</dependency>
-
-		<!-- CASSANDRA EMBEDDED -->
-
-		<dependency>
-			<groupId>com.github.nosan</groupId>
-			<artifactId>embedded-cassandra</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- SPRING BOOT -->
@@ -243,6 +234,14 @@
 							</goals>
 						</execution>
 					</executions>
+				</plugin>
+
+				<!-- DOCKER -->
+				<!-- http://dmp.fabric8.io/ -->
+				<plugin>
+					<groupId>io.fabric8</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>0.40.2</version>
 				</plugin>
 
 				<!-- TEST INTEGRATION -->
@@ -414,6 +413,45 @@
 								</configuration>
 								<goals>
 									<goal>war</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>start_cassandra</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>cassandra:${cassandra-version}</name>
+											<alias>cassandra</alias>
+											<run>
+												<ports>
+													<port>${cassandra.port}:9042</port>
+												</ports>
+												<wait>
+													<log>(?s)Startup complete</log>
+													<time>60000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>stop_all</id>
+								<goals>
+									<goal>stop</goal>
 								</goals>
 							</execution>
 						</executions>
