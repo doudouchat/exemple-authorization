@@ -16,7 +16,7 @@ import io.restassured.response.Response;
 public class InfoIT {
 
     @Test
-    public void info() {
+    void info() {
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).get("/actuator/info");
 

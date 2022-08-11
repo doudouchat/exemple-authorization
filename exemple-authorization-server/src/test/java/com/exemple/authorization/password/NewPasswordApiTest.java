@@ -107,7 +107,7 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void password() {
+    void password() {
 
         String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
                 .withClaim("client_id", "clientId1").sign(algorithm);
@@ -139,7 +139,7 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
     private String token;
 
     @Test
-    public void passwordTrustedClient() {
+    void passwordTrustedClient() {
 
         String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_TRUSTED_CLIENT" }).withAudience("app1", "app2")
                 .withClaim("client_id", "clientId1").sign(algorithm);
@@ -170,7 +170,7 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "passwordTrustedClient")
-    public void checkToken() {
+    void checkToken() {
 
         Map<String, String> params = new HashMap<>();
         params.put("token", token);
@@ -225,7 +225,7 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dataProvider = "passwordFailureForbidden")
-    public void passwordFailureForbidden(String header, String headerValue, HttpStatus expectedStatus) {
+    void passwordFailureForbidden(String header, String headerValue, HttpStatus expectedStatus) {
 
         String login = "jean.dupond@gmail.com";
 
@@ -240,7 +240,7 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void passwordFailureBadRequest() {
+    void passwordFailureBadRequest() {
 
         String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
                 .withClaim("client_id", "clientId1").sign(algorithm);

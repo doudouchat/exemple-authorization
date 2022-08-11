@@ -26,7 +26,7 @@ public class PasswordIT extends AbstractTestNGSpringContextTests {
     private String accessToken = null;
 
     @Test
-    public void connexion() {
+    void connexion() {
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "client_credentials");
@@ -42,7 +42,7 @@ public class PasswordIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "connexion")
-    public void password() {
+    void password() {
 
         Map<String, Object> newPassword = new HashMap<>();
         newPassword.put("login", "jean.dupond@gmail.com");
@@ -63,7 +63,7 @@ public class PasswordIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "password")
-    public void get() {
+    void get() {
 
         Response response = JsonRestTemplate.given()
 

@@ -110,7 +110,7 @@ public class AuthorizationCodeTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void credentials() {
+    void credentials() {
 
         Map<String, String> params = new HashMap<>();
         params.put("grant_type", "client_credentials");
@@ -125,7 +125,7 @@ public class AuthorizationCodeTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "credentials")
-    public void login() {
+    void login() {
 
         username = "jean.dupond@gmail.com";
 
@@ -145,7 +145,7 @@ public class AuthorizationCodeTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "login")
-    public void authorize() {
+    void authorize() {
 
         String authorizeUrl = restTemplate.getRootUri() + "/oauth/authorize?response_type=code&client_id=test_user&scope=account:read&state=123";
         Response response = requestSpecification.when().redirects().follow(false).header("X-Auth-Token", xAuthToken).get(authorizeUrl);
@@ -156,7 +156,7 @@ public class AuthorizationCodeTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "authorize")
-    public void token() {
+    void token() {
 
         Matcher locationMatcher = LOCATION.matcher(location);
         assertThat(locationMatcher.lookingAt(), is(true));
@@ -188,7 +188,7 @@ public class AuthorizationCodeTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "token")
-    public void tokenFailure() {
+    void tokenFailure() {
 
         Matcher locationMatcher = LOCATION.matcher(location);
         assertThat(locationMatcher.lookingAt(), is(true));
@@ -209,7 +209,7 @@ public class AuthorizationCodeTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "token")
-    public void checkToken() {
+    void checkToken() {
 
         Map<String, String> params = new HashMap<>();
         params.put("token", accessToken);
@@ -257,7 +257,7 @@ public class AuthorizationCodeTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dataProvider = "loginFailure")
-    public void loginFailure(String header, String headerValue) {
+    void loginFailure(String header, String headerValue) {
 
         String username = "jean.dupond@gmail.com";
 

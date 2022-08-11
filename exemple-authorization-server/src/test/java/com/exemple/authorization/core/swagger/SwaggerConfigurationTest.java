@@ -45,7 +45,7 @@ public class SwaggerConfigurationTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void swagger() throws IOException {
+    void swagger() throws IOException {
 
         // When perform swagger
         Response response = requestSpecification.get(restTemplate.getRootUri() + "/v3/api-docs");

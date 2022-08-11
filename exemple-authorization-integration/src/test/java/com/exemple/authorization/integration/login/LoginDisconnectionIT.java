@@ -32,7 +32,7 @@ public class LoginDisconnectionIT extends AbstractTestNGSpringContextTests {
     private String accessToken = null;
 
     @BeforeClass
-    public void init() {
+    void init() {
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "client_credentials");
@@ -48,7 +48,7 @@ public class LoginDisconnectionIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void create() {
+    void create() {
 
         Map<String, Object> body = new HashMap<>();
         body.put("password", "mdp");
@@ -66,7 +66,7 @@ public class LoginDisconnectionIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "create")
-    public void connection() {
+    void connection() {
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "password");
@@ -86,7 +86,7 @@ public class LoginDisconnectionIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "connection")
-    public void disconnection() {
+    void disconnection() {
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
 
@@ -101,7 +101,7 @@ public class LoginDisconnectionIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "disconnection")
-    public void getFailure() {
+    void getFailure() {
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
 

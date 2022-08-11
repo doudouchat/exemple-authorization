@@ -26,21 +26,21 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
     private LoginResource resource;
 
     @BeforeSuite
-    public void initKeyspace() {
+    void initKeyspace() {
 
         ResourceExecutionContext.get().setKeyspace("test");
 
     }
 
     @AfterSuite
-    public void destroy() {
+    void destroy() {
 
         ResourceExecutionContext.destroy();
 
     }
 
     @Test
-    public void create() throws UsernameAlreadyExistsException {
+    void create() throws UsernameAlreadyExistsException {
 
         // Given login
 
@@ -66,7 +66,7 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(expectedExceptions = UsernameAlreadyExistsException.class)
-    public void createFailureIfUsernameAlreadyExists() throws UsernameAlreadyExistsException {
+    void createFailureIfUsernameAlreadyExists() throws UsernameAlreadyExistsException {
 
         // Given login
 
@@ -83,7 +83,7 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void get() {
+    void get() {
 
         LoginEntity login = resource.get("jean.dupond@gmail.com").get();
         assertThat(login.getUsername(), is("jean.dupond@gmail.com"));
@@ -93,7 +93,7 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void update() throws UsernameAlreadyExistsException {
+    void update() throws UsernameAlreadyExistsException {
 
         // Given login
 
@@ -125,7 +125,7 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void delete() throws UsernameAlreadyExistsException {
+    void delete() throws UsernameAlreadyExistsException {
 
         // Given login
 

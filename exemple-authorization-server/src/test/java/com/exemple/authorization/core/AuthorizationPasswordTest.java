@@ -94,7 +94,7 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test
-    public void passwordSuccess() {
+    void passwordSuccess() {
 
         username = "jean.dupond@gmail.com";
 
@@ -155,7 +155,7 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test(dataProvider = "passwordFailure")
-    public void passwordFailure(Optional<LoginEntity> loginResponse, HttpStatus expectedStatus, String expectedError) {
+    void passwordFailure(Optional<LoginEntity> loginResponse, HttpStatus expectedStatus, String expectedError) {
 
         String login = "jean.dupond@gmail.com";
 
@@ -179,7 +179,7 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test(dependsOnMethods = "passwordSuccess")
-    public void checkToken() {
+    void checkToken() {
 
         Map<String, String> params = new HashMap<>();
         params.put("token", accessToken);
@@ -201,7 +201,7 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test(dependsOnMethods = "passwordSuccess")
-    public void refreshToken() {
+    void refreshToken() {
 
         LoginEntity account = new LoginEntity();
         account.setUsername(username);
@@ -224,7 +224,7 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test
-    public void passwordBackSuccess() {
+    void passwordBackSuccess() {
 
         Map<String, String> params = new HashMap<>();
         params.put("grant_type", "password");
@@ -244,7 +244,7 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test
-    public void passwordBackFailure() {
+    void passwordBackFailure() {
 
         Map<String, String> params = new HashMap<>();
         params.put("grant_type", "password");
@@ -264,7 +264,7 @@ public class AuthorizationPasswordTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test(dependsOnMethods = "passwordBackSuccess")
-    public void checkBackToken() {
+    void checkBackToken() {
 
         Map<String, String> params = new HashMap<>();
         params.put("token", accessTokenBack);

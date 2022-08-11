@@ -37,7 +37,7 @@ public class JwkSetApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void publicKeys() {
+    void publicKeys() {
 
         Response response = requestSpecification.get(restTemplate.getRootUri() + "/.well-known/jwks.json");
 

@@ -36,7 +36,7 @@ public class AuthorizationServerApplicationTest extends AbstractTestNGSpringCont
     }
 
     @Test
-    public void health() {
+    void health() {
 
         Response response = requestSpecification.get(restTemplate.getRootUri() + "/actuator/health");
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));

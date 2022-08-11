@@ -33,7 +33,7 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
     private String accessToken = null;
 
     @BeforeClass
-    public void init() {
+    void init() {
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "client_credentials");
@@ -49,7 +49,7 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void create() {
+    void create() {
 
         Map<String, Object> body = new HashMap<>();
         body.put("password", "mdp");
@@ -67,7 +67,7 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "create")
-    public void connection() {
+    void connection() {
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "password");
@@ -87,7 +87,7 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "connection")
-    public void changeUsernameFailsBecauseUsernameAlreadyExists() {
+    void changeUsernameFailsBecauseUsernameAlreadyExists() {
 
         Map<String, Object> body = new HashMap<>();
         body.put("toUsername", USERNAME);
@@ -108,7 +108,7 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "changeUsernameFailsBecauseUsernameAlreadyExists")
-    public void changeUsername() {
+    void changeUsername() {
 
         String username = UUID.randomUUID() + "@gmail.com";
 
