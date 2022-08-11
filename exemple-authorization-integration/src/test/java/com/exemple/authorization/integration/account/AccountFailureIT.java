@@ -22,7 +22,7 @@ import io.restassured.response.Response;
 public class AccountFailureIT extends AbstractTestNGSpringContextTests {
 
     @Test
-    public void getForbidden() {
+    void getForbidden() {
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "password");
@@ -48,7 +48,7 @@ public class AccountFailureIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void connectionFailure() {
+    void connectionFailure() {
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "password");

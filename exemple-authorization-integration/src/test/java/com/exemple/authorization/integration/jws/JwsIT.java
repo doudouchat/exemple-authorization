@@ -18,7 +18,7 @@ import io.restassured.response.Response;
 public class JwsIT extends AbstractTestNGSpringContextTests {
 
     @Test
-    public void publicKeys() {
+    void publicKeys() {
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).get("/.well-known/jwks.json");
 

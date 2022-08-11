@@ -81,7 +81,7 @@ public class DisconnectionApiTest extends AbstractTestNGSpringContextTests {
     private String accessToken;
 
     @Test
-    public void disconnection() {
+    void disconnection() {
 
         accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_ACCOUNT" }).withAudience("app")
                 .withJWTId(UUID.randomUUID().toString()).withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
@@ -113,7 +113,7 @@ public class DisconnectionApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dataProvider = "disconnectionFailure")
-    public void disconnectionFailure(String accessToken) {
+    void disconnectionFailure(String accessToken) {
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .post(restTemplate.getRootUri() + "/ws/v1/disconnection");
@@ -123,7 +123,7 @@ public class DisconnectionApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "disconnection")
-    public void checkToken() {
+    void checkToken() {
 
         Map<String, String> params = new HashMap<>();
         params.put("token", accessToken);

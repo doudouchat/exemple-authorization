@@ -88,7 +88,7 @@ public class AuthorizationCredentialsTest extends AbstractTestNGSpringContextTes
     }
 
     @Test
-    public void credentialsSuccess() {
+    void credentialsSuccess() {
 
         Map<String, String> params = new HashMap<>();
         params.put("grant_type", "client_credentials");
@@ -115,7 +115,7 @@ public class AuthorizationCredentialsTest extends AbstractTestNGSpringContextTes
     }
 
     @Test(dataProvider = "credentialsFailure")
-    public void credentialsFailure(String login, String password) {
+    void credentialsFailure(String login, String password) {
 
         Map<String, String> params = new HashMap<>();
         params.put("grant_type", "client_credentials");
@@ -127,7 +127,7 @@ public class AuthorizationCredentialsTest extends AbstractTestNGSpringContextTes
     }
 
     @Test(dependsOnMethods = "credentialsSuccess")
-    public void checkToken() {
+    void checkToken() {
 
         Map<String, String> params = new HashMap<>();
         params.put("token", accessToken);
@@ -148,7 +148,7 @@ public class AuthorizationCredentialsTest extends AbstractTestNGSpringContextTes
     }
 
     @Test(dependsOnMethods = "credentialsSuccess")
-    public void checkTokenFailure() {
+    void checkTokenFailure() {
 
         Map<String, String> params = new HashMap<>();
         params.put("token", accessToken);
@@ -163,7 +163,7 @@ public class AuthorizationCredentialsTest extends AbstractTestNGSpringContextTes
     private static Pattern RSA_PUBLIC_KEY = Pattern.compile("-----BEGIN PUBLIC KEY-----(.*)-----END PUBLIC KEY-----", Pattern.DOTALL);
 
     @Test(dependsOnMethods = "credentialsSuccess")
-    public void tokenKey() throws GeneralSecurityException {
+    void tokenKey() throws GeneralSecurityException {
 
         Response response = requestSpecification.auth().basic("resource", "secret").get(restTemplate.getRootUri() + "/oauth/token_key");
 

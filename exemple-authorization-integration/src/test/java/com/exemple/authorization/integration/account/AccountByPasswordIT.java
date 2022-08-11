@@ -24,7 +24,7 @@ public class AccountByPasswordIT extends AbstractTestNGSpringContextTests {
     private String accessToken = null;
 
     @Test
-    public void connection() {
+    void connection() {
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "password");
@@ -44,7 +44,7 @@ public class AccountByPasswordIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "connection")
-    public void get() {
+    void get() {
 
         Response response = JsonRestTemplate.given()
 
@@ -55,7 +55,7 @@ public class AccountByPasswordIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "get")
-    public void disconnection() {
+    void disconnection() {
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
 
@@ -70,7 +70,7 @@ public class AccountByPasswordIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "disconnection")
-    public void getFailure() {
+    void getFailure() {
 
         Response response = JsonRestTemplate.given()
 

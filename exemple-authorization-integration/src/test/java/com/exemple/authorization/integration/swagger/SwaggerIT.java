@@ -18,7 +18,7 @@ import io.restassured.response.Response;
 public class SwaggerIT extends AbstractTestNGSpringContextTests {
 
     @Test
-    public void swagger() {
+    void swagger() {
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).get("/v3/api-docs");
 

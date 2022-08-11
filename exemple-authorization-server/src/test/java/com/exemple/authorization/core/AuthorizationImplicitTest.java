@@ -89,7 +89,7 @@ public class AuthorizationImplicitTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test
-    public void credentials() {
+    void credentials() {
 
         Map<String, String> params = new HashMap<>();
         params.put("grant_type", "client_credentials");
@@ -104,7 +104,7 @@ public class AuthorizationImplicitTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test(dependsOnMethods = "credentials")
-    public void login() {
+    void login() {
 
         username = "jean.dupond@gmail.com";
 
@@ -124,7 +124,7 @@ public class AuthorizationImplicitTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test(dependsOnMethods = "login")
-    public void token() {
+    void token() {
 
         String authorizeUrl = restTemplate.getRootUri() + "/oauth/authorize?response_type=token&client_id=mobile";
 
@@ -138,7 +138,7 @@ public class AuthorizationImplicitTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test(dependsOnMethods = "token")
-    public void checkToken() {
+    void checkToken() {
 
         Map<String, String> params = new HashMap<>();
         params.put("token", accessToken);

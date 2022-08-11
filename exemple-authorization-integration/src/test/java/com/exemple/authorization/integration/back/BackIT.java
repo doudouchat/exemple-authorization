@@ -24,7 +24,7 @@ public class BackIT extends AbstractTestNGSpringContextTests {
     private String accessToken = null;
 
     @Test
-    public void connection() {
+    void connection() {
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "password");
@@ -44,7 +44,7 @@ public class BackIT extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = "connection")
-    public void get() {
+    void get() {
 
         Response response = JsonRestTemplate.given()
 

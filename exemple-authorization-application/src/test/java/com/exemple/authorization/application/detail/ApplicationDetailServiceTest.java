@@ -30,7 +30,7 @@ public class ApplicationDetailServiceTest extends AbstractTestNGSpringContextTes
     private ApplicationDetailService service;
 
     @Test
-    public void put() {
+    void put() {
 
         Map<String, Object> detail = new HashMap<>();
         detail.put("authorization_keyspace", "keyspace1");
@@ -43,7 +43,7 @@ public class ApplicationDetailServiceTest extends AbstractTestNGSpringContextTes
     }
 
     @Test(dependsOnMethods = "put")
-    public void get() {
+    void get() {
 
         ApplicationDetail detail = service.get("app");
 
@@ -54,7 +54,7 @@ public class ApplicationDetailServiceTest extends AbstractTestNGSpringContextTes
     }
 
     @Test
-    public void getFailureNotFoundApplication() {
+    void getFailureNotFoundApplication() {
 
         String application = UUID.randomUUID().toString();
 

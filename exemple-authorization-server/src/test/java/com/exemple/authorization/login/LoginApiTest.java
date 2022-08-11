@@ -69,7 +69,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void check() {
+    void check() {
 
         // Given login
 
@@ -99,7 +99,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void checkNotFound() {
+    void checkNotFound() {
 
         // Given login
 
@@ -129,7 +129,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void create() throws UsernameAlreadyExistsException {
+    void create() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -176,7 +176,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void createFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException {
+    void createFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -222,7 +222,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void update() throws UsernameAlreadyExistsException {
+    void update() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -273,7 +273,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void updateForbidden() throws UsernameAlreadyExistsException {
+    void updateForbidden() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -310,7 +310,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void move() throws UsernameAlreadyExistsException {
+    void move() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -369,7 +369,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void moveFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException {
+    void moveFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -416,7 +416,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void moveFailsBecauseUsernameNotFound() throws UsernameAlreadyExistsException {
+    void moveFailsBecauseUsernameNotFound() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
@@ -462,7 +462,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void moveFailsBecauseForbidden() throws UsernameAlreadyExistsException {
+    void moveFailsBecauseForbidden() throws UsernameAlreadyExistsException {
 
         // Given user_name
 
