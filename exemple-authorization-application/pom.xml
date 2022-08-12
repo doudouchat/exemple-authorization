@@ -59,13 +59,6 @@
 			<artifactId>mockito-core</artifactId>
 		</dependency>
 
-		<!-- HAMCREST -->
-
-		<dependency>
-			<groupId>nl.fd</groupId>
-			<artifactId>hamcrest-jackson</artifactId>
-		</dependency>
-
 	</dependencies>
 
 	<build>

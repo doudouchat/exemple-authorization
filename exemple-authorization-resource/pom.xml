@@ -62,13 +62,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- HAMCREST -->
-
-		<dependency>
-			<groupId>nl.fd</groupId>
-			<artifactId>hamcrest-jackson</artifactId>
-		</dependency>
-
 		<!-- CASSANDRA CONTAINER -->
 
 		<dependency>

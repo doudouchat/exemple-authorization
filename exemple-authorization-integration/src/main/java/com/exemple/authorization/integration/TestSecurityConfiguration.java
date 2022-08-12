@@ -56,7 +56,7 @@ public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new CustomAuthoritiesOpaqueTokenIntrospector(introspectionUri, clientId, clientSecret);
     }
 
-    private class CustomAuthoritiesOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
+    private static class CustomAuthoritiesOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
         private final OpaqueTokenIntrospector delegate;
 
         public CustomAuthoritiesOpaqueTokenIntrospector(String introspectionUri, String clientId, String clientSecret) {
@@ -68,10 +68,13 @@ public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
             return new DefaultOAuth2AuthenticatedPrincipal(principal.getName(), principal.getAttributes(), extractAuthorities(principal));
         }
 
-        private Collection<GrantedAuthority> extractAuthorities(OAuth2AuthenticatedPrincipal principal) {
+        private static Collection<GrantedAuthority> extractAuthorities(OAuth2AuthenticatedPrincipal principal) {
 
             List<?> scopes = principal.getAttribute(OAuth2TokenIntrospectionClaimNames.SCOPE);
             List<?> authorities = principal.getAttribute("authorities");
+
+            assert scopes != null;
+            assert authorities != null;
 
             return Stream.concat(scopes.stream(), authorities.stream())
                     .map(String.class::cast)

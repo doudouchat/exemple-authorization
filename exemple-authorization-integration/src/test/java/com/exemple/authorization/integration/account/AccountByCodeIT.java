@@ -1,8 +1,7 @@
 package com.exemple.authorization.integration.account;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,10 +9,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.http.HttpHeaders;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.authorization.integration.common.JsonRestTemplate;
 import com.exemple.authorization.integration.core.IntegrationTestConfiguration;
@@ -21,15 +23,20 @@ import com.exemple.authorization.integration.core.IntegrationTestConfiguration;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
-@ContextConfiguration(classes = IntegrationTestConfiguration.class)
-public class AccountByCodeIT extends AbstractTestNGSpringContextTests {
+@SpringJUnitConfig(IntegrationTestConfiguration.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(OrderAnnotation.class)
+class AccountByCodeIT {
 
-    private String accessToken = null;
+    private String accessToken;
 
-    private String accessAppToken = null;
+    private String accessAppToken;
 
     @Test
+    @Order(0)
     void credentials() {
+
+        // When perform get access token
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "client_credentials");
@@ -37,53 +44,66 @@ public class AccountByCodeIT extends AbstractTestNGSpringContextTests {
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth().basic("test", "secret")
                 .formParams(params).post("/oauth/token");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
-        assertThat(response.jsonPath().getString("access_token"), is(notNullValue()));
+        // Then check response
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
 
         accessAppToken = response.jsonPath().getString("access_token");
 
     }
 
-    @Test(dependsOnMethods = "credentials")
+    @Test
+    @Order(1)
     void connection() {
 
+        // When perform login
+
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-
                 .header("Authorization", "Bearer " + accessAppToken)
-
                 .formParams("username", "jean.dupond@gmail.com", "password", "123")
-
                 .post("/login");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.FOUND.value()));
+        // Then check response
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
+                () -> assertThat(response.getHeader("X-Auth-Token")).isNotNull(),
+                () -> assertThat(response.getCookies()).isEmpty());
 
         String xAuthToken = response.getHeader("X-Auth-Token");
-        assertThat(xAuthToken, is(notNullValue()));
 
-        response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).redirects().follow(false)
+        // And perform authorize
 
+        Response responseAuthorize = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).redirects()
+                .follow(false)
                 .header("X-Auth-Token", xAuthToken)
-
                 .queryParam("response_type", "code")
-
                 .queryParam("client_id", "test_user")
-
                 .queryParam("scope", "account")
-
                 .queryParam("state", "123")
-
                 .get("/oauth/authorize");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.SEE_OTHER.value()));
+        assertAll(
+                () -> assertThat(responseAuthorize.getStatusCode()).isEqualTo(HttpStatus.SEE_OTHER.value()),
+                () -> assertThat(responseAuthorize.getHeader(HttpHeaders.LOCATION)).isNotNull());
 
-        String location = response.getHeader(HttpHeaders.LOCATION);
-        assertThat(location, is(notNullValue()));
+        String location = responseAuthorize.getHeader(HttpHeaders.LOCATION);
+
+        // And check location
 
         Matcher locationMatcher = Pattern.compile(".*code=(\\w*)(&state=)?(.*)?", Pattern.DOTALL).matcher(location);
-        assertThat(locationMatcher.lookingAt(), is(true));
+        assertThat(locationMatcher.lookingAt()).isTrue();
 
         String code = locationMatcher.group(1);
         String state = locationMatcher.group(3);
+
+        // And check state
+
+        assertThat(state).isEqualTo("123");
+
+        // And perform get access token
 
         Map<String, String> params = new HashMap<>();
         params.put("grant_type", "authorization_code");
@@ -91,54 +111,64 @@ public class AccountByCodeIT extends AbstractTestNGSpringContextTests {
         params.put("client_id", "test_user");
         params.put("redirect_uri", "xxx");
 
-        response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-
+        Response responseToken = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
                 .auth().basic("test_user", "secret")
-
                 .formParams(params).post("/oauth/token");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
+        // And check response token
 
-        accessToken = response.jsonPath().getString("access_token");
-        assertThat(accessToken, is(notNullValue()));
-        assertThat(state, is("123"));
+        assertAll(
+                () -> assertThat(responseToken.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(responseToken.jsonPath().getString("access_token")).isNotNull());
+
+        accessToken = responseToken.jsonPath().getString("access_token");
 
     }
 
-    @Test(dependsOnMethods = "connection")
+    @Test
+    @Order(2)
     void get() {
 
-        Response response = JsonRestTemplate.given()
+        // When perform get
 
+        Response response = JsonRestTemplate.given()
                 .header("Authorization", "Bearer " + accessToken).get("/account/123");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
+        // Then check response
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
 
     }
 
-    @Test(dependsOnMethods = "get")
+    @Test
+    @Order(3)
     void disconnection() {
 
+        // When perform disconnection
+
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
-
                 .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
-
                 .header("Authorization", "Bearer " + accessToken)
-
                 .post("/ws/v1/disconnection");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+        // Then check response
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
     }
 
-    @Test(dependsOnMethods = "disconnection")
+    @Test
+    @Order(4)
     void getFailure() {
 
-        Response response = JsonRestTemplate.given()
+        // When perform get
 
+        Response response = JsonRestTemplate.given()
                 .header("Authorization", "Bearer " + accessToken).get("/account/123");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED.value()));
+        // Then check response
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
 }

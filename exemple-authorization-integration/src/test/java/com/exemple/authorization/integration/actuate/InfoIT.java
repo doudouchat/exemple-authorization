@@ -4,8 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.testng.annotations.Test;
 
 import com.exemple.authorization.integration.common.JsonRestTemplate;
 import com.exemple.authorization.integration.core.IntegrationTestConfiguration;
@@ -13,7 +13,7 @@ import com.exemple.authorization.integration.core.IntegrationTestConfiguration;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
-public class InfoIT {
+class InfoIT {
 
     @Test
     void info() {
