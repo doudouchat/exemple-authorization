@@ -1,7 +1,7 @@
 package com.exemple.authorization.disconnection;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -9,7 +9,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,11 +26,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -37,7 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
-public class DisconnectionApiTest extends AbstractTestNGSpringContextTests {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class DisconnectionApiTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -53,7 +58,7 @@ public class DisconnectionApiTest extends AbstractTestNGSpringContextTests {
 
     private RequestSpecification requestSpecification;
 
-    @BeforeClass
+    @BeforeAll
     private void init() throws Exception {
 
         String password = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
@@ -71,7 +76,7 @@ public class DisconnectionApiTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
 
         requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG));
@@ -80,6 +85,7 @@ public class DisconnectionApiTest extends AbstractTestNGSpringContextTests {
 
     private String accessToken;
 
+    @Order(0)
     @Test
     void disconnection() {
 
@@ -90,12 +96,11 @@ public class DisconnectionApiTest extends AbstractTestNGSpringContextTests {
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .post(restTemplate.getRootUri() + "/ws/v1/disconnection");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
     }
 
-    @DataProvider(name = "disconnectionFailure")
-    private Object[][] disconnectionFailure() {
+    private Stream<Arguments> disconnectionFailure() {
 
         String accessToken1 = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_ACCOUNT" }).withAudience("app")
                 .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.DAYS))).withClaim("client_id", "clientId1").sign(algorithm);
@@ -103,26 +108,28 @@ public class DisconnectionApiTest extends AbstractTestNGSpringContextTests {
         String accessToken2 = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_ACCOUNT" }).withAudience("app")
                 .withJWTId(UUID.randomUUID().toString()).withClaim("client_id", "clientId1").sign(algorithm);
 
-        return new Object[][] {
+        return Stream.of(
                 // no jti
-                { accessToken1 },
+                Arguments.of(accessToken1),
                 // no exp
-                { accessToken2 }
+                Arguments.of(accessToken2)
 
-        };
+        );
     }
 
-    @Test(dataProvider = "disconnectionFailure")
+    @ParameterizedTest
+    @MethodSource
     void disconnectionFailure(String accessToken) {
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .post(restTemplate.getRootUri() + "/ws/v1/disconnection");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
     }
 
-    @Test(dependsOnMethods = "disconnection")
+    @Order(1)
+    @Test
     void checkToken() {
 
         Map<String, String> params = new HashMap<>();
@@ -131,8 +138,9 @@ public class DisconnectionApiTest extends AbstractTestNGSpringContextTests {
         Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
                 .post(restTemplate.getRootUri() + "/oauth/check_token");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
-        assertThat(response.jsonPath().getString("error"), is("invalid_token"));
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.jsonPath().getString("error")).isEqualTo("invalid_token"));
 
     }
 

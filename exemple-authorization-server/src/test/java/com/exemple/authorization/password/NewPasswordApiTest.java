@@ -1,9 +1,7 @@
 package com.exemple.authorization.password;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -12,9 +10,21 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.ws.rs.core.SecurityContext;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +33,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -49,7 +54,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
-public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class NewPasswordApiTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -74,7 +80,7 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
 
     private RequestSpecification requestSpecification;
 
-    @BeforeClass
+    @BeforeAll
     private void init() throws Exception {
 
         String password = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
@@ -97,7 +103,7 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
 
         Mockito.reset(loginResource);
@@ -106,153 +112,209 @@ public class NewPasswordApiTest extends AbstractTestNGSpringContextTests {
 
     }
 
-    @Test
-    void password() {
+    @Nested
+    class Password {
 
-        String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
-                .withClaim("client_id", "clientId1").sign(algorithm);
+        @Test
+        void password() {
 
-        String username = "jean.dupond@gmail.com";
+            // Given token
 
-        LoginEntity account = new LoginEntity();
-        account.setUsername(username);
+            String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
+                    .withClaim("client_id", "clientId1").sign(algorithm);
 
-        Map<String, Object> newPassword = new HashMap<>();
-        newPassword.put("login", username);
+            // And given username
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(account));
+            String username = "jean.dupond@gmail.com";
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
+            // And mock login resource
 
-        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+            LoginEntity account = new LoginEntity();
+            account.setUsername(username);
 
-        assertThat(testFilter.context.getUserPrincipal().getName(), is("clientId1"));
-        assertThat(testFilter.context.isUserInRole("ROLE_APP"), is(true));
-        assertThat(testFilter.context.isSecure(), is(true));
-        assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
+            Map<String, Object> newPassword = new HashMap<>();
+            newPassword.put("login", username);
 
-    }
+            Mockito.when(loginResource.get(username)).thenReturn(Optional.of(account));
 
-    private String username;
+            // When perform create password
 
-    private String token;
+            Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken)
+                    .header("app", "app")
+                    .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
 
-    @Test
-    void passwordTrustedClient() {
+            // Then check response
 
-        String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_TRUSTED_CLIENT" }).withAudience("app1", "app2")
-                .withClaim("client_id", "clientId1").sign(algorithm);
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        username = "jean.dupond@gmail.com";
+            // And check security context
 
-        LoginEntity account = new LoginEntity();
-        account.setUsername(username);
+            assertAll(
+                    () -> assertThat(testFilter.context.getUserPrincipal().getName()).isEqualTo("clientId1"),
+                    () -> assertThat(testFilter.context.isUserInRole("ROLE_APP")).isTrue(),
+                    () -> assertThat(testFilter.context.isSecure()).isTrue(),
+                    () -> assertThat(testFilter.context.getAuthenticationScheme()).isEqualTo(SecurityContext.BASIC_AUTH));
 
-        Map<String, Object> newPassword = new HashMap<>();
-        newPassword.put("login", username);
-
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(account));
-
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app1")
-                .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
-
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
-        assertThat(response.jsonPath().getString("token"), is(notNullValue()));
-
-        token = response.jsonPath().getString("token");
-
-        assertThat(testFilter.context.getUserPrincipal().getName(), is("clientId1"));
-        assertThat(testFilter.context.isUserInRole("ROLE_TRUSTED_CLIENT"), is(true));
-        assertThat(testFilter.context.isSecure(), is(true));
-        assertThat(testFilter.context.getAuthenticationScheme(), is(SecurityContext.BASIC_AUTH));
+        }
 
     }
 
-    @Test(dependsOnMethods = "passwordTrustedClient")
-    void checkToken() {
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @TestMethodOrder(OrderAnnotation.class)
+    class TrustedPassword {
 
-        Map<String, String> params = new HashMap<>();
-        params.put("token", token);
+        private String username;
 
-        Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
-                .post(restTemplate.getRootUri() + "/oauth/check_token");
+        private String token;
 
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
+        @BeforeAll
+        void username() {
 
-        JWTPartsParser parser = new JWTParser();
-        Payload payload = parser.parsePayload(response.getBody().print());
+            username = "jean.dupond@gmail.com";
+        }
 
-        assertThat(payload.getSubject(), is(this.username));
-        assertThat(payload.getClaim("authorities").asArray(String.class), arrayContainingInAnyOrder("ROLE_TRUSTED_CLIENT"));
-        assertThat(payload.getClaim("scope").asArray(String.class), arrayContainingInAnyOrder("login:read", "login:update"));
-        assertThat(payload.getExpiresAt(), is(Date.from(Instant.now(clock).plusSeconds(expiryTime))));
-        assertThat(payload.getId(), is(notNullValue()));
+        @Order(0)
+        @Test
+        void passwordTrustedClient() {
+
+            // Given token
+
+            String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_TRUSTED_CLIENT" }).withAudience("app1", "app2")
+                    .withClaim("client_id", "clientId1").sign(algorithm);
+
+            // And mock login resource
+
+            LoginEntity account = new LoginEntity();
+            account.setUsername(username);
+
+            Map<String, Object> newPassword = new HashMap<>();
+            newPassword.put("login", username);
+
+            Mockito.when(loginResource.get(username)).thenReturn(Optional.of(account));
+
+            // When perform create password
+
+            Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken)
+                    .header("app", "app1")
+                    .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
+
+            // Then check response
+
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(response.jsonPath().getString("token")).isNotNull());
+
+            // And check security context
+
+            assertAll(
+                    () -> assertThat(testFilter.context.getUserPrincipal().getName()).isEqualTo("clientId1"),
+                    () -> assertThat(testFilter.context.isUserInRole("ROLE_TRUSTED_CLIENT")).isTrue(),
+                    () -> assertThat(testFilter.context.isSecure()).isTrue(),
+                    () -> assertThat(testFilter.context.getAuthenticationScheme()).isEqualTo(SecurityContext.BASIC_AUTH));
+
+            token = response.jsonPath().getString("token");
+
+        }
+
+        @Order(1)
+        @Test
+        void checkToken() {
+
+            // When perform check token
+
+            Map<String, String> params = new HashMap<>();
+            params.put("token", token);
+
+            Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+
+            // Then check response
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
+            // And check payload
+
+            JWTPartsParser parser = new JWTParser();
+            Payload payload = parser.parsePayload(response.getBody().print());
+
+            assertAll(
+                    () -> assertThat(payload.getSubject()).isEqualTo(username),
+                    () -> assertThat(payload.getClaim("authorities").asArray(String.class)).contains("ROLE_TRUSTED_CLIENT"),
+                    () -> assertThat(payload.getClaim("scope").asArray(String.class)).contains("login:read", "login:update"),
+                    () -> assertThat(payload.getExpiresAt()).isEqualTo(Date.from(Instant.now(clock).plusSeconds(expiryTime))),
+                    () -> assertThat(payload.getId()).isNotNull());
+
+        }
 
     }
 
-    @DataProvider(name = "passwordFailureForbidden")
-    private Object[][] passwordFailureForbidden() {
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class PasswordFailure {
 
-        String accessToken1 = JWT.create().withClaim("client_id", "clientId1").withArrayClaim("authorities", new String[] { "ROLE_ACCOUNT" })
-                .withAudience("app").sign(algorithm);
-        String accessToken2 = JWT.create().withClaim("client_id", "clientId1")
-                .withExpiresAt(new Date(Instant.now().minus(1, ChronoUnit.HOURS).toEpochMilli()))
-                .withArrayClaim("authorities", new String[] { "ROLE_APP" }).sign(algorithm);
-        String accessToken3 = JWT.create().withClaim("client_id", "clientId1").withArrayClaim("authorities", new String[] { "ROLE_APP" })
-                .sign(algorithm);
-        String accessToken4 = JWT.create().withClaim("client_id", "clientId1").withAudience("app").sign(algorithm);
-        String accessToken5 = JWT.create().withClaim("client_id", "other").withArrayClaim("authorities", new String[] { "ROLE_TRUSTED_CLIENT" })
-                .withAudience("app1", "app2").sign(algorithm);
+        private Stream<Arguments> passwordFailureForbidden() {
 
-        return new Object[][] {
-                // not authorities to access
-                { "Authorization", "Bearer " + accessToken1, HttpStatus.FORBIDDEN },
-                // token is expired
-                { "Authorization", "Bearer " + accessToken2, HttpStatus.UNAUTHORIZED },
-                // not bearer
-                { "Authorization", accessToken3, HttpStatus.FORBIDDEN },
-                // not token
-                { "Header", "Bearer " + accessToken3, HttpStatus.FORBIDDEN },
-                // auhorities is empty
-                { "Authorization", "Bearer " + accessToken4, HttpStatus.FORBIDDEN },
-                // token no recognized
-                { "Authorization", "Bearer toto", HttpStatus.UNAUTHORIZED },
-                // bad client id
-                { "Authorization", "Bearer " + accessToken5, HttpStatus.UNAUTHORIZED }
+            String accessToken1 = JWT.create().withClaim("client_id", "clientId1").withArrayClaim("authorities", new String[] { "ROLE_ACCOUNT" })
+                    .withAudience("app").sign(algorithm);
+            String accessToken2 = JWT.create().withClaim("client_id", "clientId1")
+                    .withExpiresAt(new Date(Instant.now().minus(1, ChronoUnit.HOURS).toEpochMilli()))
+                    .withArrayClaim("authorities", new String[] { "ROLE_APP" }).sign(algorithm);
+            String accessToken3 = JWT.create().withClaim("client_id", "clientId1").withArrayClaim("authorities", new String[] { "ROLE_APP" })
+                    .sign(algorithm);
+            String accessToken4 = JWT.create().withClaim("client_id", "clientId1").withAudience("app").sign(algorithm);
+            String accessToken5 = JWT.create().withClaim("client_id", "other").withArrayClaim("authorities", new String[] { "ROLE_TRUSTED_CLIENT" })
+                    .withAudience("app1", "app2").sign(algorithm);
 
-        };
-    }
+            return Stream.of(
+                    // not authorities to access
+                    Arguments.of("Authorization", "Bearer " + accessToken1, HttpStatus.FORBIDDEN),
+                    // token is expired
+                    Arguments.of("Authorization", "Bearer " + accessToken2, HttpStatus.UNAUTHORIZED),
+                    // not bearer
+                    Arguments.of("Authorization", accessToken3, HttpStatus.FORBIDDEN),
+                    // not token
+                    Arguments.of("Header", "Bearer " + accessToken3, HttpStatus.FORBIDDEN),
+                    // auhorities is empty
+                    Arguments.of("Authorization", "Bearer " + accessToken4, HttpStatus.FORBIDDEN),
+                    // token no recognized
+                    Arguments.of("Authorization", "Bearer toto", HttpStatus.UNAUTHORIZED),
+                    // bad client id
+                    Arguments.of("Authorization", "Bearer " + accessToken5, HttpStatus.UNAUTHORIZED));
+        }
 
-    @Test(dataProvider = "passwordFailureForbidden")
-    void passwordFailureForbidden(String header, String headerValue, HttpStatus expectedStatus) {
+        @ParameterizedTest
+        @MethodSource
+        void passwordFailureForbidden(String header, String headerValue, HttpStatus expectedStatus) {
 
-        String login = "jean.dupond@gmail.com";
+            String login = "jean.dupond@gmail.com";
 
-        Map<String, Object> newPassword = new HashMap<>();
-        newPassword.put("login", login);
+            Map<String, Object> newPassword = new HashMap<>();
+            newPassword.put("login", login);
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header(header, headerValue).header("app", "app").body(newPassword)
-                .post(restTemplate.getRootUri() + "/ws/v1/new_password");
+            Response response = requestSpecification.contentType(ContentType.JSON).header(header, headerValue).header("app", "app").body(newPassword)
+                    .post(restTemplate.getRootUri() + "/ws/v1/new_password");
 
-        assertThat(response.getStatusCode(), is(expectedStatus.value()));
+            assertThat(response.getStatusCode()).isEqualTo(expectedStatus.value());
 
-    }
+        }
 
-    @Test
-    void passwordFailureBadRequest() {
+        @Test
+        void passwordFailureBadRequest() {
 
-        String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
-                .withClaim("client_id", "clientId1").sign(algorithm);
+            String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
+                    .withClaim("client_id", "clientId1").sign(algorithm);
 
-        Map<String, Object> newPassword = new HashMap<>();
-        newPassword.put("login", "");
+            Map<String, Object> newPassword = new HashMap<>();
+            newPassword.put("login", "");
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
+            Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken)
+                    .header("app", "app")
+                    .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
+        }
     }
 
 }

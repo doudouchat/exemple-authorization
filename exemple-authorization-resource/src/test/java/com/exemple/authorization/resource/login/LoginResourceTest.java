@@ -1,39 +1,38 @@
 package com.exemple.authorization.resource.login;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Optional;
 import java.util.UUID;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.authorization.resource.core.ResourceExecutionContext;
 import com.exemple.authorization.resource.core.ResourceTestConfiguration;
 import com.exemple.authorization.resource.login.exception.UsernameAlreadyExistsException;
 import com.exemple.authorization.resource.login.model.LoginEntity;
 
-@ContextConfiguration(classes = ResourceTestConfiguration.class)
-public class LoginResourceTest extends AbstractTestNGSpringContextTests {
+@SpringJUnitConfig(ResourceTestConfiguration.class)
+class LoginResourceTest {
 
     @Autowired
     private LoginResource resource;
 
-    @BeforeSuite
-    void initKeyspace() {
+    @BeforeAll
+    static void initKeyspace() {
 
         ResourceExecutionContext.get().setKeyspace("test");
 
     }
 
-    @AfterSuite
-    void destroy() {
+    @AfterAll
+    static void destroy() {
 
         ResourceExecutionContext.destroy();
 
@@ -59,13 +58,14 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         // Then check login
 
         LoginEntity actualLogin = resource.get(username).get();
-        assertThat(actualLogin.getUsername(), is(username));
-        assertThat(actualLogin.getPassword(), is("mdp123"));
-        assertThat(actualLogin.isDisabled(), is(true));
-        assertThat(actualLogin.isAccountLocked(), is(true));
+        assertAll(
+                () -> assertThat(actualLogin.getUsername()).isEqualTo(username),
+                () -> assertThat(actualLogin.getPassword()).isEqualTo("mdp123"),
+                () -> assertThat(actualLogin.isDisabled()).isTrue(),
+                () -> assertThat(actualLogin.isAccountLocked()).isTrue());
     }
 
-    @Test(expectedExceptions = UsernameAlreadyExistsException.class)
+    @Test
     void createFailureIfUsernameAlreadyExists() throws UsernameAlreadyExistsException {
 
         // Given login
@@ -77,8 +77,12 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         login.setAccountLocked(true);
 
         // When perform
+        Throwable throwable = catchThrowable(() -> resource.save(login));
 
-        resource.save(login);
+        // Then check none exception
+        assertThat(throwable).isInstanceOfSatisfying(UsernameAlreadyExistsException.class,
+                exception -> assertAll(
+                        () -> assertThat(exception.getUsername()).isEqualTo(login.getUsername())));
 
     }
 
@@ -86,10 +90,11 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
     void get() {
 
         LoginEntity login = resource.get("jean.dupond@gmail.com").get();
-        assertThat(login.getUsername(), is("jean.dupond@gmail.com"));
-        assertThat(login.getPassword(), is(nullValue()));
-        assertThat(login.isDisabled(), is(false));
-        assertThat(login.isAccountLocked(), is(false));
+        assertAll(
+                () -> assertThat(login.getUsername()).isEqualTo("jean.dupond@gmail.com"),
+                () -> assertThat(login.getPassword()).isNull(),
+                () -> assertThat(login.isDisabled()).isFalse(),
+                () -> assertThat(login.isAccountLocked()).isFalse());
     }
 
     @Test
@@ -118,10 +123,12 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         // Then check login
 
         LoginEntity actualLogin = resource.get(username).get();
-        assertThat(actualLogin.getUsername(), is(username));
-        assertThat(actualLogin.getPassword(), is("mdp124"));
-        assertThat(actualLogin.isDisabled(), is(false));
-        assertThat(actualLogin.isAccountLocked(), is(false));
+        assertAll(
+                () -> assertThat(actualLogin.getUsername()).isEqualTo(username),
+                () -> assertThat(actualLogin.getPassword()).isEqualTo("mdp124"),
+                () -> assertThat(actualLogin.isDisabled()).isFalse(),
+                () -> assertThat(actualLogin.isAccountLocked()).isFalse());
+
     }
 
     @Test
@@ -143,7 +150,7 @@ public class LoginResourceTest extends AbstractTestNGSpringContextTests {
         // Then check login
 
         Optional<LoginEntity> actualLogin = resource.get(username);
-        assertThat(actualLogin.isPresent(), is(false));
+        assertThat(actualLogin).isEmpty();
 
     }
 

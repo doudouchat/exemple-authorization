@@ -1,8 +1,7 @@
 package com.exemple.authorization.login;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.net.URI;
 import java.util.Collections;
@@ -10,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -19,9 +20,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -41,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
-public class LoginApiTest extends AbstractTestNGSpringContextTests {
+class LoginApiTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -59,7 +57,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
     public static final String URL = "/ws/v1/logins";
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
 
         Mockito.reset(loginResource);
@@ -81,7 +79,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // And mock service
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(new LoginEntity()));
+        Mockito.when(loginResource.get(username)).thenReturn(Optional.of(new LoginEntity()));
 
         // When perform head
 
@@ -90,11 +88,11 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // Then check status
 
-        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // And check mock
 
-        Mockito.verify(loginResource).get(Mockito.eq(username));
+        Mockito.verify(loginResource).get(username);
 
     }
 
@@ -111,7 +109,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // And mock service
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.empty());
+        Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
 
         // When perform head
 
@@ -120,11 +118,11 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // Then check status
 
-        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
 
         // And check mock
 
-        Mockito.verify(loginResource).get(Mockito.eq(username));
+        Mockito.verify(loginResource).get(username);
 
     }
 
@@ -137,7 +135,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // And mock service
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.empty());
+        Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
 
         // And token
 
@@ -152,26 +150,25 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
 
-        // Then check status
+        // Then check response
 
-        assertThat(response.getStatusCode(), is(HttpStatus.CREATED.value()));
-
-        // And check location
-
-        assertThat(response.getHeader("Location"), is(URI.create(restTemplate.getRootUri() + URL + "/" + username).toString()));
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(response.getHeader("Location")).isEqualTo(URI.create(restTemplate.getRootUri() + URL + "/" + username).toString()));
 
         // And check service
 
         ArgumentCaptor<LoginEntity> entity = ArgumentCaptor.forClass(LoginEntity.class);
         Mockito.verify(loginResource).save(entity.capture());
 
-        assertThat(entity.getValue().getUsername(), is(username));
-        assertThat(entity.getValue().getPassword(), startsWith("{bcrypt}"));
-        assertThat(BCrypt.checkpw("mdp123", entity.getValue().getPassword().substring("{bcrypt}".length())), is(true));
+        assertAll(
+                () -> assertThat(entity.getValue().getUsername()).isEqualTo(username),
+                () -> assertThat(entity.getValue().getPassword()).startsWith("{bcrypt}"),
+                () -> assertThat(BCrypt.checkpw("mdp123", entity.getValue().getPassword().substring("{bcrypt}".length()))).isTrue());
 
         // And check mock
 
-        Mockito.verify(loginResource).get(Mockito.eq(username));
+        Mockito.verify(loginResource).get(username);
 
     }
 
@@ -184,7 +181,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // And mock service
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.empty());
+        Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
         Mockito.doThrow(new UsernameAlreadyExistsException(username)).when(loginResource).save(Mockito.any());
 
         // And token
@@ -202,7 +199,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // Then check status
 
-        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         // And check message
 
@@ -217,7 +214,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         });
         JsonNode message = response.as(JsonNode.class);
-        assertThat(message, is(expectedMessage));
+        assertThat(message).isEqualTo(expectedMessage);
 
     }
 
@@ -236,7 +233,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         entity.setDisabled(true);
         entity.setAccountLocked(true);
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(entity));
+        Mockito.when(loginResource.get(username)).thenReturn(Optional.of(entity));
 
         // And token
 
@@ -253,22 +250,23 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // Then check status
 
-        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
         // And check service
 
         ArgumentCaptor<LoginEntity> actualEntity = ArgumentCaptor.forClass(LoginEntity.class);
         Mockito.verify(loginResource).update(actualEntity.capture());
 
-        assertThat(actualEntity.getValue().getUsername(), is(username));
-        assertThat(actualEntity.getValue().getPassword(), startsWith("{bcrypt}"));
-        assertThat(BCrypt.checkpw("mdp124", actualEntity.getValue().getPassword().substring("{bcrypt}".length())), is(true));
-        assertThat(actualEntity.getValue().isDisabled(), is(true));
-        assertThat(actualEntity.getValue().isAccountLocked(), is(true));
+        assertAll(
+                () -> assertThat(actualEntity.getValue().getUsername()).isEqualTo(username),
+                () -> assertThat(actualEntity.getValue().getPassword()).startsWith("{bcrypt}"),
+                () -> assertThat(BCrypt.checkpw("mdp124", actualEntity.getValue().getPassword().substring("{bcrypt}".length()))).isTrue(),
+                () -> assertThat(actualEntity.getValue().isDisabled()).isTrue(),
+                () -> assertThat(actualEntity.getValue().isAccountLocked()).isTrue());
 
         // And check mock
 
-        Mockito.verify(loginResource).get(Mockito.eq(username));
+        Mockito.verify(loginResource).get(username);
 
     }
 
@@ -284,7 +282,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         LoginEntity entity = new LoginEntity();
         entity.setUsername(username);
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(entity));
+        Mockito.when(loginResource.get(username)).thenReturn(Optional.of(entity));
 
         // And token
 
@@ -301,11 +299,11 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // Then check status
 
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN.value()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
 
         // And check mock
         Mockito.verify(loginResource, Mockito.never()).update(Mockito.any());
-        Mockito.verify(loginResource).get(Mockito.eq(username));
+        Mockito.verify(loginResource).get(username);
 
     }
 
@@ -324,7 +322,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         entity.setDisabled(true);
         entity.setAccountLocked(true);
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(entity));
+        Mockito.when(loginResource.get(username)).thenReturn(Optional.of(entity));
 
         // And token
 
@@ -340,31 +338,31 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).post(restTemplate.getRootUri() + URL + "/move");
 
-        // Then check status
+        // Then check response
 
-        assertThat(response.getStatusCode(), is(HttpStatus.CREATED.value()));
-
-        // And check location
-
-        assertThat(response.getHeader("Location"), is(URI.create(restTemplate.getRootUri() + URL + "/jean.dupont@gmail.com").toString()));
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(response.getHeader("Location"))
+                        .isEqualTo(URI.create(restTemplate.getRootUri() + URL + "/jean.dupont@gmail.com").toString()));
 
         // And check service
 
         ArgumentCaptor<LoginEntity> entityCaptor = ArgumentCaptor.forClass(LoginEntity.class);
         Mockito.verify(loginResource).save(entityCaptor.capture());
 
-        assertThat(entityCaptor.getValue().getUsername(), is("jean.dupont@gmail.com"));
-        assertThat(entityCaptor.getValue().getPassword(), is("mdp123"));
-        assertThat(entityCaptor.getValue().isDisabled(), is(true));
-        assertThat(entityCaptor.getValue().isAccountLocked(), is(true));
+        assertAll(
+                () -> assertThat(entityCaptor.getValue().getUsername()).isEqualTo("jean.dupont@gmail.com"),
+                () -> assertThat(entityCaptor.getValue().getPassword()).isEqualTo("mdp123"),
+                () -> assertThat(entityCaptor.getValue().isDisabled()).isTrue(),
+                () -> assertThat(entityCaptor.getValue().isAccountLocked()).isTrue());
 
         // And check mock
 
-        Mockito.verify(loginResource).get(Mockito.eq(username));
+        Mockito.verify(loginResource).get(username);
 
         // And check mock
 
-        Mockito.verify(loginResource).delete(Mockito.eq(username));
+        Mockito.verify(loginResource).delete(username);
 
     }
 
@@ -377,7 +375,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // And mock service
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.of(new LoginEntity()));
+        Mockito.when(loginResource.get(username)).thenReturn(Optional.of(new LoginEntity()));
         Mockito.doThrow(new UsernameAlreadyExistsException(username)).when(loginResource).save(Mockito.any());
 
         // And token
@@ -396,7 +394,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // Then check status
 
-        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         // And check message
 
@@ -411,7 +409,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         });
         JsonNode message = response.as(JsonNode.class);
-        assertThat(message, is(expectedMessage));
+        assertThat(message).isEqualTo(expectedMessage);
 
     }
 
@@ -424,7 +422,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // And mock service
 
-        Mockito.when(loginResource.get(Mockito.eq(username))).thenReturn(Optional.empty());
+        Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
 
         // And token
 
@@ -442,7 +440,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // Then check status
 
-        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         // And check message
 
@@ -457,7 +455,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         });
         JsonNode message = response.as(JsonNode.class);
-        assertThat(message, is(expectedMessage));
+        assertThat(message).isEqualTo(expectedMessage);
 
     }
 
@@ -484,7 +482,7 @@ public class LoginApiTest extends AbstractTestNGSpringContextTests {
 
         // Then check status
 
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN.value()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
 
     }
 

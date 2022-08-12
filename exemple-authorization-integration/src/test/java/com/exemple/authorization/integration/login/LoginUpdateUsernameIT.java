@@ -1,19 +1,20 @@
 package com.exemple.authorization.integration.login;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.exemple.authorization.integration.common.JsonRestTemplate;
 import com.exemple.authorization.integration.core.IntegrationTestConfiguration;
@@ -21,8 +22,10 @@ import com.exemple.authorization.integration.core.IntegrationTestConfiguration;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
-@ContextConfiguration(classes = { IntegrationTestConfiguration.class })
-public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
+@SpringJUnitConfig(IntegrationTestConfiguration.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(OrderAnnotation.class)
+class LoginUpdateUsernameIT {
 
     public static final String URL = "/ws/v1/logins";
 
@@ -32,7 +35,7 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
 
     private String accessToken = null;
 
-    @BeforeClass
+    @BeforeAll
     void init() {
 
         Map<String, Object> params = new HashMap<>();
@@ -41,33 +44,40 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth().basic("test", "secret")
                 .formParams(params).post("/oauth/token");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
+        // Then check response
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
 
         accessAppToken = response.jsonPath().getString("access_token");
-        assertThat(accessAppToken, is(notNullValue()));
-
     }
 
     @Test
+    @Order(0)
     void create() {
+
+        // When perform post login
 
         Map<String, Object> body = new HashMap<>();
         body.put("password", "mdp");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
-
                 .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
-
                 .header("Authorization", "Bearer " + accessAppToken)
+                .body(body).put(LoginDisconnectionIT.URL + "/" + USERNAME);
 
-                .body(body).put(LoginUpdateUsernameIT.URL + "/" + USERNAME);
+        // Then check response
 
-        assertThat(response.getStatusCode(), is(HttpStatus.CREATED.value()));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED.value());
 
     }
 
-    @Test(dependsOnMethods = "create")
+    @Test
+    @Order(1)
     void connection() {
+
+        // When perform get access token
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "password");
@@ -79,36 +89,43 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
                 .basic("test_user", "secret").formParams(params).post("/oauth/token");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
+        // Then check response
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
 
         accessToken = response.jsonPath().getString("access_token");
-        assertThat(accessToken, is(notNullValue()));
 
     }
 
-    @Test(dependsOnMethods = "connection")
+    @Test
     void changeUsernameFailsBecauseUsernameAlreadyExists() {
+
+        // When perform change username
 
         Map<String, Object> body = new HashMap<>();
         body.put("toUsername", USERNAME);
         body.put("fromUsername", USERNAME);
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
-
                 .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
-
                 .header("Authorization", "Bearer " + accessToken)
-
                 .body(body).post(LoginUpdateUsernameIT.URL + "/move");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST.value()));
-        assertThat(response.jsonPath().getList("code"), contains(is("username")));
-        assertThat(response.jsonPath().getList("path"), contains(is("/toUsername")));
+        // Then check response
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                () -> assertThat(response.jsonPath().getString("code")).contains("username"),
+                () -> assertThat(response.jsonPath().getString("path")).contains("/toUsername"));
 
     }
 
-    @Test(dependsOnMethods = "changeUsernameFailsBecauseUsernameAlreadyExists")
+    @Test
     void changeUsername() {
+
+        // When perform change username
 
         String username = UUID.randomUUID() + "@gmail.com";
 
@@ -117,14 +134,15 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
         body.put("fromUsername", USERNAME);
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
-
                 .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
-
                 .header("Authorization", "Bearer " + accessToken)
-
                 .body(body).post(LoginUpdateUsernameIT.URL + "/move");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.CREATED.value()));
+        // Then check response
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED.value());
+
+        // And get access token
 
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "password");
@@ -133,21 +151,24 @@ public class LoginUpdateUsernameIT extends AbstractTestNGSpringContextTests {
         params.put("client_id", "test_user");
         params.put("redirect_uri", "xxx");
 
-        response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth().basic("test_user", "secret")
+        Response responseToken = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
+                .basic("test_user", "secret")
                 .formParams(params).post("/oauth/token");
 
-        assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
-        assertThat(response.jsonPath().getString("access_token"), is(notNullValue()));
+        // And check access token
 
-        response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
+        assertAll(
+                () -> assertThat(responseToken.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(responseToken.jsonPath().getString("access_token")).isNotNull());
 
+        // And check username
+
+        Response responseUsername = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
                 .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
-
                 .header("Authorization", "Bearer " + accessToken)
-
                 .head(LoginIT.URL + "/" + USERNAME);
 
-        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND.value()));
+        assertThat(responseUsername.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
 
     }
 

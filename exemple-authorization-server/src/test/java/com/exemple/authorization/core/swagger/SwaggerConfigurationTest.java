@@ -8,14 +8,13 @@ import java.util.List;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.curator.shaded.com.google.common.collect.ImmutableList;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.util.ResourceUtils;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.exemple.authorization.common.LoggingFilter;
 import com.exemple.authorization.core.AuthorizationTestConfiguration;
@@ -28,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
-public class SwaggerConfigurationTest extends AbstractTestNGSpringContextTests {
+class SwaggerConfigurationTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -37,7 +36,7 @@ public class SwaggerConfigurationTest extends AbstractTestNGSpringContextTests {
 
     private RequestSpecification requestSpecification;
 
-    @BeforeMethod
+    @BeforeEach
     private void before() {
 
         requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG));
