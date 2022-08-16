@@ -7,8 +7,6 @@ import lombok.Getter;
 @Getter
 public class LoginAlreadyExistsException extends UsernameAlreadyExistsException {
 
-    private static final long serialVersionUID = 1L;
-
     private final String path;
 
     public LoginAlreadyExistsException(String username, String path) {

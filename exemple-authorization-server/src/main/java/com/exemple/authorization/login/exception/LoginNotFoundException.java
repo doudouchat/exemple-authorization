@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class LoginNotFoundException extends Exception {
 
-    private static final long serialVersionUID = 1L;
-
     private final String username;
 
     private final String path;
