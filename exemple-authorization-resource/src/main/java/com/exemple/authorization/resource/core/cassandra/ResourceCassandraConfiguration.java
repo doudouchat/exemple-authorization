@@ -25,7 +25,7 @@ public class ResourceCassandraConfiguration {
     @Bean
     public CqlSession session() {
 
-        DriverConfigLoader loader = DriverConfigLoader.fromFile(cassandraResource);
+        var loader = DriverConfigLoader.fromFile(cassandraResource);
 
         return CqlSession.builder().withConfigLoader(loader).build();
     }

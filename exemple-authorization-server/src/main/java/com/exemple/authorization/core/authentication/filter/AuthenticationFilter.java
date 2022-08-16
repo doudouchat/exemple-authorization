@@ -40,7 +40,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
-        Authentication preAuthentication = tokenExtractor.extract(request);
+        var preAuthentication = tokenExtractor.extract(request);
 
         if (preAuthentication != null) {
 

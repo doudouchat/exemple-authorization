@@ -62,7 +62,7 @@ public class AuthorizationTokenConfiguration {
 
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+        var converter = new JwtAccessTokenConverter();
         converter.setKeyPair(this.keyStoreKeyFactory.getKeyPair(alias));
         converter.setJwtClaimsSetVerifier((Map<String, Object> claims) -> {
 
@@ -77,14 +77,14 @@ public class AuthorizationTokenConfiguration {
     @Bean
     public TokenEnhancer tokenEnhancer() {
 
-        TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+        var tokenEnhancerChain = new TokenEnhancerChain();
         tokenEnhancerChain.setTokenEnhancers(Arrays.asList((OAuth2AccessToken accessToken, OAuth2Authentication authentication) -> {
 
             Map<String, Object> additionalInfo = new HashMap<>();
 
             if (authentication.getPrincipal() instanceof User) {
 
-                User user = (User) authentication.getPrincipal();
+                var user = (User) authentication.getPrincipal();
                 additionalInfo.put("sub", user.getUsername());
             }
             additionalInfo.put("authorities",
@@ -102,7 +102,7 @@ public class AuthorizationTokenConfiguration {
     @Bean
     @Primary
     public DefaultTokenServices tokenServices() {
-        DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+        var defaultTokenServices = new DefaultTokenServices();
         defaultTokenServices.setTokenStore(tokenStore());
         defaultTokenServices.setSupportRefreshToken(true);
         return defaultTokenServices;
@@ -110,7 +110,7 @@ public class AuthorizationTokenConfiguration {
 
     @Bean
     public JWKSet jwkSet() {
-        RSAKey.Builder builder = new RSAKey.Builder((RSAPublicKey) this.keyStoreKeyFactory.getKeyPair(alias).getPublic()).keyUse(KeyUse.SIGNATURE)
+        var builder = new RSAKey.Builder((RSAPublicKey) this.keyStoreKeyFactory.getKeyPair(alias).getPublic()).keyUse(KeyUse.SIGNATURE)
                 .algorithm(JWSAlgorithm.RS256).keyID("exemple-key-id");
         return new JWKSet(builder.build());
     }

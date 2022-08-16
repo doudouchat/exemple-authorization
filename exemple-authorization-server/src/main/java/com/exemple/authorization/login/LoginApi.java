@@ -21,7 +21,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -92,7 +91,7 @@ public class LoginApi {
 
             checkIfUsernameHasRight(username, servletContext.getSecurityContext());
 
-            LoginEntity entity = toLoginEntity(source, origin.get());
+            var entity = toLoginEntity(source, origin.get());
             entity.setUsername(username);
             entity.setPassword(encryptPassword(entity.getPassword()));
 
@@ -102,13 +101,13 @@ public class LoginApi {
 
         } else {
 
-            LoginEntity entity = toLoginEntity(source);
+            var entity = toLoginEntity(source);
             entity.setUsername(username);
             entity.setPassword(encryptPassword(entity.getPassword()));
 
             loginResource.save(entity);
 
-            UriBuilder builder = uriInfo.getBaseUriBuilder();
+            var builder = uriInfo.getBaseUriBuilder();
             builder.path("v1/logins/" + username);
             response = Response.created(builder.build()).build();
 
@@ -146,7 +145,7 @@ public class LoginApi {
 
         loginResource.delete(copy.getFromUsername());
 
-        UriBuilder builder = uriInfo.getBaseUriBuilder();
+        var builder = uriInfo.getBaseUriBuilder();
         builder.path("v1/logins/" + copy.getToUsername());
 
         return Response.created(builder.build()).build();

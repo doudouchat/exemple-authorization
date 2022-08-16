@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.common.security.AuthorizationContextSecurity;
 import com.exemple.authorization.password.model.NewPassword;
@@ -34,9 +33,9 @@ public class AccessTokenBuilder {
 
     public String createAccessToken(NewPassword newPassword, String app, AuthorizationContextSecurity securityContext) {
 
-        ApplicationDetail applicationDetail = applicationDetailService.get(app);
+        var applicationDetail = applicationDetailService.get(app);
 
-        Date expiresAt = Date.from(Instant.now(clock)
+        var expiresAt = Date.from(Instant.now(clock)
                 .plus(ObjectUtils.defaultIfNull(applicationDetail.getExpiryTimePassword(), passwordProperties.getExpiryTime()), ChronoUnit.SECONDS));
 
         return JWT.create()

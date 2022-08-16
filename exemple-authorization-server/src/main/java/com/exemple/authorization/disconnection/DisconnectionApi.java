@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.RegisteredClaims;
-import com.auth0.jwt.interfaces.Payload;
 import com.exemple.authorization.common.security.AuthorizationContextSecurity;
 import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
 import com.hazelcast.core.HazelcastInstance;
@@ -44,7 +43,7 @@ public class DisconnectionApi {
     @RolesAllowed("ROLE_ACCOUNT")
     public void disconnection() {
 
-        Payload payload = ((AuthorizationContextSecurity) servletContext.getSecurityContext()).getPayload();
+        var payload = ((AuthorizationContextSecurity) servletContext.getSecurityContext()).getPayload();
 
         if (payload.getId() == null) {
             throw new BadRequestException(RegisteredClaims.JWT_ID + " is required in accessToken");

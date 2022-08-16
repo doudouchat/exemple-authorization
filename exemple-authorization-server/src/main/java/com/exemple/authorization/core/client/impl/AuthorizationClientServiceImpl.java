@@ -53,8 +53,7 @@ public class AuthorizationClientServiceImpl implements AuthorizationClientServic
 
     private PersistentNode createAuthorization(String clientId, JsonNode data) {
 
-        PersistentNode node = new PersistentNode(client, CreateMode.PERSISTENT, false, "/" + clientId,
-                data.toString().getBytes(StandardCharsets.UTF_8));
+        var node = new PersistentNode(client, CreateMode.PERSISTENT, false, "/" + clientId, data.toString().getBytes(StandardCharsets.UTF_8));
         node.start();
 
         return node;

@@ -34,7 +34,7 @@ public class PrimitivesAndStringFactory implements Serializable, ObjectFactory {
         String type = null;
         String value = null;
         while (refAddrs.hasMoreElements()) {
-            RefAddr addr = refAddrs.nextElement();
+            var addr = refAddrs.nextElement();
             String propName = addr.getType();
 
             type = ref.getClassName();

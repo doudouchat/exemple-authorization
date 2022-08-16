@@ -1,6 +1,5 @@
 package com.exemple.authorization.core.swagger;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +49,7 @@ public class SwaggerConfiguration {
 
     @SuppressWarnings("unchecked")
     private static <T> T getHandlerMappings(Object bean) {
-        Field field = ReflectionUtils.findField(bean.getClass(), "handlerMappings");
+        var field = ReflectionUtils.findField(bean.getClass(), "handlerMappings");
         ReflectionUtils.makeAccessible(field);
         return (T) ReflectionUtils.getField(field, bean);
     }

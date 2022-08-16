@@ -69,7 +69,7 @@ public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
 
-        AuthenticationFilter filter = new AuthenticationFilter(tokenServices, authorizationResourceKeyspace, "ROLE_APP");
+        var filter = new AuthenticationFilter(tokenServices, authorizationResourceKeyspace, "ROLE_APP");
         filter.setAuthenticationManager(authenticationManagerBean());
 
         http.cors().and().addFilter(filter)

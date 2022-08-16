@@ -34,15 +34,15 @@ public class HazelcastHttpSessionConfiguration {
     @SpringSessionHazelcastInstance
     public HazelcastInstance hazelcastInstance() {
 
-        Config config = Config.load();
+        var config = Config.load();
 
-        AttributeConfig attributeConfig = new AttributeConfig().setName(Hazelcast4IndexedSessionRepository.PRINCIPAL_NAME_ATTRIBUTE)
+        var attributeConfig = new AttributeConfig().setName(Hazelcast4IndexedSessionRepository.PRINCIPAL_NAME_ATTRIBUTE)
                 .setExtractorClassName(Hazelcast4PrincipalNameExtractor.class.getName());
 
         config.getMapConfig(Hazelcast4IndexedSessionRepository.DEFAULT_SESSION_MAP_NAME).addAttributeConfig(attributeConfig)
                 .addIndexConfig(new IndexConfig(IndexType.HASH, Hazelcast4IndexedSessionRepository.PRINCIPAL_NAME_ATTRIBUTE));
 
-        SerializerConfig serializerConfig = new SerializerConfig();
+        var serializerConfig = new SerializerConfig();
         serializerConfig.setImplementation(new HazelcastSessionSerializer()).setTypeClass(MapSession.class);
         config.getSerializationConfig().addSerializerConfig(serializerConfig);
 
@@ -51,7 +51,7 @@ public class HazelcastHttpSessionConfiguration {
 
     @Bean
     public HazelcastInstance client() {
-        ClientConfig clientConfig = ClientConfig.load();
+        var clientConfig = ClientConfig.load();
         return HazelcastClient.newHazelcastClient(clientConfig);
     }
 

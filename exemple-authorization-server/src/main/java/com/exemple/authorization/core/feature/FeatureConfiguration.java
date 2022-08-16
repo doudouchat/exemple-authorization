@@ -1,6 +1,5 @@
 package com.exemple.authorization.core.feature;
 
-import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Clock;
@@ -66,22 +65,22 @@ public class FeatureConfiguration extends ResourceConfig {
                 // disconnection feature
                 "com.exemple.authorization.disconnection")
 
-                        // security
+                // security
 
-                        .register(RolesAllowedDynamicFeature.class)
+                .register(RolesAllowedDynamicFeature.class)
 
-                        .register(AuthorizationFilter.class)
+                .register(AuthorizationFilter.class)
 
-                        // logging
+                // logging
 
-                        .register(LoggingFeature.class)
+                .register(LoggingFeature.class)
 
-                        .property(LoggingFeature.LOGGING_FEATURE_VERBOSITY, LoggingFeature.Verbosity.PAYLOAD_ANY)
+                .property(LoggingFeature.LOGGING_FEATURE_VERBOSITY, LoggingFeature.Verbosity.PAYLOAD_ANY)
 
-                        .property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL, Level.FINE.getName())
+                .property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL, Level.FINE.getName())
 
-                        // JSON
-                        .register(JacksonJsonProvider.class);
+                // JSON
+                .register(JacksonJsonProvider.class);
 
     }
 
@@ -104,9 +103,8 @@ public class FeatureConfiguration extends ResourceConfig {
     @Bean
     public Algorithm algorithm(ResourceLoader resourceLoader) {
 
-        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(resourceLoader.getResource(certificateLocation),
-                certificatePassword.toCharArray());
-        KeyPair keyPair = keyStoreKeyFactory.getKeyPair(certificateAlias);
+        var keyStoreKeyFactory = new KeyStoreKeyFactory(resourceLoader.getResource(certificateLocation), certificatePassword.toCharArray());
+        var keyPair = keyStoreKeyFactory.getKeyPair(certificateAlias);
 
         return Algorithm.RSA256((RSAPublicKey) keyPair.getPublic(), (RSAPrivateKey) keyPair.getPrivate());
 
