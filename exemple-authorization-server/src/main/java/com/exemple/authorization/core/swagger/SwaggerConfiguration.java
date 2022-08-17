@@ -47,7 +47,6 @@ public class SwaggerConfiguration {
         };
     }
 
-    @SuppressWarnings("unchecked")
     private static <T> T getHandlerMappings(Object bean) {
         var field = ReflectionUtils.findField(bean.getClass(), "handlerMappings");
         ReflectionUtils.makeAccessible(field);
