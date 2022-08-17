@@ -14,6 +14,9 @@
 		<!-- KAFKA -->
 		<kafka.broker.logs-dir>${project.build.directory}/kafka</kafka.broker.logs-dir>
 
+		<!-- SONAR -->
+		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
+
 	</properties>
 
 	<dependencies>

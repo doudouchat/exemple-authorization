@@ -9,6 +9,13 @@
 	</parent>
 	<artifactId>exemple-authorization-application</artifactId>
 
+	<properties>
+
+		<!-- SONAR -->
+		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
+
+	</properties>
+
 	<dependencies>
 
 		<!-- SPRING FRAMEWORK -->

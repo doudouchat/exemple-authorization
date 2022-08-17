@@ -21,6 +21,7 @@
 		<module>exemple-authorization-server</module>
 		<module>exemple-authorization-launcher</module>
 		<module>exemple-authorization-integration</module>
+		<module>jacoco-report</module>
 	</modules>
 
 	<scm>
@@ -49,11 +50,8 @@
 		<cassandra-version>3.11.12</cassandra-version>
 
 		<!-- SONAR -->
-
-		<!-- force sonar to use jacoco -->
-		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-		<!-- property checked by sonar to locate jacoco UT/IT reports -->
-		<sonar.jacoco.itReportPath>${project.build.directory}/../../target/jacoco-it.exec</sonar.jacoco.itReportPath>
+		<sonar.coverage.exclusions>**/test/**/*.java</sonar.coverage.exclusions>
+		<sonar.coverage.report.path>${basedir}/../jacoco-report/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.report.path>
 
 	</properties>
 
