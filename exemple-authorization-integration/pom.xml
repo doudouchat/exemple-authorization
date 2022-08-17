@@ -342,8 +342,6 @@
 									<goal>report-integration</goal>
 								</goals>
 								<configuration>
-									<dataFile>${sonar.jacoco.itReportPath}</dataFile>
-									<outputDirectory>${project.parent.reporting.outputDirectory}/jacoco-it</outputDirectory>
 									<excludes>
 										<exclude>com/exemple/authorization/integration/**</exclude>
 									</excludes>
