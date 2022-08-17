@@ -15,7 +15,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -49,9 +48,6 @@ class LoginApiTest {
 
     @Autowired
     private Algorithm algorithm;
-
-    @Value("${authorization.password.expiryTime}")
-    private long expiryTime;
 
     private RequestSpecification requestSpecification;
 

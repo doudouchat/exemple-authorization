@@ -21,7 +21,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -52,9 +51,6 @@ class DisconnectionApiTest {
 
     @Autowired
     private Algorithm algorithm;
-
-    @Value("${authorization.password.expiryTime}")
-    private long expiryTime;
 
     private RequestSpecification requestSpecification;
 

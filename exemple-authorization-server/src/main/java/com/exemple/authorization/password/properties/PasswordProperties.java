@@ -1,19 +1,20 @@
 package com.exemple.authorization.password.properties;
 
-import java.time.temporal.ChronoUnit;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import lombok.Getter;
-import lombok.Setter;
 
-@Component
+@ConstructorBinding
 @ConfigurationProperties(prefix = "authorization.password")
 @Getter
-@Setter
 public class PasswordProperties {
 
-    private Long expiryTime = ChronoUnit.DAYS.getDuration().getSeconds();
+    private final long expiryTime;
+
+    public PasswordProperties(@DefaultValue("86400") long expiryTime) {
+        this.expiryTime = expiryTime;
+    }
 
 }
