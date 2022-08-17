@@ -34,6 +34,6 @@ public class TestApi {
     @PostMapping("/account")
     @PreAuthorize("hasAuthority('login:update')")
     public void post() {
-
+        // no implementation
     }
 }

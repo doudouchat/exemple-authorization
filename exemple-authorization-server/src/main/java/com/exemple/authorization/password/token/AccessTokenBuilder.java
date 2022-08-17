@@ -6,6 +6,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.validation.Valid;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -31,7 +33,7 @@ public class AccessTokenBuilder {
 
     private final Clock clock;
 
-    public String createAccessToken(NewPassword newPassword, String app, AuthorizationContextSecurity securityContext) {
+    public String createAccessToken(@Valid NewPassword newPassword, String app, AuthorizationContextSecurity securityContext) {
 
         var applicationDetail = applicationDetailService.get(app);
 
