@@ -338,7 +338,7 @@ class AuthorizationServerTest {
         @ParameterizedTest
         @MethodSource
         void loginFailure(String header, String headerValue) {
-            
+
             // Given mock login resource
 
             LoginEntity account = new LoginEntity();
@@ -346,12 +346,12 @@ class AuthorizationServerTest {
             account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
 
             Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
-            
+
             // When perform get access token
 
             Response response = requestSpecification.header(header, headerValue).formParams("username", username, "password", "123")
                     .post(restTemplate.getRootUri() + "/login");
-            
+
             // Then check response
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
