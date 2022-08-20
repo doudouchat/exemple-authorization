@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.common.exceptions.InvalidTokenExcepti
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.util.Assert;
 
 import com.auth0.jwt.JWT;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
@@ -28,7 +29,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     static {
 
-        BEARER = Pattern.compile("Bearer ");
+        BEARER = Pattern.compile("Bearer (.*)");
     }
 
     @Autowired
@@ -47,7 +48,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
             try {
 
-                String accessToken = BEARER.matcher(requestContext.getHeaderString("Authorization")).replaceFirst("");
+                String accessToken = extractAccessToken(BEARER, requestContext);
 
                 OAuth2Authentication authentication = tokenServices.loadAuthentication(accessToken);
 
@@ -72,6 +73,16 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     private static Response build(OAuth2Exception e) {
 
         return Response.status(e.getHttpErrorCode()).entity(e.getMessage()).build();
+    }
+
+    private static String extractAccessToken(Pattern pattern, ContainerRequestContext requestContext) {
+
+        var matcher = pattern.matcher(requestContext.getHeaderString("Authorization"));
+
+        Assert.isTrue(matcher.lookingAt(), "Pattern is invalid");
+
+        return matcher.group(1);
+
     }
 
 }
