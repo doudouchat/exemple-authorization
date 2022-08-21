@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -131,8 +130,7 @@ class DisconnectionApiTest {
     @Test
     void checkToken() {
 
-        Map<String, String> params = new HashMap<>();
-        params.put("token", accessToken);
+        Map<String, String> params = Map.of("token", accessToken);
 
         Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
                 .post(restTemplate.getRootUri() + "/oauth/check_token");

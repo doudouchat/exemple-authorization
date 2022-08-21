@@ -1,7 +1,6 @@
 package com.exemple.authorization.login;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -158,10 +157,10 @@ public class LoginApi {
         @Override
         public Response toResponse(UsernameAlreadyExistsException exception) {
 
-            Map<String, Object> cause = new HashMap<>();
-            cause.put("path", "/username");
-            cause.put("code", "username");
-            cause.put("message", "[".concat(exception.getUsername()).concat("] already exists"));
+            Map<String, Object> cause = Map.of(
+                    "path", "/username",
+                    "code", "username",
+                    "message", "[".concat(exception.getUsername()).concat("] already exists"));
 
             return Response.status(Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON).entity(Collections.singletonList(cause)).build();
 
@@ -175,10 +174,10 @@ public class LoginApi {
         @Override
         public Response toResponse(LoginAlreadyExistsException exception) {
 
-            Map<String, Object> cause = new HashMap<>();
-            cause.put("path", exception.getPath());
-            cause.put("code", "username");
-            cause.put("message", "[".concat(exception.getUsername()).concat("] already exists"));
+            Map<String, Object> cause = Map.of(
+                    "path", exception.getPath(),
+                    "code", "username",
+                    "message", "[".concat(exception.getUsername()).concat("] already exists"));
 
             return Response.status(Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON).entity(Collections.singletonList(cause)).build();
 
@@ -192,10 +191,10 @@ public class LoginApi {
         @Override
         public Response toResponse(LoginNotFoundException exception) {
 
-            Map<String, Object> cause = new HashMap<>();
-            cause.put("path", exception.getPath());
-            cause.put("code", "not_found");
-            cause.put("message", "[".concat(exception.getUsername()).concat("] not found"));
+            Map<String, Object> cause = Map.of(
+                    "path", exception.getPath(),
+                    "code", "not_found",
+                    "message", "[".concat(exception.getUsername()).concat("] not found"));
 
             return Response.status(Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON).entity(Collections.singletonList(cause)).build();
 

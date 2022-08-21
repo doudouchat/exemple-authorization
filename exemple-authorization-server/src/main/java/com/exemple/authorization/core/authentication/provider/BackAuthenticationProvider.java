@@ -1,6 +1,5 @@
 package com.exemple.authorization.core.authentication.provider;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -19,13 +18,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class BackAuthenticationProvider extends DaoAuthenticationProvider {
 
-    private final Map<String, UserDetails> users = new HashMap<>();
+    private final Map<String, UserDetails> users;
 
     public BackAuthenticationProvider() {
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-        users.put("admin",
+        users = Map.of("admin",
                 User.builder()
                         .username("admin")
                         .password("{bcrypt}" + passwordEncoder.encode("admin123"))
