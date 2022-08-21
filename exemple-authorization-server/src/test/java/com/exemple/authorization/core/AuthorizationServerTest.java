@@ -13,7 +13,6 @@ import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -149,8 +148,7 @@ class AuthorizationServerTest {
 
             // Given client credentials
 
-            Map<String, String> params = new HashMap<>();
-            params.put("grant_type", "client_credentials");
+            Map<String, String> params = Map.of("grant_type", "client_credentials");
 
             // When perform get access token
 
@@ -233,11 +231,11 @@ class AuthorizationServerTest {
 
             // When perform get access token
 
-            Map<String, String> params = new HashMap<>();
-            params.put("grant_type", "authorization_code");
-            params.put("code", code);
-            params.put("client_id", "test_user");
-            params.put("redirect_uri", "/ws/test");
+            Map<String, String> params = Map.of(
+                    "grant_type", "authorization_code",
+                    "code", code,
+                    "client_id", "test_user",
+                    "redirect_uri", "/ws/test");
 
             Response response = requestSpecification.auth().basic("test_user", "secret").formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/token");
@@ -267,11 +265,11 @@ class AuthorizationServerTest {
 
             // When perform get access token
 
-            Map<String, String> params = new HashMap<>();
-            params.put("grant_type", "authorization_code");
-            params.put("code", code);
-            params.put("client_id", "test_user");
-            params.put("redirect_uri", "xxx");
+            Map<String, String> params = Map.of(
+                    "grant_type", "authorization_code",
+                    "code", code,
+                    "client_id", "test_user",
+                    "redirect_uri", "xxx");
 
             Response response = requestSpecification.auth().basic("test_user", "secret").formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/token");
@@ -288,8 +286,7 @@ class AuthorizationServerTest {
 
             // When perform check token
 
-            Map<String, String> params = new HashMap<>();
-            params.put("token", accessToken);
+            Map<String, String> params = Map.of("token", accessToken);
 
             Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
@@ -373,8 +370,7 @@ class AuthorizationServerTest {
 
             // Given client credentials
 
-            Map<String, String> params = new HashMap<>();
-            params.put("grant_type", "client_credentials");
+            Map<String, String> params = Map.of("grant_type", "client_credentials");
 
             // When perform get access token
 
@@ -406,8 +402,7 @@ class AuthorizationServerTest {
 
             // Given client credentials
 
-            Map<String, String> params = new HashMap<>();
-            params.put("grant_type", "client_credentials");
+            Map<String, String> params = Map.of("grant_type", "client_credentials");
 
             // When perform get access token
 
@@ -426,8 +421,7 @@ class AuthorizationServerTest {
 
             // When perform check token
 
-            Map<String, String> params = new HashMap<>();
-            params.put("token", accessToken);
+            Map<String, String> params = Map.of("token", accessToken);
 
             Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
@@ -454,8 +448,7 @@ class AuthorizationServerTest {
 
             // When perform check token
 
-            Map<String, String> params = new HashMap<>();
-            params.put("token", accessToken);
+            Map<String, String> params = Map.of("token", accessToken);
 
             Response response = requestSpecification.auth().basic("test", "secret").formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
@@ -532,8 +525,7 @@ class AuthorizationServerTest {
 
             // Given client credentials
 
-            Map<String, String> params = new HashMap<>();
-            params.put("grant_type", "client_credentials");
+            Map<String, String> params = Map.of("grant_type", "client_credentials");
 
             // When perform get access token
 
@@ -606,8 +598,7 @@ class AuthorizationServerTest {
 
             // When perform check token
 
-            Map<String, String> params = new HashMap<>();
-            params.put("token", accessToken);
+            Map<String, String> params = Map.of("token", accessToken);
 
             Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
@@ -666,12 +657,12 @@ class AuthorizationServerTest {
 
                 // When perform get access token
 
-                Map<String, String> params = new HashMap<>();
-                params.put("grant_type", "password");
-                params.put("username", username);
-                params.put("password", "123");
-                params.put("client_id", "test_user");
-                params.put("redirect_uri", "xxx");
+                Map<String, String> params = Map.of(
+                        "grant_type", "password",
+                        "username", username,
+                        "password", "123",
+                        "client_id", "test_user",
+                        "redirect_uri", "xxx");
 
                 Response response = requestSpecification.auth().basic("test_user", "secret").formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
@@ -694,8 +685,7 @@ class AuthorizationServerTest {
 
                 // When perform check token
 
-                Map<String, String> params = new HashMap<>();
-                params.put("token", accessToken);
+                Map<String, String> params = Map.of("token", accessToken);
 
                 Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/check_token");
@@ -730,10 +720,10 @@ class AuthorizationServerTest {
 
                 // When perform refresh token
 
-                Map<String, String> params = new HashMap<>();
-                params.put("grant_type", "refresh_token");
-                params.put("client_id", "test_user");
-                params.put("refresh_token", refreshToken);
+                Map<String, String> params = Map.of(
+                        "grant_type", "refresh_token",
+                        "client_id", "test_user",
+                        "refresh_token", refreshToken);
 
                 Response response = requestSpecification.auth().basic("test_user", "secret").formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
@@ -778,12 +768,12 @@ class AuthorizationServerTest {
 
                 // When perform get access token
 
-                Map<String, String> params = new HashMap<>();
-                params.put("grant_type", "password");
-                params.put("username", username);
-                params.put("password", "123");
-                params.put("client_id", "test_user");
-                params.put("redirect_uri", "xxx");
+                Map<String, String> params = Map.of(
+                        "grant_type", "password",
+                        "username", username,
+                        "password", "123",
+                        "client_id", "test_user",
+                        "redirect_uri", "xxx");
 
                 Response response = requestSpecification.auth().basic("test_user", "secret").formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
@@ -811,12 +801,12 @@ class AuthorizationServerTest {
 
                 // When perform get access token
 
-                Map<String, String> params = new HashMap<>();
-                params.put("grant_type", "password");
-                params.put("username", "admin");
-                params.put("password", "admin123");
-                params.put("client_id", "back_user");
-                params.put("redirect_uri", "xxx");
+                Map<String, String> params = Map.of(
+                        "grant_type", "password",
+                        "username", "admin",
+                        "password", "admin123",
+                        "client_id", "back_user",
+                        "redirect_uri", "xxx");
 
                 Response response = requestSpecification.auth().basic("back_user", "secret").formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
@@ -836,12 +826,12 @@ class AuthorizationServerTest {
 
                 // When perform get access token
 
-                Map<String, String> params = new HashMap<>();
-                params.put("grant_type", "password");
-                params.put("username", "bad_login");
-                params.put("password", "admin123");
-                params.put("client_id", "back_user");
-                params.put("redirect_uri", "xxx");
+                Map<String, String> params = Map.of(
+                        "grant_type", "password",
+                        "username", "bad_login",
+                        "password", "admin123",
+                        "client_id", "back_user",
+                        "redirect_uri", "xxx");
 
                 Response response = requestSpecification.auth().basic("back_user", "secret").formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
@@ -859,8 +849,7 @@ class AuthorizationServerTest {
 
                 // When perform check token
 
-                Map<String, String> params = new HashMap<>();
-                params.put("token", accessToken);
+                Map<String, String> params = Map.of("token", accessToken);
 
                 Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/check_token");

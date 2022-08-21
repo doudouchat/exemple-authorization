@@ -3,7 +3,6 @@ package com.exemple.authorization.integration.login;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,8 +37,7 @@ class LoginUpdateUsernameIT {
     @BeforeAll
     void init() {
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("grant_type", "client_credentials");
+        Map<String, Object> params = Map.of("grant_type", "client_credentials");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth().basic("test", "secret")
                 .formParams(params).post("/oauth/token");
@@ -59,8 +57,7 @@ class LoginUpdateUsernameIT {
 
         // When perform post login
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("password", "mdp");
+        Map<String, Object> body = Map.of("password", "mdp");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
                 .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
@@ -79,12 +76,12 @@ class LoginUpdateUsernameIT {
 
         // When perform get access token
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("grant_type", "password");
-        params.put("username", USERNAME);
-        params.put("password", "mdp");
-        params.put("client_id", "test_user");
-        params.put("redirect_uri", "xxx");
+        Map<String, Object> params = Map.of(
+                "grant_type", "password",
+                "username", USERNAME,
+                "password", "mdp",
+                "client_id", "test_user",
+                "redirect_uri", "xxx");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
                 .basic("test_user", "secret").formParams(params).post("/oauth/token");
@@ -104,9 +101,9 @@ class LoginUpdateUsernameIT {
 
         // When perform change username
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("toUsername", USERNAME);
-        body.put("fromUsername", USERNAME);
+        Map<String, Object> body = Map.of(
+                "toUsername", USERNAME,
+                "fromUsername", USERNAME);
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
                 .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
@@ -129,9 +126,7 @@ class LoginUpdateUsernameIT {
 
         String username = UUID.randomUUID() + "@gmail.com";
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("toUsername", username);
-        body.put("fromUsername", USERNAME);
+        Map<String, Object> body = Map.of("toUsername", username, "fromUsername", USERNAME);
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
                 .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
@@ -144,12 +139,12 @@ class LoginUpdateUsernameIT {
 
         // And get access token
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("grant_type", "password");
-        params.put("username", username);
-        params.put("password", "mdp");
-        params.put("client_id", "test_user");
-        params.put("redirect_uri", "xxx");
+        Map<String, Object> params = Map.of(
+                "grant_type", "password",
+                "username", username,
+                "password", "mdp",
+                "client_id", "test_user",
+                "redirect_uri", "xxx");
 
         Response responseToken = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
                 .basic("test_user", "secret")

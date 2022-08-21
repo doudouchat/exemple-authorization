@@ -3,7 +3,6 @@ package com.exemple.authorization.integration.account;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -33,12 +32,12 @@ class AccountByPasswordIT {
 
         // When perform get access token
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("grant_type", "password");
-        params.put("username", "jean.dupond@gmail.com");
-        params.put("password", "123");
-        params.put("client_id", "test_user");
-        params.put("redirect_uri", "xxx");
+        Map<String, Object> params = Map.of(
+                "grant_type", "password",
+                "username", "jean.dupond@gmail.com",
+                "password", "123",
+                "client_id", "test_user",
+                "redirect_uri", "xxx");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
                 .basic("test_user", "secret").formParams(params).post("/oauth/token");

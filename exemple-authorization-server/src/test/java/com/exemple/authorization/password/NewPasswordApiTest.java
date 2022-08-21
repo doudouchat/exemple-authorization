@@ -7,7 +7,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -132,8 +131,7 @@ class NewPasswordApiTest {
             LoginEntity account = new LoginEntity();
             account.setUsername(username);
 
-            Map<String, Object> newPassword = new HashMap<>();
-            newPassword.put("login", username);
+            Map<String, Object> newPassword = Map.of("login", username);
 
             Mockito.when(loginResource.get(username)).thenReturn(Optional.of(account));
 
@@ -188,8 +186,7 @@ class NewPasswordApiTest {
             LoginEntity account = new LoginEntity();
             account.setUsername(username);
 
-            Map<String, Object> newPassword = new HashMap<>();
-            newPassword.put("login", username);
+            Map<String, Object> newPassword = Map.of("login", username);
 
             Mockito.when(loginResource.get(username)).thenReturn(Optional.of(account));
 
@@ -223,8 +220,7 @@ class NewPasswordApiTest {
 
             // When perform check token
 
-            Map<String, String> params = new HashMap<>();
-            params.put("token", token);
+            Map<String, String> params = Map.of("token", token);
 
             Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
@@ -289,8 +285,7 @@ class NewPasswordApiTest {
 
             String login = "jean.dupond@gmail.com";
 
-            Map<String, Object> newPassword = new HashMap<>();
-            newPassword.put("login", login);
+            Map<String, Object> newPassword = Map.of("login", login);
 
             Response response = requestSpecification.contentType(ContentType.JSON).header(header, headerValue).header("app", "app").body(newPassword)
                     .post(restTemplate.getRootUri() + "/ws/v1/new_password");
@@ -305,8 +300,7 @@ class NewPasswordApiTest {
             String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
                     .withClaim("client_id", "clientId1").sign(algorithm);
 
-            Map<String, Object> newPassword = new HashMap<>();
-            newPassword.put("login", "");
+            Map<String, Object> newPassword = Map.of("login", "");
 
             Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken)
                     .header("app", "app")

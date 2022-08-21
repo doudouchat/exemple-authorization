@@ -3,7 +3,6 @@ package com.exemple.authorization.integration.account;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,8 +37,7 @@ class AccountByCodeIT {
 
         // When perform get access token
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("grant_type", "client_credentials");
+        Map<String, Object> params = Map.of("grant_type", "client_credentials");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth().basic("test", "secret")
                 .formParams(params).post("/oauth/token");
@@ -105,11 +103,11 @@ class AccountByCodeIT {
 
         // And perform get access token
 
-        Map<String, String> params = new HashMap<>();
-        params.put("grant_type", "authorization_code");
-        params.put("code", code);
-        params.put("client_id", "test_user");
-        params.put("redirect_uri", "xxx");
+        Map<String, String> params = Map.of(
+                "grant_type", "authorization_code",
+                "code", code,
+                "client_id", "test_user",
+                "redirect_uri", "xxx");
 
         Response responseToken = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
                 .auth().basic("test_user", "secret")

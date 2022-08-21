@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -140,8 +139,7 @@ class LoginApiTest {
 
         // When perform post
 
-        Map<String, Object> login = new HashMap<>();
-        login.put("password", "mdp123");
+        Map<String, Object> login = Map.of("password", "mdp123");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
@@ -187,8 +185,7 @@ class LoginApiTest {
 
         // When perform post
 
-        Map<String, Object> login = new HashMap<>();
-        login.put("password", "mdp123");
+        Map<String, Object> login = Map.of("password", "mdp123");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
@@ -201,10 +198,10 @@ class LoginApiTest {
 
         JsonNode expectedMessage = JsonNodeUtils.create(() -> {
 
-            Map<String, Object> model = new HashMap<>();
-            model.put("path", "/username");
-            model.put("code", "username");
-            model.put("message", "[" + username + "] already exists");
+            Map<String, Object> model = Map.of(
+                    "path", "/username",
+                    "code", "username",
+                    "message", "[" + username + "] already exists");
 
             return Collections.singletonList(model);
 
@@ -238,8 +235,7 @@ class LoginApiTest {
 
         // When perform post
 
-        Map<String, Object> login = new HashMap<>();
-        login.put("password", "mdp124");
+        Map<String, Object> login = Map.of("password", "mdp124");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
@@ -287,8 +283,7 @@ class LoginApiTest {
 
         // When perform post
 
-        Map<String, Object> login = new HashMap<>();
-        login.put("password", "mdp124");
+        Map<String, Object> login = Map.of("password", "mdp124");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
@@ -327,9 +322,9 @@ class LoginApiTest {
 
         // When perform post
 
-        Map<String, Object> login = new HashMap<>();
-        login.put("fromUsername", username);
-        login.put("toUsername", "jean.dupont@gmail.com");
+        Map<String, Object> login = Map.of(
+                "fromUsername", username,
+                "toUsername", "jean.dupont@gmail.com");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).post(restTemplate.getRootUri() + URL + "/move");
@@ -381,9 +376,9 @@ class LoginApiTest {
 
         // When perform post
 
-        Map<String, Object> login = new HashMap<>();
-        login.put("fromUsername", username);
-        login.put("toUsername", "jean.dupont@gmail.com");
+        Map<String, Object> login = Map.of(
+                "fromUsername", username,
+                "toUsername", "jean.dupont@gmail.com");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).post(restTemplate.getRootUri() + URL + "/move");
@@ -396,10 +391,10 @@ class LoginApiTest {
 
         JsonNode expectedMessage = JsonNodeUtils.create(() -> {
 
-            Map<String, Object> model = new HashMap<>();
-            model.put("path", "/toUsername");
-            model.put("code", "username");
-            model.put("message", "[" + username + "] already exists");
+            Map<String, Object> model = Map.of(
+                    "path", "/toUsername",
+                    "code", "username",
+                    "message", "[" + username + "] already exists");
 
             return Collections.singletonList(model);
 
@@ -427,9 +422,9 @@ class LoginApiTest {
 
         // When perform post
 
-        Map<String, Object> login = new HashMap<>();
-        login.put("fromUsername", username);
-        login.put("toUsername", "jean.dupont@gmail.com");
+        Map<String, Object> login = Map.of(
+                "fromUsername", username,
+                "toUsername", "jean.dupont@gmail.com");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).post(restTemplate.getRootUri() + URL + "/move");
@@ -442,10 +437,10 @@ class LoginApiTest {
 
         JsonNode expectedMessage = JsonNodeUtils.create(() -> {
 
-            Map<String, Object> model = new HashMap<>();
-            model.put("path", "/fromUsername");
-            model.put("code", "not_found");
-            model.put("message", "[" + username + "] not found");
+            Map<String, Object> model = Map.of(
+                    "path", "/fromUsername",
+                    "code", "not_found",
+                    "message", "[" + username + "] not found");
 
             return Collections.singletonList(model);
 
@@ -469,9 +464,9 @@ class LoginApiTest {
 
         // When perform post
 
-        Map<String, Object> login = new HashMap<>();
-        login.put("fromUsername", username);
-        login.put("toUsername", "jean.dupont@gmail.com");
+        Map<String, Object> login = Map.of(
+                "fromUsername", username,
+                "toUsername", "jean.dupont@gmail.com");
 
         Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
                 .body(login).post(restTemplate.getRootUri() + URL + "/move");

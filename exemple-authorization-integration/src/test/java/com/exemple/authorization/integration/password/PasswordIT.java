@@ -3,7 +3,6 @@ package com.exemple.authorization.integration.password;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -35,8 +34,7 @@ class PasswordIT {
 
         // When perform get access token
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("grant_type", "client_credentials");
+        Map<String, Object> params = Map.of("grant_type", "client_credentials");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth().basic("admin", "secret")
                 .formParams(params).post("/oauth/token");
@@ -57,8 +55,7 @@ class PasswordIT {
 
         // When perform new password
 
-        Map<String, Object> newPassword = new HashMap<>();
-        newPassword.put("login", "jean.dupond@gmail.com");
+        Map<String, Object> newPassword = Map.of("login", "jean.dupond@gmail.com");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
                 .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_ADMIN)

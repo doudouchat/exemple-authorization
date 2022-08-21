@@ -3,7 +3,6 @@ package com.exemple.authorization.integration.login;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,8 +39,7 @@ class LoginIT {
 
         // When perform get access token
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("grant_type", "client_credentials");
+        Map<String, Object> params = Map.of("grant_type", "client_credentials");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth().basic("test", "secret")
                 .formParams(params).post("/oauth/token");
@@ -61,8 +59,7 @@ class LoginIT {
 
         // When perform post login
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("password", "mdp");
+        Map<String, Object> body = Map.of("password", "mdp");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.JSON)
                 .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
@@ -81,12 +78,12 @@ class LoginIT {
 
         // When perform get access token
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("grant_type", "password");
-        params.put("username", "jean.dupond@gmail.com");
-        params.put("password", "123");
-        params.put("client_id", "test_user");
-        params.put("redirect_uri", "xxx");
+        Map<String, Object> params = Map.of(
+                "grant_type", "password",
+                "username", "jean.dupond@gmail.com",
+                "password", "123",
+                "client_id", "test_user",
+                "redirect_uri", "xxx");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
                 .basic("test_user", "secret").formParams(params).post("/oauth/token");
@@ -123,12 +120,12 @@ class LoginIT {
 
         // When perform get access token
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("grant_type", "password");
-        params.put("username", "jean.dupont@gmail.com");
-        params.put("password", "mdp");
-        params.put("client_id", "test_user");
-        params.put("redirect_uri", "xxx");
+        Map<String, Object> params = Map.of(
+                "grant_type", "password",
+                "username", "jean.dupont@gmail.com",
+                "password", "mdp",
+                "client_id", "test_user",
+                "redirect_uri", "xxx");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
                 .basic("test_user", "secret")
