@@ -82,9 +82,7 @@ public class AuthorizationTokenConfiguration {
 
             Map<String, Object> additionalInfo = new HashMap<>();
 
-            if (authentication.getPrincipal() instanceof User) {
-
-                var user = (User) authentication.getPrincipal();
+            if (authentication.getPrincipal() instanceof User user) {
                 additionalInfo.put("sub", user.getUsername());
             }
             additionalInfo.put("authorities",
