@@ -2,7 +2,6 @@ package com.exemple.authorization.integration;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -79,7 +78,8 @@ public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
             return Stream.concat(scopes.stream(), authorities.stream())
                     .map(String.class::cast)
                     .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
+                    .map(GrantedAuthority.class::cast)
+                    .toList();
         }
     }
 }

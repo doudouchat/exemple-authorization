@@ -1,7 +1,6 @@
 package com.exemple.authorization.core.swagger;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +38,7 @@ public class SwaggerConfiguration {
                 List<RequestMappingInfoHandlerMapping> originalHandlerMappings = getHandlerMappings(bean);
                 List<RequestMappingInfoHandlerMapping> overrideHandlerMappings = originalHandlerMappings.stream()
                         .filter(mapping -> mapping.getPatternParser() == null)
-                        .collect(Collectors.toList());
+                        .toList();
                 originalHandlerMappings.clear();
                 originalHandlerMappings.addAll(overrideHandlerMappings);
             }

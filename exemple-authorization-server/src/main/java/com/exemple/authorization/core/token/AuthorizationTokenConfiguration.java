@@ -4,7 +4,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,8 +84,7 @@ public class AuthorizationTokenConfiguration {
             if (authentication.getPrincipal() instanceof User user) {
                 additionalInfo.put("sub", user.getUsername());
             }
-            additionalInfo.put("authorities",
-                    authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+            additionalInfo.put("authorities", authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList());
 
             ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
 
