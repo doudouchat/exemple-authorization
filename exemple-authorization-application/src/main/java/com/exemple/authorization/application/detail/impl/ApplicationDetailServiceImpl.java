@@ -1,14 +1,15 @@
 package com.exemple.authorization.application.detail.impl;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.exemple.authorization.application.common.exception.NotFoundApplicationException;
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -33,17 +35,19 @@ public class ApplicationDetailServiceImpl implements ApplicationDetailService {
     private final CuratorFramework client;
 
     @Override
-    public ApplicationDetail get(String application) {
+    @SneakyThrows
+    public Optional<ApplicationDetail> get(String application) {
 
         try {
 
-            return MAPPER.readValue(client.getData().forPath("/" + application), ApplicationDetail.class);
+            return Optional.of(MAPPER.readValue(client.getData().forPath("/" + application), ApplicationDetail.class));
 
-        } catch (Exception e) {
+        } catch (KeeperException.NoNodeException e) {
 
-            throw new NotFoundApplicationException(application, e);
+            LOG.warn("Application '" + application + "' not exists", e);
+
+            return Optional.empty();
         }
-
     }
 
     @Override

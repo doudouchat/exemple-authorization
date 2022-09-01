@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.util.Assert;
 
 import com.auth0.jwt.JWT;
+import com.exemple.authorization.application.common.exception.NotFoundApplicationException;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.common.security.AuthorizationContextSecurity;
 import com.exemple.authorization.core.feature.FeatureConfiguration;
@@ -54,7 +55,9 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
                 requestContext.setSecurityContext(new AuthorizationContextSecurity(authentication, JWT.decode(accessToken)));
 
-                var applicationDetail = applicationDetailService.get(requestContext.getHeaderString(FeatureConfiguration.APP_HEADER));
+                var applicationName = requestContext.getHeaderString(FeatureConfiguration.APP_HEADER);
+                var applicationDetail = applicationDetailService.get(applicationName)
+                        .orElseThrow(() -> new NotFoundApplicationException(applicationName));
 
                 if (!applicationDetail.getClientIds().contains(authentication.getOAuth2Request().getClientId())) {
                     throw new InvalidTokenException(authentication.getOAuth2Request().getClientId() + " is forbidden");
