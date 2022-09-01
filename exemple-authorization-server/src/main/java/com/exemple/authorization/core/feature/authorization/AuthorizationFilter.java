@@ -54,7 +54,9 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
                 requestContext.setSecurityContext(new AuthorizationContextSecurity(authentication, JWT.decode(accessToken)));
 
-                var applicationDetail = applicationDetailService.get(requestContext.getHeaderString(FeatureConfiguration.APP_HEADER));
+                var applicationName = requestContext.getHeaderString(FeatureConfiguration.APP_HEADER);
+                var applicationDetail = applicationDetailService.get(applicationName)
+                        .orElseThrow(() -> new OAuth2Exception(applicationName + " is forbidden"));
 
                 if (!applicationDetail.getClientIds().contains(authentication.getOAuth2Request().getClientId())) {
                     throw new InvalidTokenException(authentication.getOAuth2Request().getClientId() + " is forbidden");

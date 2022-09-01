@@ -1,5 +1,7 @@
 package com.exemple.authorization.core;
 
+import java.util.Optional;
+
 import org.mockito.Mockito;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -45,7 +47,7 @@ public class AuthorizationTestConfiguration {
                 .clientId("clientId1")
                 .build();
 
-        Mockito.when(service.get(Mockito.anyString())).thenReturn(detail);
+        Mockito.when(service.get(Mockito.anyString())).thenReturn(Optional.of(detail));
 
         return service;
     }
