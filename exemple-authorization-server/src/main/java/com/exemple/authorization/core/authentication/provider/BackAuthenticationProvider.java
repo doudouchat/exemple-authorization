@@ -5,12 +5,12 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -41,7 +41,7 @@ public class BackAuthenticationProvider extends DaoAuthenticationProvider {
 
             if (user == null) {
 
-                throw new UsernameNotFoundException(username);
+                throw new BadCredentialsException(username);
             }
 
             return user;
