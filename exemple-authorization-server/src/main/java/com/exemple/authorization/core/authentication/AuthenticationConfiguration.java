@@ -7,12 +7,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 
 import com.exemple.authorization.core.authentication.filter.AuthenticationFilter;
@@ -43,7 +44,7 @@ public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
 
                     @Override
                     public Authentication authenticate(Authentication authentication) {
-                        throw new UsernameNotFoundException("Bad Credentials");
+                        throw new AuthenticationServiceException("Bad Credentials");
                     }
 
                     @Override
@@ -87,5 +88,6 @@ public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/ws/**").permitAll()
 
                 .anyRequest().authenticated().and().csrf().disable();
+
     }
 }
