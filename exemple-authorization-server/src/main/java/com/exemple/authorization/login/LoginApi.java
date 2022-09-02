@@ -8,6 +8,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
@@ -69,6 +70,7 @@ public class LoginApi {
     }
 
     @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{username}")
     @Operation(tags = "login")
     @ApiResponses(value = {
@@ -117,6 +119,7 @@ public class LoginApi {
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/move")
     @Operation(tags = "login")
     @ApiResponses(value = {
