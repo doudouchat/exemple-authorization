@@ -9,8 +9,9 @@ public class LoginAlreadyExistsException extends UsernameAlreadyExistsException 
 
     private final String path;
 
-    public LoginAlreadyExistsException(String username, String path) {
+    public LoginAlreadyExistsException(String username, String path, Throwable cause) {
         super(username);
+        super.initCause(cause);
         this.path = path;
     }
 

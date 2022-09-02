@@ -142,7 +142,7 @@ public class LoginApi {
         try {
             loginResource.save(origin);
         } catch (UsernameAlreadyExistsException e) {
-            throw new LoginAlreadyExistsException(e.getUsername(), "/toUsername");
+            throw new LoginAlreadyExistsException(e.getUsername(), "/toUsername", e);
         }
 
         loginResource.delete(copy.getFromUsername());
