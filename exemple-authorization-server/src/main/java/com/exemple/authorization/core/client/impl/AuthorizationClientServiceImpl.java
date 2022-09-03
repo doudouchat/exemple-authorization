@@ -7,7 +7,6 @@ import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.oauth2.provider.ClientDetails;
-import org.springframework.security.oauth2.provider.ClientRegistrationException;
 import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -29,16 +29,10 @@ public class AuthorizationClientServiceImpl implements AuthorizationClientServic
     private final CuratorFramework client;
 
     @Override
+    @SneakyThrows
     public ClientDetails get(String clientId) {
 
-        try {
-
-            return MAPPER.readValue(client.getData().forPath("/" + clientId), BaseClientDetails.class);
-
-        } catch (Exception e) {
-
-            throw new ClientRegistrationException("Client " + clientId + " not found", e);
-        }
+        return MAPPER.readValue(client.getData().forPath("/" + clientId), BaseClientDetails.class);
 
     }
 
