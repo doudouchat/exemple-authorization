@@ -225,8 +225,12 @@ public class LoginApi {
 
     }
 
-    private static LoginEntity toLoginEntity(LoginModel resource, LoginEntity entity) {
+    private static LoginEntity toLoginEntity(LoginModel resource, LoginEntity loginEntity) {
 
+        var entity = new LoginEntity();
+
+        entity.setAccountLocked(loginEntity.isAccountLocked());
+        entity.setDisabled(loginEntity.isDisabled());
         entity.setPassword(resource.getPassword());
         entity.setUsername(resource.getUsername());
 

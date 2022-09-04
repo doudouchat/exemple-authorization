@@ -86,9 +86,10 @@ public class AuthorizationTokenConfiguration {
             }
             additionalInfo.put("authorities", authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList());
 
-            ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
+            var token = new DefaultOAuth2AccessToken(accessToken);
+            token.setAdditionalInformation(additionalInfo);
 
-            return accessToken;
+            return token;
         }, accessTokenConverter()));
 
         return tokenEnhancerChain;
