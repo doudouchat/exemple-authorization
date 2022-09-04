@@ -2,6 +2,7 @@ package com.exemple.authorization.password;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
@@ -55,29 +56,25 @@ public class NewPasswordApi {
 
         AuthorizationContextSecurity securityContext = (AuthorizationContextSecurity) servletContext.getSecurityContext();
 
-        Map<String, Object> data = new HashMap<>();
+        Optional<String> accessToken = loginResource.get(newPassword.getLogin())
+                .map((LoginEntity login) -> accessTokenBuilder.createAccessToken(newPassword, app, securityContext));
 
-        loginResource.get(newPassword.getLogin()).ifPresent((LoginEntity login) -> {
+        if (securityContext.isUserInRole("ROLE_TRUSTED_CLIENT")) {
 
-            String accessToken = accessTokenBuilder.createAccessToken(newPassword, app, securityContext);
+            Map<String, Object> data = new HashMap<>();
+            accessToken.ifPresent(token -> data.put("token", token));
+            return Response.status(Status.OK).entity(data).build();
 
-            data.put("token", accessToken);
-
-            if (!securityContext.isUserInRole("ROLE_TRUSTED_CLIENT")) {
-
-                Message<Map<String, Object>> message = MessageBuilder.withPayload(data).setHeader(KafkaHeaders.TOPIC, "new_password").build();
-                template.send(message);
-
-            }
-
-        });
-
-        if (!securityContext.isUserInRole("ROLE_TRUSTED_CLIENT")) {
-
-            return Response.status(Status.NO_CONTENT).build();
         }
 
-        return Response.status(Status.OK).entity(data).build();
+        accessToken.ifPresent((String token) -> {
+            Map<String, Object> data = Map.of(
+                    "token", token);
+            Message<Map<String, Object>> message = MessageBuilder.withPayload(data).setHeader(KafkaHeaders.TOPIC, "new_password").build();
+            template.send(message);
+        });
+
+        return Response.status(Status.NO_CONTENT).build();
 
     }
 
