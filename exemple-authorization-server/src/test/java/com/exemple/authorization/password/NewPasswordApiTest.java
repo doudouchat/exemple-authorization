@@ -1,9 +1,11 @@
 package com.exemple.authorization.password;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -13,6 +15,9 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -32,6 +37,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -112,19 +118,39 @@ class NewPasswordApiTest {
     }
 
     @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @TestMethodOrder(OrderAnnotation.class)
     class Password {
 
+        @Autowired
+        private EmbeddedKafkaBroker embeddedKafka;
+
+        @Autowired
+        private Consumer<String, Map<String, Object>> consumerKafka;
+
+        private String username;
+
+        private String token;
+
+        @BeforeAll
+        void username() {
+
+            username = "jean.dupond@gmail.com";
+        }
+
+        @BeforeAll
+        void subscribeConsumer() {
+            embeddedKafka.consumeFromAllEmbeddedTopics(consumerKafka);
+        }
+
         @Test
+        @Order(0)
         void password() {
 
             // Given token
 
             String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
                     .withClaim("client_id", "clientId1").sign(algorithm);
-
-            // And given username
-
-            String username = "jean.dupond@gmail.com";
 
             // And mock login resource
 
@@ -152,6 +178,82 @@ class NewPasswordApiTest {
                     () -> assertThat(testFilter.context.isUserInRole("ROLE_APP")).isTrue(),
                     () -> assertThat(testFilter.context.isSecure()).isTrue(),
                     () -> assertThat(testFilter.context.getAuthenticationScheme()).isEqualTo(SecurityContext.BASIC_AUTH));
+
+            // And check kafka message
+
+            ConsumerRecords<String, Map<String, Object>> records = this.consumerKafka.poll(Duration.ofSeconds(1));
+            await().untilAsserted(() -> assertThat(records).hasSize(1));
+            ConsumerRecord<String, Map<String, Object>> record = records.iterator().next();
+            assertThat(record.value()).hasFieldOrProperty("token");
+
+            token = (String) record.value().get("token");
+
+        }
+
+        @Order(1)
+        @Test
+        void checkToken() {
+
+            // When perform check token
+
+            Map<String, String> params = Map.of("token", token);
+
+            Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+
+            // Then check response
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
+            // And check payload
+
+            JWTPartsParser parser = new JWTParser();
+            Payload payload = parser.parsePayload(response.getBody().print());
+
+            assertAll(
+                    () -> assertThat(payload.getSubject()).isEqualTo(username),
+                    () -> assertThat(payload.getClaim("authorities").asArray(String.class)).contains("ROLE_APP"),
+                    () -> assertThat(payload.getClaim("scope").asArray(String.class)).contains("login:read", "login:update"),
+                    () -> assertThat(payload.getExpiresAt()).isEqualTo(Date.from(Instant.now(clock).plusSeconds(expiryTime))),
+                    () -> assertThat(payload.getId()).isNotNull());
+
+        }
+
+        @Test
+        void passwordButLoginIsNotFound() {
+
+            // Given token
+
+            String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_APP" }).withAudience("app")
+                    .withClaim("client_id", "clientId1").sign(algorithm);
+
+            // And mock login resource
+
+            Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
+
+            // When perform create password
+
+            Map<String, Object> newPassword = Map.of("login", username);
+            Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken)
+                    .header("app", "app")
+                    .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
+
+            // Then check response
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+            // And check security context
+
+            assertAll(
+                    () -> assertThat(testFilter.context.getUserPrincipal().getName()).isEqualTo("clientId1"),
+                    () -> assertThat(testFilter.context.isUserInRole("ROLE_APP")).isTrue(),
+                    () -> assertThat(testFilter.context.isSecure()).isTrue(),
+                    () -> assertThat(testFilter.context.getAuthenticationScheme()).isEqualTo(SecurityContext.BASIC_AUTH));
+
+            // And check kafka message
+
+            ConsumerRecords<String, Map<String, Object>> records = this.consumerKafka.poll(Duration.ofSeconds(1));
+            await().during(Duration.ofSeconds(1)).untilAsserted(() -> assertThat(records).isEmpty());
 
         }
 
@@ -240,6 +342,33 @@ class NewPasswordApiTest {
                     () -> assertThat(payload.getClaim("scope").asArray(String.class)).contains("login:read", "login:update"),
                     () -> assertThat(payload.getExpiresAt()).isEqualTo(Date.from(Instant.now(clock).plusSeconds(expiryTime))),
                     () -> assertThat(payload.getId()).isNotNull());
+
+        }
+
+        @Test
+        void passwordTrustedClientButLoginIsNotFound() {
+
+            // Given token
+
+            String accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_TRUSTED_CLIENT" }).withAudience("app1", "app2")
+                    .withClaim("client_id", "clientId1").sign(algorithm);
+
+            // And mock login resource
+
+            Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
+
+            // When perform create password
+
+            Map<String, Object> newPassword = Map.of("login", username);
+            Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken)
+                    .header("app", "app1")
+                    .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
+
+            // Then check response
+
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(response.getBody().asString()).isEqualTo("{}"));
 
         }
 

@@ -181,6 +181,14 @@
 			<artifactId>java-jwt</artifactId>
 		</dependency>
 
+		<!-- AWAITILITY -->
+
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
