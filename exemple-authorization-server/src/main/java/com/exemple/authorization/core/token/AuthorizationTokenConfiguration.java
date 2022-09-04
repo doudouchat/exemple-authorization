@@ -2,7 +2,6 @@ package com.exemple.authorization.core.token;
 
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -79,16 +78,13 @@ public class AuthorizationTokenConfiguration {
         var tokenEnhancerChain = new TokenEnhancerChain();
         tokenEnhancerChain.setTokenEnhancers(Arrays.asList((OAuth2AccessToken accessToken, OAuth2Authentication authentication) -> {
 
-            Map<String, Object> additionalInfo = new HashMap<>();
-
+            var token = new DefaultOAuth2AccessToken(accessToken);
             if (authentication.getPrincipal() instanceof User user) {
-                additionalInfo.put("sub", user.getUsername());
+                token.getAdditionalInformation().put("sub", user.getUsername());
             }
-            additionalInfo.put("authorities", authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList());
-
-            ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
-
-            return accessToken;
+            token.getAdditionalInformation().put("authorities",
+                    authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList());
+            return token;
         }, accessTokenConverter()));
 
         return tokenEnhancerChain;
