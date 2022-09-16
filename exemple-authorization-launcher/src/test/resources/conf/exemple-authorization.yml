@@ -1,0 +1,30 @@
+authorization:
+   resource:
+      cassandra:
+         resource_configuration: file:/usr/local/tomcat/etc/cassandra.conf
+   zookeeper:
+      host: 172.17.0.1:${zookeeper.port}
+   certificat:
+      location: file:/usr/local/etc/authorization/certificat/mytest.jks
+      alias: mytest
+      password: mypass
+   kafka:
+      bootstrap-servers: 172.17.0.1:${kafka.port}
+application:
+   zookeeper:
+      host: 172.17.0.1:${zookeeper.port}
+management:
+   endpoints:
+      web:
+         exposure:
+            include:
+             - info
+             - health
+   endpoint:
+      info:
+         enabled: true
+      health:
+         enabled: true
+   info:
+      env: 
+         enabled: true

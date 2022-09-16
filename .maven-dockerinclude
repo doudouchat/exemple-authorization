@@ -1,0 +1,2 @@
+exemple-authorization-launcher/target/*.war
+exemple-authorization-launcher/src/main/conf/**

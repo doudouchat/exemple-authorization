@@ -8,7 +8,7 @@
 
 <p>execute <code>mvn clean install</code></p>
 
-<p>execute with cargo and cassandra <code>mvn clean verify -Pauthorization,it</code></p>
+<p>execute with docker and cassandra <code>mvn clean verify -Pauthorization,it</code></p>
 
 ## Docker
 
