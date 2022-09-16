@@ -277,6 +277,44 @@
 								</configuration>
 							</execution>
 							<execution>
+								<id>start_hazelcast</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>hazelcast/hazelcast:${hazelcast.version}</name>
+											<alias>hazelcast</alias>
+											<run>
+												<ports>
+													<port>${hazelcast.port}:5701</port>
+												</ports>
+												<env>
+													<JAVA_OPTS>-Dhazelcast.config=/usr/local/etc/hazelcast/hazelcast_server.yaml</JAVA_OPTS>
+												</env>
+												<volumes>
+													<bind>
+														<volume>${project.build.testOutputDirectory}/conf:/usr/local/etc/hazelcast/</volume>
+													</bind>
+												</volumes>
+												<wait>
+													<http>
+														<url>http://localhost:${hazelcast.port}/hazelcast/health/ready</url>
+														<method>GET</method>
+														<status>200</status>
+													</http>
+													<time>10000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
 								<id>start_resource_test</id>
 								<goals>
 									<goal>start</goal>
@@ -331,7 +369,7 @@
 													<port>${authorization.port}:8080</port>
 												</ports>
 												<env>
-													<CATALINA_OPTS>-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml</CATALINA_OPTS>
+													<CATALINA_OPTS>-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml -Dhazelcast.config=/usr/local/tomcat/etc/hazelcast.yaml -Dhazelcast.client.config=/usr/local/tomcat/etc/hazelcast_client.yaml</CATALINA_OPTS>
 												</env>
 												<volumes>
 													<bind>
