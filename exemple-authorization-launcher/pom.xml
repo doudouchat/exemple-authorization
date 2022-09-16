@@ -171,13 +171,49 @@
 								<goals>
 									<goal>report-integration</goal>
 								</goals>
+							</execution>
+							<execution>
+								<id>dump</id>
+								<goals>
+									<goal>dump</goal>
+								</goals>
 								<configuration>
-									<excludes>
-										<exclude>com/exemple/authorization/integration/**</exclude>
-									</excludes>
+									<address>127.0.0.1</address>
+									<port>6300</port>
+									<destFile>${project.build.directory}/jacoco-it.exec</destFile>
 								</configuration>
 							</execution>
 						</executions>
+					</plugin>
+
+					<!-- COPY JACOCO JAR AGENT -->
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.jacoco</groupId>
+									<artifactId>org.jacoco.agent</artifactId>
+									<version>${jacoco-version}</version>
+									<classifier>runtime</classifier>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/lib</outputDirectory>
+									<destFileName>jacocoagent.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
 					</plugin>
 
 					<!-- DOCKER -->
@@ -367,14 +403,17 @@
 											<run>
 												<ports>
 													<port>${authorization.port}:8080</port>
+													<port>6300:6300</port>
 												</ports>
 												<env>
 													<CATALINA_OPTS>-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml -Dhazelcast.config=/usr/local/tomcat/etc/hazelcast.yaml -Dhazelcast.client.config=/usr/local/tomcat/etc/hazelcast_client.yaml</CATALINA_OPTS>
+													<JAVA_TOOL_OPTIONS>-javaagent:/usr/local/tomcat/etc/lib/jacocoagent.jar=includes=com.exemple.authorization.*,output=tcpserver,address=*</JAVA_TOOL_OPTIONS>
 												</env>
 												<volumes>
 													<bind>
 														<volume>${project.build.testOutputDirectory}/conf:/usr/local/tomcat/etc</volume>
 														<volume>${project.parent.basedir}/certificat:/usr/local/etc/authorization/certificat</volume>
+														<volume>${project.build.directory}/lib:/usr/local/tomcat/etc/lib</volume>
 													</bind>
 												</volumes>
 												<wait>
