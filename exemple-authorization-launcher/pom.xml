@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>exemple</groupId>
@@ -34,12 +34,20 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- CURATOR -->
+		<!-- COMMONS APACHE -->
 
 		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-test</artifactId>
-			<scope>provided</scope>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- TEST -->
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
@@ -52,6 +60,44 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+
+		<pluginManagement>
+
+			<plugins>
+
+				<!-- DOCKER -->
+				<!-- http://dmp.fabric8.io/ -->
+				<plugin>
+					<groupId>io.fabric8</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>0.40.2</version>
+				</plugin>
+
+				<!-- TEST INTEGRATION -->
+				<!-- http://maven.apache.org/surefire/maven-failsafe-plugin/ -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<executions>
+						<execution>
+							<goals>
+								<goal>integration-test</goal>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+			</plugins>
+
+		</pluginManagement>
 
 		<plugins>
 
@@ -67,5 +113,295 @@
 		</plugins>
 
 	</build>
+
+	<profiles>
+
+		<profile>
+			<id>authorization</id>
+
+			<dependencies>
+
+				<!-- RESOURCE TEST -->
+
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>exemple-authorization-integration-resource</artifactId>
+					<version>${project.version}</version>
+					<scope>test</scope>
+				</dependency>
+
+			</dependencies>
+
+			<build>
+
+				<plugins>
+
+					<!-- HELPER -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>reserve-network-port</id>
+								<goals>
+									<goal>reserve-network-port</goal>
+								</goals>
+								<phase>process-resources</phase>
+								<configuration>
+									<portNames>
+										<portName>authorization.port</portName>
+										<portName>test.port</portName>
+										<portName>cassandra.port</portName>
+										<portName>hazelcast.port</portName>
+										<portName>zookeeper.port</portName>
+										<portName>kafka.port</portName>
+									</portNames>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- JACOCO -->
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>report-integration</id>
+								<goals>
+									<goal>report-integration</goal>
+								</goals>
+								<configuration>
+									<excludes>
+										<exclude>com/exemple/authorization/integration/**</exclude>
+									</excludes>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- DOCKER -->
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>build_exemple_authorization</id>
+								<goals>
+									<goal>build</goal>
+								</goals>
+								<phase>package</phase>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-authorization</name>
+											<build>
+												<dockerFile>${basedir}/../Dockerfile</dockerFile>
+												<args>
+													<VERSION_TOMCAT>${tomcat.version}-jdk17</VERSION_TOMCAT>
+												</args>
+											</build>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>build_resource_test</id>
+								<goals>
+									<goal>build</goal>
+								</goals>
+								<phase>package</phase>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-resource-test</name>
+											<build>
+												<dockerFile>${project.parent.basedir}/exemple-authorization-integration-resource/Dockerfile</dockerFile>
+												<args>
+													<VERSION_OPENJDK>${maven.compiler.target}-jdk-buster</VERSION_OPENJDK>
+												</args>
+											</build>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_cassandra</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>cassandra:${cassandra-version}</name>
+											<alias>cassandra</alias>
+											<run>
+												<ports>
+													<port>${cassandra.port}:9042</port>
+												</ports>
+												<wait>
+													<log>(?s)Startup complete</log>
+													<time>60000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_zookeeper</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>zookeeper:3.8.0</name>
+											<alias>zookeeper</alias>
+											<run>
+												<ports>
+													<port>${zookeeper.port}:2181</port>
+												</ports>
+												<wait>
+													<time>5000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_resource_test</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-resource-test</name>
+											<alias>exemple-resource-test</alias>
+											<run>
+												<ports>
+													<port>${test.port}:8080</port>
+												</ports>
+												<env>
+													<server.servlet.context-path>/Test</server.servlet.context-path>
+													<spring.config.location>file:/usr/local/test/etc/application.yml</spring.config.location>
+												</env>
+												<volumes>
+													<bind>
+														<volume>${project.build.testOutputDirectory}/test:/usr/local/test/etc</volume>
+													</bind>
+												</volumes>
+												<wait>
+													<http>
+														<url>http://localhost:${test.port}/Test/actuator/health</url>
+														<method>GET</method>
+														<status>200</status>
+													</http>
+													<time>10000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_exemple_authorization</id>
+								<goals>
+									<goal>start</goal>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>exemple-authorization</name>
+											<alias>exemple-authorization</alias>
+											<run>
+												<ports>
+													<port>${authorization.port}:8080</port>
+												</ports>
+												<env>
+													<CATALINA_OPTS>-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml</CATALINA_OPTS>
+												</env>
+												<volumes>
+													<bind>
+														<volume>${project.build.testOutputDirectory}/conf:/usr/local/tomcat/etc</volume>
+														<volume>${project.parent.basedir}/certificat:/usr/local/etc/authorization/certificat</volume>
+													</bind>
+												</volumes>
+												<wait>
+													<http>
+														<url>http://localhost:${authorization.port}/ExempleAuthorization/actuator/health</url>
+														<method>GET</method>
+														<status>200</status>
+													</http>
+													<time>60000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+											<copy>
+												<entries>
+													<entry>
+														<containerPath>/usr/local/tomcat/logs</containerPath>
+														<hostDirectory>${project.build.directory}</hostDirectory>
+													</entry>
+												</entries>
+											</copy>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>stop_all</id>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>it</id>
+
+			<build>
+
+				<plugins>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<test.host>http://localhost</test.host>
+								<test.port>${test.port}</test.port>
+								<test.contextpath>Test</test.contextpath>
+								<authorization.host>http://localhost</authorization.host>
+								<authorization.port>${authorization.port}</authorization.port>
+								<authorization.contextpath>ExempleAuthorization</authorization.contextpath>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
+	</profiles>
 
 </project>

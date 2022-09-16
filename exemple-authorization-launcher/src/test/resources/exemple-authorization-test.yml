@@ -1,0 +1,11 @@
+authorization:
+   resource:
+      cassandra:
+         resource_configuration: file:${project.build.testOutputDirectory}/cassandra.conf
+   zookeeper:
+      host: 127.0.0.1:${zookeeper.port}
+application:
+   zookeeper:
+      host: 127.0.0.1:${zookeeper.port}
+cassandra:
+   scripts: ${project.build.testOutputDirectory}/cassandra/schema.cql, ${project.build.testOutputDirectory}/cassandra/exec.cql

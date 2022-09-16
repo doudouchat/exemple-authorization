@@ -51,14 +51,6 @@
 			<type>war</type>
 		</dependency>
 
-		<!-- INTEGRATION -->
-
-		<dependency>
-			<groupId>exemple</groupId>
-			<artifactId>exemple-authorization-integration</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -69,11 +61,6 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>com/exemple/authorization/integration/**</exclude>
-					</excludes>
-				</configuration>
 				<executions>
 					<execution>
 						<id>report-sonar</id>

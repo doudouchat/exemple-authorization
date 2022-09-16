@@ -1,0 +1,8 @@
+spring:
+   security:
+      oauth2:
+         resourceserver:
+           opaque-token:
+              introspection-uri: http://172.17.0.1:${authorization.port}/ExempleAuthorization/oauth/check_token
+              client-id: resource
+              client-secret: secret
