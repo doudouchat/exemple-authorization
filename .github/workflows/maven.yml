@@ -17,14 +17,8 @@ jobs:
          uses: actions/cache@v2
          with:
             path: ~/.m2
-            key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+            key: ${{ runner.os }}-m2-${{ hashFiles('/pom.xml') }}
             restore-keys: ${{ runner.os }}-m2
-      -  name: Cache embedded cassandra
-         uses: actions/cache@v2
-         with:
-            path: ~/.embedded-cassandra
-            key: ${{ runner.os }}-embedded-cassandra-${{ hashFiles('**/CHANGES.txt') }}
-            restore-keys: ${{ runner.os }}-embedded-cassandra
       -  name: maven-settings-xml-action
          uses: whelk-io/maven-settings-xml-action@v14
          with:
