@@ -47,7 +47,7 @@
 		<maven.compiler.target>17</maven.compiler.target>
 
 		<!-- VERSION -->
-		<cassandra-version>3.11.13</cassandra-version>
+		<cassandra-version>3.11.14</cassandra-version>
 		<jacoco-version>0.8.8</jacoco-version>
 
 		<!-- SONAR -->
