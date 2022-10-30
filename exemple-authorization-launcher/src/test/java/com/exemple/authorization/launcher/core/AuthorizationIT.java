@@ -1,4 +1,4 @@
-package com.exemple.authorization.launcher.password;
+package com.exemple.authorization.launcher.core;
 
 import org.junit.platform.suite.api.ConfigurationParameter;
 import org.junit.platform.suite.api.IncludeEngines;
@@ -9,11 +9,10 @@ import io.cucumber.junit.platform.engine.Constants;
 
 @Suite
 @IncludeEngines("cucumber")
-@SelectClasspathResource("feature/password")
+@SelectClasspathResource("feature/authorization")
 @ConfigurationParameter(key = Constants.GLUE_PROPERTY_NAME, value = "com.exemple.authorization.launcher.core, "
-        + "com.exemple.authorization.launcher.password, "
         + "com.exemple.authorization.launcher.api, "
         + "com.exemple.authorization.launcher.token")
-class PasswordIT {
+class AuthorizationIT {
 
 }

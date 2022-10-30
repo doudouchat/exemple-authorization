@@ -4,7 +4,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,7 +15,7 @@ public class TestApi {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @GetMapping("/account/{id}")
-    @Secured("ROLE_ACCOUNT")
+    @PreAuthorize("hasRole('ROLE_ACCOUNT') and #id == authentication.principal.name")
     public JsonNode get(@PathVariable String id) {
 
         return MAPPER.createObjectNode();
@@ -29,11 +28,5 @@ public class TestApi {
 
         return MAPPER.createObjectNode();
 
-    }
-
-    @PostMapping("/account")
-    @PreAuthorize("hasAuthority('login:update')")
-    public void post() {
-        // no implementation
     }
 }
