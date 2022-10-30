@@ -10,7 +10,9 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -33,6 +35,7 @@ import lombok.SneakyThrows;
 
 @Configuration
 @Import({ ResourceConfiguration.class, ApplicationConfiguration.class, AuthorizationClientConfiguration.class })
+@ComponentScan(basePackages = "com.exemple.authorization.launcher", excludeFilters = @ComponentScan.Filter(SpringBootApplication.class))
 public class IntegrationTestConfiguration {
 
     public static final String AUTHORIZATION_URL = System.getProperty("authorization.host", "http://localhost") + ":"
@@ -115,7 +118,8 @@ public class IntegrationTestConfiguration {
 
                 .and()
 
-                .withClient("test_user").secret(password).authorizedGrantTypes("password", "authorization_code", "refresh_token").redirectUris("xxx")
+                .withClient("test_user").secret(password).authorizedGrantTypes("password", "authorization_code", "implicit", "refresh_token")
+                .redirectUris("xxx")
                 .scopes("account", "login:head", "login:update", "login:read", "login:delete")
                 .autoApprove("account", "login:head", "login:update", "login:read", "login:delete").authorities("ROLE_APP").resourceIds("exemple")
                 .additionalInformation("keyspace=test")

@@ -1,27 +1,17 @@
 package com.exemple.authorization.launcher.swagger;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.platform.suite.api.ConfigurationParameter;
+import org.junit.platform.suite.api.IncludeEngines;
+import org.junit.platform.suite.api.SelectClasspathResource;
+import org.junit.platform.suite.api.Suite;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ContextConfiguration;
+import io.cucumber.junit.platform.engine.Constants;
 
-import com.exemple.authorization.launcher.common.JsonRestTemplate;
-import com.exemple.authorization.launcher.core.IntegrationTestConfiguration;
-
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-
-@ContextConfiguration(classes = { IntegrationTestConfiguration.class })
+@Suite
+@IncludeEngines("cucumber")
+@SelectClasspathResource("feature/swagger")
+@ConfigurationParameter(key = Constants.GLUE_PROPERTY_NAME, value = "com.exemple.authorization.launcher.core, "
+        + "com.exemple.authorization.launcher.swagger")
 class SwaggerIT {
-
-    @Test
-    void swagger() {
-
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).get("/v3/api-docs");
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
-
-    }
 
 }
