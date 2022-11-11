@@ -1,7 +1,5 @@
 package com.exemple.authorization.core.feature;
 
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.time.Clock;
 import java.util.Map;
 import java.util.logging.Level;
@@ -19,17 +17,17 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
-import com.auth0.jwt.algorithms.Algorithm;
-import com.exemple.authorization.core.feature.authorization.AuthorizationFilter;
+import com.exemple.authorization.core.feature.authorization.AuthorizationFeatureConfiguration;
+import com.exemple.authorization.core.feature.authorization.AuthorizationFeatureFilter;
 import com.exemple.authorization.password.properties.PasswordProperties;
 
 @Configuration
+@Import(AuthorizationFeatureConfiguration.class)
 @ApplicationPath("/ws")
 @ComponentScan(basePackages = { "com.exemple.authorization.disconnection", "com.exemple.authorization.password", "com.exemple.authorization.login" })
 @EnableConfigurationProperties(PasswordProperties.class)
@@ -37,23 +35,10 @@ public class FeatureConfiguration extends ResourceConfig {
 
     public static final String APP_HEADER = "app";
 
-    private final String bootstrapServers;
+    @Value("${authorization.kafka.bootstrap-servers}")
+    private String bootstrapServers;
 
-    private final String certificateLocation;
-
-    private final String certificateAlias;
-
-    private final String certificatePassword;
-
-    public FeatureConfiguration(@Value("${authorization.kafka.bootstrap-servers}") String bootstrapServers,
-            @Value("${authorization.certificat.location}") String certificateLocation,
-            @Value("${authorization.certificat.alias}") String certificateAlias,
-            @Value("${authorization.certificat.password}") String certificatePassword) {
-
-        this.bootstrapServers = bootstrapServers;
-        this.certificateLocation = certificateLocation;
-        this.certificateAlias = certificateAlias;
-        this.certificatePassword = certificatePassword;
+    public FeatureConfiguration() {
 
         // Resources
         packages(
@@ -62,13 +47,15 @@ public class FeatureConfiguration extends ResourceConfig {
                 // password feature
                 "com.exemple.authorization.password",
                 // disconnection feature
-                "com.exemple.authorization.disconnection")
+                "com.exemple.authorization.disconnection",
+                // exception
+                "com.exemple.authorization.core.feature.exception")
 
                 // security
 
                 .register(RolesAllowedDynamicFeature.class)
 
-                .register(AuthorizationFilter.class)
+                .register(AuthorizationFeatureFilter.class)
 
                 // logging
 
@@ -100,18 +87,7 @@ public class FeatureConfiguration extends ResourceConfig {
     }
 
     @Bean
-    public Algorithm algorithm(ResourceLoader resourceLoader) {
-
-        var keyStoreKeyFactory = new KeyStoreKeyFactory(resourceLoader.getResource(certificateLocation), certificatePassword.toCharArray());
-        var keyPair = keyStoreKeyFactory.getKeyPair(certificateAlias);
-
-        return Algorithm.RSA256((RSAPublicKey) keyPair.getPublic(), (RSAPrivateKey) keyPair.getPrivate());
-
-    }
-
-    @Bean
     public Clock clock() {
         return Clock.systemDefaultZone();
     }
-
 }

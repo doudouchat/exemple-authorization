@@ -8,7 +8,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,9 +16,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,11 +23,15 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.authorization.common.LoggingFilter;
 import com.exemple.authorization.core.AuthorizationTestConfiguration;
 import com.exemple.authorization.core.client.AuthorizationClientBuilder;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -49,10 +49,10 @@ class DisconnectionApiTest {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private AuthorizationClientBuilder authorizationClientBuilder;
+    private JWSSigner algorithm;
 
     @Autowired
-    private Algorithm algorithm;
+    private AuthorizationClientBuilder authorizationClientBuilder;
 
     private RequestSpecification requestSpecification;
 
@@ -62,14 +62,10 @@ class DisconnectionApiTest {
         String password = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
 
         authorizationClientBuilder
-
                 .withClient("test").secret(password).authorizedGrantTypes("client_credentials").redirectUris("xxx").scopes("account:create")
                 .autoApprove("account:create").authorities("ROLE_APP").resourceIds("app1")
-
                 .and()
-
                 .withClient("resource").secret(password).authorizedGrantTypes("client_credentials").authorities("ROLE_TRUSTED_CLIENT")
-
                 .and().build();
 
     }
@@ -81,48 +77,31 @@ class DisconnectionApiTest {
 
     }
 
-    private String accessToken;
+    private SignedJWT accessToken;
 
     @Order(0)
     @Test
-    void disconnection() {
+    void disconnection() throws JOSEException {
 
-        accessToken = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_ACCOUNT" }).withAudience("app")
-                .withJWTId(UUID.randomUUID().toString()).withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
-                .withClaim("client_id", "clientId1").sign(algorithm);
+        var payload = new JWTClaimsSet.Builder()
+                .claim("authorities", new String[] { "ROLE_ACCOUNT" })
+                .audience("app")
+                .jwtID(UUID.randomUUID().toString())
+                .expirationTime(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
+                .claim("client_id", "clientId1")
+                .build();
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+        accessToken = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        accessToken.sign(algorithm);
+
+        Response response = requestSpecification.contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + accessToken.serialize())
+                .header("app", "app")
                 .post(restTemplate.getRootUri() + "/ws/v1/disconnection");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-    }
-
-    private Stream<Arguments> disconnectionFailure() {
-
-        String accessToken1 = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_ACCOUNT" }).withAudience("app")
-                .withExpiresAt(Date.from(Instant.now().plus(1, ChronoUnit.DAYS))).withClaim("client_id", "clientId1").sign(algorithm);
-
-        String accessToken2 = JWT.create().withArrayClaim("authorities", new String[] { "ROLE_ACCOUNT" }).withAudience("app")
-                .withJWTId(UUID.randomUUID().toString()).withClaim("client_id", "clientId1").sign(algorithm);
-
-        return Stream.of(
-                // no jti
-                Arguments.of(accessToken1),
-                // no exp
-                Arguments.of(accessToken2)
-
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    void disconnectionFailure(String accessToken) {
-
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
-                .post(restTemplate.getRootUri() + "/ws/v1/disconnection");
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
     }
 
@@ -130,7 +109,7 @@ class DisconnectionApiTest {
     @Test
     void checkToken() {
 
-        Map<String, String> params = Map.of("token", accessToken);
+        Map<String, String> params = Map.of("token", accessToken.serialize());
 
         Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
                 .post(restTemplate.getRootUri() + "/oauth/check_token");

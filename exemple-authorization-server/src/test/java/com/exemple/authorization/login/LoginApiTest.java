@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.authorization.common.JsonNodeUtils;
 import com.exemple.authorization.common.LoggingFilter;
 import com.exemple.authorization.core.AuthorizationTestConfiguration;
@@ -28,6 +27,12 @@ import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.login.exception.UsernameAlreadyExistsException;
 import com.exemple.authorization.resource.login.model.LoginEntity;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -43,10 +48,10 @@ class LoginApiTest {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private LoginResource loginResource;
+    private JWSSigner algorithm;
 
     @Autowired
-    private Algorithm algorithm;
+    private LoginResource loginResource;
 
     private RequestSpecification requestSpecification;
 
@@ -62,7 +67,7 @@ class LoginApiTest {
     }
 
     @Test
-    void check() {
+    void check() throws JOSEException {
 
         // Given login
 
@@ -70,7 +75,16 @@ class LoginApiTest {
 
         // And token
 
-        String accessToken = JWT.create().withArrayClaim("scope", new String[] { "login:head" }).withClaim("client_id", "clientId1").sign(algorithm);
+        var payload = new JWTClaimsSet.Builder()
+                .claim("scope", new String[] { "login:head" })
+                .claim("client_id", "clientId1")
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var accessToken = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        accessToken.sign(algorithm);
 
         // And mock service
 
@@ -78,7 +92,9 @@ class LoginApiTest {
 
         // When perform head
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+        Response response = requestSpecification.contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + accessToken.serialize())
+                .header("app", "app")
                 .head(restTemplate.getRootUri() + URL + "/" + username);
 
         // Then check status
@@ -92,7 +108,7 @@ class LoginApiTest {
     }
 
     @Test
-    void checkNotFound() {
+    void checkNotFound() throws JOSEException {
 
         // Given login
 
@@ -100,7 +116,16 @@ class LoginApiTest {
 
         // And token
 
-        String accessToken = JWT.create().withArrayClaim("scope", new String[] { "login:head" }).withClaim("client_id", "clientId1").sign(algorithm);
+        var payload = new JWTClaimsSet.Builder()
+                .claim("scope", new String[] { "login:head" })
+                .claim("client_id", "clientId1")
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var accessToken = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        accessToken.sign(algorithm);
 
         // And mock service
 
@@ -108,7 +133,9 @@ class LoginApiTest {
 
         // When perform head
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+        Response response = requestSpecification.contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + accessToken.serialize())
+                .header("app", "app")
                 .head(restTemplate.getRootUri() + URL + "/" + username);
 
         // Then check status
@@ -122,7 +149,7 @@ class LoginApiTest {
     }
 
     @Test
-    void create() throws UsernameAlreadyExistsException {
+    void create() throws UsernameAlreadyExistsException, JOSEException {
 
         // Given user_name
 
@@ -134,14 +161,24 @@ class LoginApiTest {
 
         // And token
 
-        String accessToken = JWT.create().withArrayClaim("scope", new String[] { "login:update" }).withClaim("client_id", "clientId1")
-                .sign(algorithm);
+        var payload = new JWTClaimsSet.Builder()
+                .claim("scope", new String[] { "login:update" })
+                .claim("client_id", "clientId1")
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var accessToken = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        accessToken.sign(algorithm);
 
         // When perform post
 
         Map<String, Object> login = Map.of("password", "mdp123");
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+        Response response = requestSpecification.contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + accessToken.serialize())
+                .header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
 
         // Then check response
@@ -167,7 +204,7 @@ class LoginApiTest {
     }
 
     @Test
-    void createFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException {
+    void createFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException, JOSEException {
 
         // Given user_name
 
@@ -180,14 +217,24 @@ class LoginApiTest {
 
         // And token
 
-        String accessToken = JWT.create().withArrayClaim("scope", new String[] { "login:update" }).withClaim("client_id", "clientId1")
-                .sign(algorithm);
+        var payload = new JWTClaimsSet.Builder()
+                .claim("scope", new String[] { "login:update" })
+                .claim("client_id", "clientId1")
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var accessToken = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        accessToken.sign(algorithm);
 
         // When perform post
 
         Map<String, Object> login = Map.of("password", "mdp123");
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+        Response response = requestSpecification.contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + accessToken.serialize())
+                .header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
 
         // Then check status
@@ -212,7 +259,7 @@ class LoginApiTest {
     }
 
     @Test
-    void update() throws UsernameAlreadyExistsException {
+    void update() throws UsernameAlreadyExistsException, JOSEException {
 
         // Given user_name
 
@@ -230,14 +277,25 @@ class LoginApiTest {
 
         // And token
 
-        String accessToken = JWT.create().withSubject(username).withArrayClaim("scope", new String[] { "login:update" })
-                .withClaim("client_id", "clientId1").sign(algorithm);
+        var payload = new JWTClaimsSet.Builder()
+                .subject(username)
+                .claim("scope", new String[] { "login:update" })
+                .claim("client_id", "clientId1")
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var accessToken = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        accessToken.sign(algorithm);
 
         // When perform post
 
         Map<String, Object> login = Map.of("password", "mdp124");
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+        Response response = requestSpecification.contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + accessToken.serialize())
+                .header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
 
         // Then check status
@@ -263,7 +321,7 @@ class LoginApiTest {
     }
 
     @Test
-    void updateForbidden() throws UsernameAlreadyExistsException {
+    void updateForbidden() throws UsernameAlreadyExistsException, JOSEException {
 
         // Given user_name
 
@@ -278,14 +336,25 @@ class LoginApiTest {
 
         // And token
 
-        String accessToken = JWT.create().withSubject("jean.dupont@gmail.com").withArrayClaim("scope", new String[] { "login:update" })
-                .withClaim("client_id", "clientId1").sign(algorithm);
+        var payload = new JWTClaimsSet.Builder()
+                .subject("jean.dupont@gmail.com")
+                .claim("scope", new String[] { "login:update" })
+                .claim("client_id", "clientId1")
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var accessToken = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        accessToken.sign(algorithm);
 
         // When perform post
 
         Map<String, Object> login = Map.of("password", "mdp124");
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+        Response response = requestSpecification.contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + accessToken.serialize())
+                .header("app", "app")
                 .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
 
         // Then check status
@@ -299,7 +368,7 @@ class LoginApiTest {
     }
 
     @Test
-    void move() throws UsernameAlreadyExistsException {
+    void move() throws UsernameAlreadyExistsException, JOSEException {
 
         // Given user_name
 
@@ -317,8 +386,17 @@ class LoginApiTest {
 
         // And token
 
-        String accessToken = JWT.create().withSubject(username).withArrayClaim("scope", new String[] { "login:update" })
-                .withClaim("client_id", "clientId1").sign(algorithm);
+        var payload = new JWTClaimsSet.Builder()
+                .subject(username)
+                .claim("scope", new String[] { "login:update" })
+                .claim("client_id", "clientId1")
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var accessToken = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        accessToken.sign(algorithm);
 
         // When perform post
 
@@ -326,7 +404,9 @@ class LoginApiTest {
                 "fromUsername", username,
                 "toUsername", "jean.dupont@gmail.com");
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+        Response response = requestSpecification.contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + accessToken.serialize())
+                .header("app", "app")
                 .body(login).post(restTemplate.getRootUri() + URL + "/move");
 
         // Then check response
@@ -358,7 +438,7 @@ class LoginApiTest {
     }
 
     @Test
-    void moveFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException {
+    void moveFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException, JOSEException {
 
         // Given user_name
 
@@ -371,8 +451,17 @@ class LoginApiTest {
 
         // And token
 
-        String accessToken = JWT.create().withSubject(username).withArrayClaim("scope", new String[] { "login:update" })
-                .withClaim("client_id", "clientId1").sign(algorithm);
+        var payload = new JWTClaimsSet.Builder()
+                .subject(username)
+                .claim("scope", new String[] { "login:update" })
+                .claim("client_id", "clientId1")
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var accessToken = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        accessToken.sign(algorithm);
 
         // When perform post
 
@@ -380,7 +469,9 @@ class LoginApiTest {
                 "fromUsername", username,
                 "toUsername", "jean.dupont@gmail.com");
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+        Response response = requestSpecification.contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + accessToken.serialize())
+                .header("app", "app")
                 .body(login).post(restTemplate.getRootUri() + URL + "/move");
 
         // Then check status
@@ -405,7 +496,7 @@ class LoginApiTest {
     }
 
     @Test
-    void moveFailsBecauseUsernameNotFound() throws UsernameAlreadyExistsException {
+    void moveFailsBecauseUsernameNotFound() throws UsernameAlreadyExistsException, JOSEException {
 
         // Given user_name
 
@@ -417,8 +508,17 @@ class LoginApiTest {
 
         // And token
 
-        String accessToken = JWT.create().withSubject(username).withArrayClaim("scope", new String[] { "login:update" })
-                .withClaim("client_id", "clientId1").sign(algorithm);
+        var payload = new JWTClaimsSet.Builder()
+                .subject(username)
+                .claim("scope", new String[] { "login:update" })
+                .claim("client_id", "clientId1")
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var accessToken = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        accessToken.sign(algorithm);
 
         // When perform post
 
@@ -426,7 +526,9 @@ class LoginApiTest {
                 "fromUsername", username,
                 "toUsername", "jean.dupont@gmail.com");
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+        Response response = requestSpecification.contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + accessToken.serialize())
+                .header("app", "app")
                 .body(login).post(restTemplate.getRootUri() + URL + "/move");
 
         // Then check status
@@ -451,7 +553,7 @@ class LoginApiTest {
     }
 
     @Test
-    void moveFailsBecauseForbidden() throws UsernameAlreadyExistsException {
+    void moveFailsBecauseForbidden() throws UsernameAlreadyExistsException, JOSEException {
 
         // Given user_name
 
@@ -459,8 +561,17 @@ class LoginApiTest {
 
         // And token
 
-        String accessToken = JWT.create().withSubject("jean.dupont@gmail.com").withArrayClaim("scope", new String[] { "login:update" })
-                .withClaim("client_id", "clientId1").sign(algorithm);
+        var payload = new JWTClaimsSet.Builder()
+                .subject("jean.dupont@gmail.com")
+                .claim("scope", new String[] { "login:update" })
+                .claim("client_id", "clientId1")
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        var accessToken = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                payload);
+        accessToken.sign(algorithm);
 
         // When perform post
 
@@ -468,7 +579,9 @@ class LoginApiTest {
                 "fromUsername", username,
                 "toUsername", "jean.dupont@gmail.com");
 
-        Response response = requestSpecification.contentType(ContentType.JSON).header("Authorization", "Bearer " + accessToken).header("app", "app")
+        Response response = requestSpecification.contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + accessToken.serialize())
+                .header("app", "app")
                 .body(login).post(restTemplate.getRootUri() + URL + "/move");
 
         // Then check status

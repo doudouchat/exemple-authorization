@@ -61,6 +61,23 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- SPRING SECURITY -->
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-jose</artifactId>
+		</dependency>
+
 		<!-- SPRING SESSION -->
 
 		<dependency>
@@ -99,13 +116,6 @@
 		<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>
-		</dependency>
-
-		<!-- NIMBUS -->
-
-		<dependency>
-			<groupId>com.nimbusds</groupId>
-			<artifactId>nimbus-jose-jwt</artifactId>
 		</dependency>
 
 		<!-- CURATOR -->
@@ -178,13 +188,6 @@
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
-		</dependency>
-
-		<!-- JWT TOKEN -->
-
-		<dependency>
-			<groupId>com.auth0</groupId>
-			<artifactId>java-jwt</artifactId>
 		</dependency>
 
 		<!-- AWAITILITY -->

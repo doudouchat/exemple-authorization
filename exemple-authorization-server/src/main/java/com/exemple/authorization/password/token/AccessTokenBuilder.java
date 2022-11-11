@@ -9,24 +9,27 @@ import java.util.UUID;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.exemple.authorization.application.common.exception.NotFoundApplicationException;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.common.security.AuthorizationContextSecurity;
 import com.exemple.authorization.password.model.NewPassword;
 import com.exemple.authorization.password.properties.PasswordProperties;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 @Component
 @RequiredArgsConstructor
 public class AccessTokenBuilder {
 
-    private final Algorithm algorithm;
+    private final JWSSigner algorithm;
 
     private final ApplicationDetailService applicationDetailService;
 
@@ -34,6 +37,7 @@ public class AccessTokenBuilder {
 
     private final Clock clock;
 
+    @SneakyThrows
     public String createAccessToken(@Valid NewPassword newPassword, String app, AuthorizationContextSecurity securityContext) {
 
         var applicationDetail = applicationDetailService.get(app).orElseThrow(() -> new NotFoundApplicationException(app));
@@ -42,21 +46,19 @@ public class AccessTokenBuilder {
                 .plus(ObjectUtils.defaultIfNull(applicationDetail.getExpiryTimePassword(), passwordProperties.getExpiryTime()),
                         ChronoUnit.SECONDS));
 
-        return JWT.create()
+        var payload = new JWTClaimsSet.Builder()
+                .jwtID(UUID.randomUUID().toString())
+                .claim("scope", new String[] { "login:update", "login:read" })
+                .subject(newPassword.getLogin())
+                .expirationTime(expiresAt)
+                .claim("client_id", securityContext.getJwt().getClaimAsString("client_id"))
+                .claim("authorities", securityContext.getRoles().toArray(String[]::new))
+                .build();
 
-                .withJWTId(UUID.randomUUID().toString())
+        var token = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), payload);
+        token.sign(algorithm);
 
-                .withArrayClaim("scope", new String[] { "login:update", "login:read" })
-
-                .withSubject(newPassword.getLogin()).withExpiresAt(expiresAt)
-
-                .withClaim("client_id", securityContext.getAuthentication().getOAuth2Request().getClientId())
-
-                .withArrayClaim("authorities",
-                        securityContext.getAuthentication().getOAuth2Request().getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                                .toArray(String[]::new))
-
-                .sign(algorithm);
+        return token.serialize();
 
     }
 

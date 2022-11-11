@@ -5,7 +5,9 @@ import java.nio.charset.StandardCharsets;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,14 @@ public class AuthorizationClientServiceImpl implements AuthorizationClientServic
     @SneakyThrows
     public ClientDetails get(String clientId) {
 
-        return MAPPER.readValue(client.getData().forPath("/" + clientId), BaseClientDetails.class);
+        try {
+
+            return MAPPER.readValue(client.getData().forPath("/" + clientId), BaseClientDetails.class);
+
+        } catch (KeeperException.NoNodeException e) {
+
+            throw new BadCredentialsException("Client '" + clientId + "' not exists", e);
+        }
 
     }
 
