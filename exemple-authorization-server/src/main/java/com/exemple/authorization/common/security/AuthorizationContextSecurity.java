@@ -1,16 +1,11 @@
 package com.exemple.authorization.common.security;
 
 import java.security.Principal;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.Collection;
 
 import javax.ws.rs.core.SecurityContext;
 
-import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-
-import com.auth0.jwt.interfaces.Payload;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,20 +14,21 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class AuthorizationContextSecurity implements SecurityContext {
 
-    private final OAuth2Authentication authentication;
+    private final Principal principal;
 
-    private final Payload payload;
+    private final Collection<String> roles;
+
+    @Getter
+    private final Jwt jwt;
 
     @Override
     public Principal getUserPrincipal() {
-        return () -> ObjectUtils.defaultIfNull(payload.getSubject(), authentication.getPrincipal().toString());
+        return this.principal;
     }
 
     @Override
     public boolean isUserInRole(String role) {
-        return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch((String authority) -> authority.equals(role))
-                || Optional.ofNullable(payload.getClaim("scope").asList(String.class)).orElseGet(Collections::emptyList).stream()
-                        .anyMatch((String scope) -> scope.equals(role));
+        return roles.contains(role);
     }
 
     @Override
@@ -44,4 +40,5 @@ public class AuthorizationContextSecurity implements SecurityContext {
     public String getAuthenticationScheme() {
         return SecurityContext.BASIC_AUTH;
     }
+
 }

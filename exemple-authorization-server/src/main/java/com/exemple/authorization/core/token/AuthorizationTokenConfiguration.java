@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
+import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
@@ -25,7 +26,6 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
-import com.auth0.jwt.RegisteredClaims;
 import com.hazelcast.core.HazelcastInstance;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -64,8 +64,8 @@ public class AuthorizationTokenConfiguration {
         converter.setKeyPair(this.keyStoreKeyFactory.getKeyPair(alias));
         converter.setJwtClaimsSetVerifier((Map<String, Object> claims) -> {
 
-            Object jti = claims.get(RegisteredClaims.JWT_ID);
-            if (jti != null && hazelcastInstance.getMap(TOKEN_BLACK_LIST).containsKey(jti.toString())) {
+            Object jti = claims.get(JwtClaimNames.JTI);
+            if (hazelcastInstance.getMap(TOKEN_BLACK_LIST).containsKey(jti.toString())) {
                 throw new InvalidTokenException(jti + " has been excluded");
             }
         });

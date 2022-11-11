@@ -5,6 +5,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
@@ -19,10 +23,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import kafka.server.KafkaConfig;
 
 @Configuration
 public class FeatureTestConfiguration extends FeatureConfiguration {
+
+    @Value("${authorization.kafka.bootstrap-servers}")
+    private String bootstrapServers;
 
     @Value("${authorization.kafka.embedded.port}")
     private int kafkaPort;
@@ -30,32 +38,9 @@ public class FeatureTestConfiguration extends FeatureConfiguration {
     @Value("${authorization.kafka.embedded.dir}")
     private String logDir;
 
-    private final String bootstrapServers;
-
-    public FeatureTestConfiguration(@Value("${authorization.kafka.bootstrap-servers}") String bootstrapServers,
-            @Value("${authorization.certificat.location}") String certificateLocation,
-            @Value("${authorization.certificat.alias}") String certificateAlias,
-            @Value("${authorization.certificat.password}") String certificatePassword) {
-
-        super(bootstrapServers, certificateLocation, certificateAlias, certificatePassword);
-        this.bootstrapServers = bootstrapServers;
-
-    }
-
     @Bean
-    @Override
     public Clock clock() {
         return Clock.fixed(super.clock().instant().truncatedTo(ChronoUnit.SECONDS), super.clock().getZone());
-    }
-
-    @Bean
-    public TestFilter testFilter() {
-
-        TestFilter filter = new TestFilter();
-        this.register(filter);
-
-        return filter;
-
     }
 
     @Bean
@@ -77,6 +62,41 @@ public class FeatureTestConfiguration extends FeatureConfiguration {
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class,
                 ConsumerConfig.GROUP_ID_CONFIG, "test");
         return new KafkaConsumer<>(configs);
+
+    }
+
+    @Bean
+    public TestApi testApi() {
+
+        TestApi api = new TestApi();
+        this.register(api);
+
+        return api;
+
+    }
+
+    @Bean
+    public TestFilter testFilter() {
+
+        TestFilter filter = new TestFilter();
+        this.register(filter);
+
+        return filter;
+
+    }
+
+    @Path("/v1/test")
+    @Hidden
+    public static class TestApi {
+
+        @GET
+        @Produces(javax.ws.rs.core.MediaType.APPLICATION_JSON)
+        @RolesAllowed("test:read")
+        public javax.ws.rs.core.Response get() {
+
+            return javax.ws.rs.core.Response.ok().build();
+
+        }
 
     }
 
