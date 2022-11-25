@@ -16,6 +16,20 @@
 
 	</properties>
 
+	<dependencyManagement>
+
+		<dependencies>
+
+			<dependency>
+				<groupId>com.nimbusds</groupId>
+				<artifactId>oauth2-oidc-sdk</artifactId>
+				<version>9.35</version>
+			</dependency>
+
+		</dependencies>
+
+	</dependencyManagement>
+
 	<dependencies>
 
 		<!-- SPRING BOOT -->
@@ -38,13 +52,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.security.oauth</groupId>
-			<artifactId>spring-security-oauth2</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>com.nimbusds</groupId>
 			<artifactId>oauth2-oidc-sdk</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
 	</dependencies>

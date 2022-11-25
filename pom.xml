@@ -76,21 +76,6 @@
 				<version>1.1.1.RELEASE</version>
 			</dependency>
 
-			<!-- NIMBUS -->
-
-			<dependency>
-				<groupId>com.nimbusds</groupId>
-				<artifactId>nimbus-jose-jwt</artifactId>
-				<version>9.22</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.nimbusds</groupId>
-				<artifactId>oauth2-oidc-sdk</artifactId>
-				<version>9.35</version>
-				<scope>runtime</scope>
-			</dependency>
-
 			<!-- BCRYPT -->
 			<!-- https://www.mindrot.org/projects/jBCrypt/ -->
 
