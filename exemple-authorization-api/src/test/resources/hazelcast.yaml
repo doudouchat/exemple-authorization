@@ -1,0 +1,11 @@
+hazelcast:
+   cluster-name: "authorization-cluster"
+   network:
+      port:
+         port: ${hazelcast.port}
+         auto-increment: false
+      join:
+         tcp-ip:
+            enabled: false
+         multicast:
+            enabled: false

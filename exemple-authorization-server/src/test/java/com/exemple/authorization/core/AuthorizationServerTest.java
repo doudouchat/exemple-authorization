@@ -32,7 +32,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,12 +39,13 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.util.Assert;
 
 import com.exemple.authorization.common.LoggingFilter;
 import com.exemple.authorization.core.client.AuthorizationClientBuilder;
-import com.exemple.authorization.core.feature.authorization.AuthorizationFeatureConfiguration;
+import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.login.model.LoginEntity;
 import com.hazelcast.core.HazelcastInstance;
@@ -95,7 +95,7 @@ class AuthorizationServerTest {
     private LoginResource resource;
 
     @Autowired
-    private HazelcastInstance hazelcastInstance;
+    private HazelcastInstance client;
 
     private RequestSpecification requestSpecification;
 
@@ -385,7 +385,7 @@ class AuthorizationServerTest {
 
             // Then check response
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
         }
 
@@ -891,11 +891,7 @@ class AuthorizationServerTest {
 
             // Then check status
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
-
-            // And check security context
-
-            // assertThat(SecurityContextHolder.getContext()).isNull();
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
         }
 
@@ -906,7 +902,7 @@ class AuthorizationServerTest {
             // Given token
 
             String deprecatedTokenId = UUID.randomUUID().toString();
-            hazelcastInstance.getMap(AuthorizationFeatureConfiguration.TOKEN_BLACK_LIST).put(deprecatedTokenId, Date.from(Instant.now()));
+            client.getMap(AuthorizationTokenConfiguration.TOKEN_BLACK_LIST).put(deprecatedTokenId, Date.from(Instant.now()));
 
             var payload = new JWTClaimsSet.Builder()
                     .audience("app1")
@@ -937,7 +933,7 @@ class AuthorizationServerTest {
 
             // Then check status
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
         }
 
@@ -976,7 +972,7 @@ class AuthorizationServerTest {
 
             // Then check status
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
         }
 
@@ -1016,7 +1012,7 @@ class AuthorizationServerTest {
 
             // Then check status
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
         }
 
@@ -1032,11 +1028,7 @@ class AuthorizationServerTest {
 
             // Then check status
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
-
-            // And check security context
-
-            // assertThat(SecurityContextHolder.getContext()).isNull();
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
         }
 
@@ -1075,11 +1067,7 @@ class AuthorizationServerTest {
 
             // Then check response
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
-
-            // And check security context
-
-            // assertThat(SecurityContextHolder.getContext()).isNull();
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
         }
 
@@ -1121,10 +1109,6 @@ class AuthorizationServerTest {
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
                     () -> assertThat(response.getHeader("X-Auth-Token")).isNotNull(),
                     () -> assertThat(response.getCookies()).isEmpty());
-
-            // And check security context
-
-            // assertThat(SecurityContextHolder.getContext()).isNull();
 
         }
 

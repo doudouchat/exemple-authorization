@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.apache.curator.shaded.com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
-class SwaggerConfigurationTest {
+class SwaggerTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -50,7 +48,7 @@ class SwaggerConfigurationTest {
         Response response = requestSpecification.get(restTemplate.getRootUri() + "/v3/api-docs");
 
         // Then check status
-        assertThat(response.getStatusCode()).isEqualTo(Status.OK.getStatusCode());
+        assertThat(response.getStatusCode()).isEqualTo(200);
 
         // And check paths swagger
         List<String> expectedPaths = ImmutableList

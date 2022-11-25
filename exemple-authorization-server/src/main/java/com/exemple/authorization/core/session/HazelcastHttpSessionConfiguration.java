@@ -32,7 +32,7 @@ public class HazelcastHttpSessionConfiguration {
 
     @Bean
     @SpringSessionHazelcastInstance
-    public HazelcastInstance hazelcastInstance() {
+    public HazelcastInstance sessionHazelcastInstance() {
 
         var config = Config.load();
 

@@ -1,42 +1,64 @@
 package com.exemple.authorization.core;
 
+import java.security.PrivateKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Optional;
 
 import org.mockito.Mockito;
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
 
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.authentication.AuthenticationConfiguration;
 import com.exemple.authorization.core.client.AuthorizationClientTestConfiguration;
-import com.exemple.authorization.core.feature.FeatureTestConfiguration;
 import com.exemple.authorization.core.resource.keyspace.AuthorizationResourceKeyspace;
-import com.exemple.authorization.core.rsa.KeystoreConfiguration;
 import com.exemple.authorization.core.session.HazelcastHttpSessionConfiguration;
-import com.exemple.authorization.core.swagger.SwaggerConfiguration;
 import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 
 @Configuration
 @Import({ AuthorizationConfiguration.class,
         AuthenticationConfiguration.class,
         AuthorizationTokenConfiguration.class,
         HazelcastHttpSessionConfiguration.class,
-        SwaggerConfiguration.class,
-        AuthorizationClientTestConfiguration.class,
-        FeatureTestConfiguration.class,
-        KeystoreConfiguration.class })
+        AuthorizationClientTestConfiguration.class })
 @ComponentScan(basePackageClasses = AuthorizationResourceKeyspace.class)
 @EnableAutoConfiguration(exclude = CassandraAutoConfiguration.class)
 public class AuthorizationTestConfiguration {
+
+    public static final RSAKey RSA_KEY;
+
+    static {
+
+        try {
+            RSA_KEY = new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE).generate();
+        } catch (JOSEException e) {
+            throw new IllegalStateException(e);
+        }
+
+    }
+
+    @Bean
+    public RSAPublicKey publicKey() throws JOSEException {
+        return RSA_KEY.toRSAPublicKey();
+    }
+
+    @Bean
+    public RSAPrivateKey privateKey() throws JOSEException {
+        return RSA_KEY.toRSAPrivateKey();
+    }
 
     @Bean
     public LoginResource loginResource() {
@@ -59,14 +81,7 @@ public class AuthorizationTestConfiguration {
     }
 
     @Bean
-    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-
-        PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
-
-        YamlPropertiesFactoryBean properties = new YamlPropertiesFactoryBean();
-        properties.setResources(new ClassPathResource("exemple-authorization-test.yml"));
-
-        propertySourcesPlaceholderConfigurer.setProperties(properties.getObject());
-        return propertySourcesPlaceholderConfigurer;
+    public JWSSigner signer(PrivateKey privateKey) {
+        return new RSASSASigner(privateKey);
     }
 }

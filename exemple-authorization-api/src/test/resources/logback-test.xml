@@ -10,11 +10,7 @@
 
 	<logger name="com.exemple.authorization" level="DEBUG" />
 
-	<logger name="com.exemple.authorization.core.swagger.SwaggerTest" level="INFO" />
-	<logger name="org.springframework.boot" level="INFO" />
-	<logger name="org.springframework.security" level="INFO" />
 	<logger name="com.hazelcast" level="INFO" />
-	<logger name="org.apache.zookeeper" level="INFO" />
 	
 	<!-- Niveau general pour l'application -->
 

@@ -41,6 +41,14 @@
 			<artifactId>exemple-authorization-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- API -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-authorization-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- LAUNCHER -->
 

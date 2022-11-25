@@ -27,7 +27,7 @@ public class AuthorizationFeatureConfiguration {
 
     public static final String TOKEN_BLACK_LIST = "token.black_list";
 
-    private final HazelcastInstance hazelcastInstance;
+    private final HazelcastInstance client;
 
     @Bean
     public JwtDecoder decoder(RSAPublicKey publicKey) {
@@ -52,7 +52,7 @@ public class AuthorizationFeatureConfiguration {
 
         @Override
         public OAuth2TokenValidatorResult validate(Jwt jwt) {
-            if (hazelcastInstance.getMap(TOKEN_BLACK_LIST).containsKey(jwt.getId())) {
+            if (client.getMap(TOKEN_BLACK_LIST).containsKey(jwt.getId())) {
                 return OAuth2TokenValidatorResult.failure(new OAuth2Error("custom_code", jwt.getId() + " has been excluded", null));
             }
             return OAuth2TokenValidatorResult.success();

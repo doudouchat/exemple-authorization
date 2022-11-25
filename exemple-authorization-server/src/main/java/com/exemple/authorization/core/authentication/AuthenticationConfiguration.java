@@ -72,20 +72,11 @@ public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
         var filter = new AuthenticationFilter(tokenServices, authorizationResourceKeyspace, "ROLE_APP");
         filter.setAuthenticationManager(authenticationManagerBean());
 
-        http.cors().and().addFilter(filter)
-
+        http
+                .requestMatchers()
+                .antMatchers("/login", "/oauth/**").and()
+                .addFilter(filter)
                 .authorizeRequests()
-
-                .antMatchers("/actuator/**").permitAll()
-
-                .antMatchers("/v3/api-docs/**").permitAll()
-
-                .antMatchers("/.well-known/jwks.json").permitAll()
-
-                .antMatchers("/toto").permitAll()
-
-                .antMatchers("/ws/**").permitAll()
-
                 .anyRequest().authenticated().and().csrf().disable();
 
     }

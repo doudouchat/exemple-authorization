@@ -11,9 +11,6 @@
 
 	<properties>
 
-		<!-- KAFKA -->
-		<kafka.broker.logs-dir>${project.build.directory}/kafka</kafka.broker.logs-dir>
-
 		<!-- SONAR -->
 		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
 
@@ -38,16 +35,6 @@
 		</dependency>
 
 		<!-- SPRING BOOT -->
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jersey</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -98,19 +85,6 @@
 			<artifactId>hazelcast</artifactId>
 		</dependency>
 
-		<!-- SPRING KAFKA -->
-
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- OAUTH -->
 
 		<dependency>
@@ -131,19 +105,11 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- BCRYPT -->
-
-		<dependency>
-			<groupId>org.mindrot</groupId>
-			<artifactId>jbcrypt</artifactId>
-		</dependency>
-
 		<!-- SWAGGER -->
 
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-boot-starter</artifactId>
-			<version>3.0.0</version>
 		</dependency>
 
 		<!-- JWT -->
@@ -160,11 +126,9 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
-		<!-- GROOVY -->
-
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy</artifactId>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
 		</dependency>
 
 		<!-- JAXB -->
@@ -206,22 +170,10 @@
 			<testResource>
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
-				<excludes>
-					<exclude>mytest.jks</exclude>
-				</excludes>
 			</testResource>
 		</testResources>
 
 		<plugins>
-
-			<!-- DEPLOY -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
 
 			<!-- HELPER -->
 			<plugin>
@@ -238,33 +190,7 @@
 							<portNames>
 								<portName>hazelcast.port</portName>
 								<portName>zmp.clientPort</portName>
-								<portName>kafka.port</portName>
 							</portNames>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>delete_repertory_kafka</id>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<phase>test</phase>
-						<configuration>
-							<excludeDefaultDirectories>true</excludeDefaultDirectories>
-							<verbose>true</verbose>
-							<filesets>
-								<fileset>
-									<directory>${java.io.tmpdir}</directory>
-									<includes>
-										<include>kafka-*/**</include>
-									</includes>
-								</fileset>
-							</filesets>
 						</configuration>
 					</execution>
 				</executions>

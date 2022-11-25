@@ -3,15 +3,14 @@ package com.exemple.authorization.login;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +18,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
-import com.exemple.authorization.common.JsonNodeUtils;
 import com.exemple.authorization.common.LoggingFilter;
 import com.exemple.authorization.core.AuthorizationTestConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.login.exception.UsernameAlreadyExistsException;
 import com.exemple.authorization.resource.login.model.LoginEntity;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -43,6 +43,8 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
 class LoginApiTest {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -204,7 +206,7 @@ class LoginApiTest {
     }
 
     @Test
-    void createFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException, JOSEException {
+    void createFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException, JOSEException, IOException {
 
         // Given user_name
 
@@ -243,16 +245,17 @@ class LoginApiTest {
 
         // And check message
 
-        JsonNode expectedMessage = JsonNodeUtils.create(() -> {
+        JsonNode expectedMessage = MAPPER.readTree(
+                """
+                [
+                  {
+                    "path": "/username",
+                    "code": "username",
+                    "message": "[%username] already exists"
+                    }
+                ]
+                """.replace("%username", username));
 
-            Map<String, Object> model = Map.of(
-                    "path", "/username",
-                    "code", "username",
-                    "message", "[" + username + "] already exists");
-
-            return Collections.singletonList(model);
-
-        });
         JsonNode message = response.as(JsonNode.class);
         assertThat(message).isEqualTo(expectedMessage);
 
@@ -438,7 +441,7 @@ class LoginApiTest {
     }
 
     @Test
-    void moveFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException, JOSEException {
+    void moveFailsBecauseUsernameAlreadyExists() throws UsernameAlreadyExistsException, JOSEException, IOException {
 
         // Given user_name
 
@@ -480,23 +483,23 @@ class LoginApiTest {
 
         // And check message
 
-        JsonNode expectedMessage = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = Map.of(
-                    "path", "/toUsername",
-                    "code", "username",
-                    "message", "[" + username + "] already exists");
-
-            return Collections.singletonList(model);
-
-        });
+        JsonNode expectedMessage = MAPPER.readTree(
+                """
+                [
+                  {
+                    "path": "/toUsername",
+                    "code": "username",
+                    "message": "[%username] already exists"
+                    }
+                ]
+                """.replace("%username", username));
         JsonNode message = response.as(JsonNode.class);
         assertThat(message).isEqualTo(expectedMessage);
 
     }
 
     @Test
-    void moveFailsBecauseUsernameNotFound() throws UsernameAlreadyExistsException, JOSEException {
+    void moveFailsBecauseUsernameNotFound() throws UsernameAlreadyExistsException, JOSEException, IOException {
 
         // Given user_name
 
@@ -537,16 +540,16 @@ class LoginApiTest {
 
         // And check message
 
-        JsonNode expectedMessage = JsonNodeUtils.create(() -> {
-
-            Map<String, Object> model = Map.of(
-                    "path", "/fromUsername",
-                    "code", "not_found",
-                    "message", "[" + username + "] not found");
-
-            return Collections.singletonList(model);
-
-        });
+        JsonNode expectedMessage = MAPPER.readTree(
+                """
+                [
+                  {
+                    "path": "/fromUsername",
+                    "code": "not_found",
+                    "message": "[%username] not found"
+                    }
+                ]
+                """.replace("%username", username));
         JsonNode message = response.as(JsonNode.class);
         assertThat(message).isEqualTo(expectedMessage);
 
