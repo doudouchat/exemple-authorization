@@ -12,6 +12,7 @@ import com.exemple.authorization.core.AuthorizationConfiguration;
 import com.exemple.authorization.core.authentication.AuthenticationConfiguration;
 import com.exemple.authorization.core.client.AuthorizationClientConfiguration;
 import com.exemple.authorization.core.feature.FeatureConfiguration;
+import com.exemple.authorization.core.rsa.KeystoreConfiguration;
 import com.exemple.authorization.core.session.HazelcastHttpSessionConfiguration;
 import com.exemple.authorization.core.swagger.SwaggerConfiguration;
 import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
@@ -26,7 +27,8 @@ import com.exemple.authorization.resource.core.ResourceConfiguration;
         AuthorizationClientConfiguration.class,
         FeatureConfiguration.class,
         ApplicationConfiguration.class,
-        ResourceConfiguration.class })
+        ResourceConfiguration.class,
+        KeystoreConfiguration.class })
 @PropertySource("classpath:default.properties")
 public class AuthorizationServerApplication extends SpringBootServletInitializer {
 
