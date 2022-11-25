@@ -1,16 +1,16 @@
 package com.exemple.authorization.core.token;
 
+import java.security.KeyPair;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -24,7 +24,6 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -32,26 +31,21 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @ComponentScan("com.exemple.authorization.core.token")
+@RequiredArgsConstructor
 public class AuthorizationTokenConfiguration {
 
     public static final String TOKEN_BLACK_LIST = "token.black_list";
 
-    private final String alias;
-
+    @Qualifier("client")
     private final HazelcastInstance hazelcastInstance;
 
-    private final KeyStoreKeyFactory keyStoreKeyFactory;
+    private final RSAPublicKey publicKey;
 
-    public AuthorizationTokenConfiguration(ResourceLoader resourceLoader, @Qualifier("client") HazelcastInstance hazelcastInstance,
-            @Value("${authorization.certificat.location}") String location, @Value("${authorization.certificat.alias}") String alias,
-            @Value("${authorization.certificat.password}") String password) {
-
-        this.alias = alias;
-        this.hazelcastInstance = hazelcastInstance;
-        this.keyStoreKeyFactory = new KeyStoreKeyFactory(resourceLoader.getResource(location), password.toCharArray());
-    }
+    private final RSAPrivateKey privateKey;
 
     @Bean
     public TokenStore tokenStore() {
@@ -61,7 +55,7 @@ public class AuthorizationTokenConfiguration {
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         var converter = new JwtAccessTokenConverter();
-        converter.setKeyPair(this.keyStoreKeyFactory.getKeyPair(alias));
+        converter.setKeyPair(new KeyPair(publicKey, privateKey));
         converter.setJwtClaimsSetVerifier((Map<String, Object> claims) -> {
 
             Object jti = claims.get(JwtClaimNames.JTI);
@@ -102,7 +96,8 @@ public class AuthorizationTokenConfiguration {
 
     @Bean
     public JWKSet jwkSet() {
-        var builder = new RSAKey.Builder((RSAPublicKey) this.keyStoreKeyFactory.getKeyPair(alias).getPublic()).keyUse(KeyUse.SIGNATURE)
+        var builder = new RSAKey.Builder(publicKey)
+                .keyUse(KeyUse.SIGNATURE)
                 .algorithm(JWSAlgorithm.RS256).keyID("exemple-key-id");
         return new JWKSet(builder.build());
     }

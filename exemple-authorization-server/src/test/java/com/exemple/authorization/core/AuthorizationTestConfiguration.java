@@ -19,15 +19,21 @@ import com.exemple.authorization.core.authentication.AuthenticationConfiguration
 import com.exemple.authorization.core.client.AuthorizationClientTestConfiguration;
 import com.exemple.authorization.core.feature.FeatureTestConfiguration;
 import com.exemple.authorization.core.resource.keyspace.AuthorizationResourceKeyspace;
+import com.exemple.authorization.core.rsa.KeystoreConfiguration;
 import com.exemple.authorization.core.session.HazelcastHttpSessionConfiguration;
 import com.exemple.authorization.core.swagger.SwaggerConfiguration;
 import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
 
 @Configuration
-@Import({ AuthorizationConfiguration.class, AuthenticationConfiguration.class, AuthorizationTokenConfiguration.class,
-        HazelcastHttpSessionConfiguration.class, SwaggerConfiguration.class, AuthorizationClientTestConfiguration.class,
-        FeatureTestConfiguration.class })
+@Import({ AuthorizationConfiguration.class,
+        AuthenticationConfiguration.class,
+        AuthorizationTokenConfiguration.class,
+        HazelcastHttpSessionConfiguration.class,
+        SwaggerConfiguration.class,
+        AuthorizationClientTestConfiguration.class,
+        FeatureTestConfiguration.class,
+        KeystoreConfiguration.class })
 @ComponentScan(basePackageClasses = AuthorizationResourceKeyspace.class)
 @EnableAutoConfiguration(exclude = CassandraAutoConfiguration.class)
 public class AuthorizationTestConfiguration {
