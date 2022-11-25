@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,10 +34,10 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 import com.exemple.authorization.common.LoggingFilter;
 import com.exemple.authorization.core.AuthorizationTestConfiguration;
-import com.exemple.authorization.core.client.AuthorizationClientBuilder;
 import com.exemple.authorization.core.feature.FeatureTestConfiguration.TestFilter;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.login.model.LoginEntity;
@@ -73,30 +72,15 @@ class NewPasswordApiTest {
     private LoginResource loginResource;
 
     @Autowired
-    private AuthorizationClientBuilder authorizationClientBuilder;
+    private Clock clock;
 
     @Autowired
-    private Clock clock;
+    private RSAPublicKey publicKey;
 
     @Value("${authorization.password.expiryTime}")
     private long expiryTime;
 
     private RequestSpecification requestSpecification;
-
-    @BeforeAll
-    private void init() throws Exception {
-
-        String password = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
-
-        authorizationClientBuilder
-                .withClient("clientId1").secret(password).authorizedGrantTypes("password", "authorization_code", "refresh_token").redirectUris("xxx")
-                .scopes("account:read", "account:update").autoApprove("account:read", "account:update").authorities("ROLE_APP").resourceIds("app1")
-                .and()
-                .withClient("resource").secret(password).authorizedGrantTypes("client_credentials").authorities("ROLE_TRUSTED_CLIENT")
-                .and()
-                .build();
-
-    }
 
     @BeforeEach
     private void before() {
@@ -193,27 +177,20 @@ class NewPasswordApiTest {
         @Test
         void checkToken() throws ParseException {
 
-            // When perform check token
+            // When decode token
 
-            Map<String, String> params = Map.of("token", token);
+            NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withPublicKey(publicKey).build();
 
-            Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+            var payload = jwtDecoder.decode(token);
 
-            // Then check response
-
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
-
-            // And check payload
-
-            var payload = JWTClaimsSet.parse(response.getBody().print());
+            // Then check payload
 
             assertAll(
                     () -> assertThat(payload.getSubject()).isEqualTo(username),
-                    () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_APP"),
-                    () -> assertThat(payload.getStringListClaim("scope")).contains("login:read", "login:update"),
-                    () -> assertThat(payload.getExpirationTime()).isEqualTo(Date.from(Instant.now(clock).plusSeconds(expiryTime))),
-                    () -> assertThat(payload.getJWTID()).isNotNull());
+                    () -> assertThat(payload.getClaimAsStringList("authorities")).contains("ROLE_APP"),
+                    () -> assertThat(payload.getClaimAsStringList("scope")).contains("login:read", "login:update"),
+                    () -> assertThat(payload.getExpiresAt()).isEqualTo(clock.instant().plusSeconds(expiryTime)),
+                    () -> assertThat(payload.getId()).isNotNull());
 
         }
 
@@ -336,27 +313,20 @@ class NewPasswordApiTest {
         @Test
         void checkToken() throws ParseException {
 
-            // When perform check token
+            // When decode token
 
-            Map<String, String> params = Map.of("token", token);
+            NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withPublicKey(publicKey).build();
 
-            Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+            var payload = jwtDecoder.decode(token);
 
-            // Then check response
-
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
-
-            // And check payload
-
-            var payload = JWTClaimsSet.parse(response.getBody().print());
+            // Then check payload
 
             assertAll(
                     () -> assertThat(payload.getSubject()).isEqualTo(username),
-                    () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_TRUSTED_CLIENT"),
-                    () -> assertThat(payload.getStringListClaim("scope")).contains("login:read", "login:update"),
-                    () -> assertThat(payload.getExpirationTime()).isEqualTo(Date.from(Instant.now(clock).plusSeconds(expiryTime))),
-                    () -> assertThat(payload.getJWTID()).isNotNull());
+                    () -> assertThat(payload.getClaimAsStringList("authorities")).contains("ROLE_TRUSTED_CLIENT"),
+                    () -> assertThat(payload.getClaimAsStringList("scope")).contains("login:read", "login:update"),
+                    () -> assertThat(payload.getExpiresAt()).isEqualTo(Instant.now(clock).plusSeconds(expiryTime)),
+                    () -> assertThat(payload.getId()).isNotNull());
 
         }
 

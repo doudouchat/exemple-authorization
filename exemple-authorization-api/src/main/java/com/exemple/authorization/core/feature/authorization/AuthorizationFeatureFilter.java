@@ -21,7 +21,7 @@ import com.exemple.authorization.application.common.exception.NotFoundApplicatio
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.common.security.AuthorizationContextSecurity;
 import com.exemple.authorization.core.feature.FeatureConfiguration;
-import com.exemple.authorization.core.resource.keyspace.AuthorizationResourceKeyspace;
+import com.exemple.authorization.core.keyspace.ApiResourceKeyspace;
 
 @Priority(Priorities.AUTHENTICATION)
 public class AuthorizationFeatureFilter implements ContainerRequestFilter {
@@ -34,7 +34,7 @@ public class AuthorizationFeatureFilter implements ContainerRequestFilter {
     }
 
     @Autowired
-    private AuthorizationResourceKeyspace authorizationResourceKeyspace;
+    private ApiResourceKeyspace authorizationResourceKeyspace;
 
     @Autowired
     private ApplicationDetailService applicationDetailService;

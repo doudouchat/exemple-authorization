@@ -4,9 +4,7 @@
 		"title": "Api Documentation",
 		"description": "Api Documentation",
 		"termsOfService": "urn:tos",
-		"contact": {
-			
-		},
+		"contact": {},
 		"license": {
 			"name": "Apache 2.0",
 			"url": "http://www.apache.org/licenses/LICENSE-2.0"
@@ -19,8 +17,16 @@
 			"description": "Authorization Endpoint"
 		},
 		{
+			"name": "basic-error-controller",
+			"description": "Basic Error Controller"
+		},
+		{
 			"name": "check-token-endpoint",
 			"description": "Check Token Endpoint"
+		},
+		{
+			"name": "jwk-set-api",
+			"description": "Jwk Set Api"
 		},
 		{
 			"name": "token-endpoint",
@@ -634,6 +640,262 @@
 				}
 			}
 		},
+		"/error": {
+			"get": {
+				"tags": [
+					"basic-error-controller"
+				],
+				"summary": "error",
+				"operationId": "errorUsingGET",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "object",
+									"additionalProperties": {
+										"type": "object"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				}
+			},
+			"put": {
+				"tags": [
+					"basic-error-controller"
+				],
+				"summary": "error",
+				"operationId": "errorUsingPUT",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "object",
+									"additionalProperties": {
+										"type": "object"
+									}
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Created"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"basic-error-controller"
+				],
+				"summary": "error",
+				"operationId": "errorUsingPOST",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "object",
+									"additionalProperties": {
+										"type": "object"
+									}
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Created"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"basic-error-controller"
+				],
+				"summary": "error",
+				"operationId": "errorUsingDELETE",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "object",
+									"additionalProperties": {
+										"type": "object"
+									}
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				}
+			},
+			"options": {
+				"tags": [
+					"basic-error-controller"
+				],
+				"summary": "error",
+				"operationId": "errorUsingOPTIONS",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "object",
+									"additionalProperties": {
+										"type": "object"
+									}
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				}
+			},
+			"head": {
+				"tags": [
+					"basic-error-controller"
+				],
+				"summary": "error",
+				"operationId": "errorUsingHEAD",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "object",
+									"additionalProperties": {
+										"type": "object"
+									}
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				}
+			},
+			"patch": {
+				"tags": [
+					"basic-error-controller"
+				],
+				"summary": "error",
+				"operationId": "errorUsingPATCH",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "object",
+									"additionalProperties": {
+										"type": "object"
+									}
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				}
+			},
+			"trace": {
+				"tags": [
+					"basic-error-controller"
+				],
+				"summary": "error",
+				"operationId": "errorUsingTRACE",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "object",
+									"additionalProperties": {
+										"type": "object"
+									}
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				}
+			}
+		},
 		"/oauth/check_token": {
 			"post": {
 				"tags": [
@@ -666,6 +928,36 @@
 					},
 					"201": {
 						"description": "Created"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				}
+			}
+		},
+		"/.well-known/jwks.json": {
+			"get": {
+				"tags": [
+					"jwk-set-api"
+				],
+				"summary": "publicKeys",
+				"operationId": "publicKeysUsingGET",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "object"
+								}
+							}
+						}
 					},
 					"401": {
 						"description": "Unauthorized"

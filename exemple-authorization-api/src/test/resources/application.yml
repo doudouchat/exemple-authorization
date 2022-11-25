@@ -1,13 +1,4 @@
 authorization:
-   zookeeper:
-      host: 127.0.0.1:${zmp.clientPort}
-      port: ${zmp.clientPort}
-      sessionTimeout: 30000
-      connectionTimeout: 10000
-      retry: 3
-      sleepMsBetweenRetries: 1000
-      ttlMs:
-         product: 30000
    certificat:
       location: file:${project.parent.basedir}/certificat/mytest.jks
       alias: mytest
@@ -19,3 +10,11 @@ authorization:
          port: ${kafka.port}
    password:
       expiryTime: 60
+spring:
+   hazelcast:
+      config: file:${project.build.testOutputDirectory}/hazelcast.yaml
+   mvc:
+      pathmatch:
+         matching-strategy: ant_path_matcher
+hazelcast:
+   port: ${hazelcast.port}

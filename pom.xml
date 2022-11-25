@@ -19,6 +19,7 @@
 		<module>exemple-authorization-resource</module>
 		<module>exemple-authorization-application</module>
 		<module>exemple-authorization-server</module>
+		<module>exemple-authorization-api</module>
 		<module>exemple-authorization-launcher</module>
 		<module>exemple-authorization-integration-resource</module>
 		<module>jacoco-report</module>
@@ -76,13 +77,12 @@
 				<version>1.1.1.RELEASE</version>
 			</dependency>
 
-			<!-- BCRYPT -->
-			<!-- https://www.mindrot.org/projects/jBCrypt/ -->
+			<!-- SWAGGER -->
 
 			<dependency>
-				<groupId>org.mindrot</groupId>
-				<artifactId>jbcrypt</artifactId>
-				<version>0.4</version>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-boot-starter</artifactId>
+				<version>3.0.0</version>
 			</dependency>
 
 			<!-- CURATOR -->
