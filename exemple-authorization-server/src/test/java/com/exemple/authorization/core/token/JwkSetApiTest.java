@@ -38,7 +38,7 @@ class JwkSetApiTest {
     @Test
     void publicKeys() {
 
-        Response response = requestSpecification.get(restTemplate.getRootUri() + "/.well-known/jwks.json");
+        Response response = requestSpecification.get(restTemplate.getRootUri() + "/oauth/jwks");
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
         assertThat(response.jsonPath().get("keys[0].kid"), is("exemple-key-id"));

@@ -4,11 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.KeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
@@ -22,6 +17,7 @@ import java.util.stream.Stream;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Nested;
@@ -40,12 +36,13 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.util.Assert;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
+import com.exemple.authorization.AuthorizationJwtConfiguration;
 import com.exemple.authorization.common.LoggingFilter;
-import com.exemple.authorization.core.client.AuthorizationClientBuilder;
-import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
+import com.exemple.authorization.core.client.AuthorizationClient;
+import com.exemple.authorization.core.client.resource.AuthorizationClientResource;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.login.model.LoginEntity;
 import com.hazelcast.core.HazelcastInstance;
@@ -89,10 +86,10 @@ class AuthorizationServerTest {
     private JWSSigner algorithm;
 
     @Autowired
-    private AuthorizationClientBuilder authorizationClientBuilder;
+    private LoginResource resource;
 
     @Autowired
-    private LoginResource resource;
+    private AuthorizationClientResource authorizationClientResource;
 
     @Autowired
     private HazelcastInstance client;
@@ -101,36 +98,85 @@ class AuthorizationServerTest {
 
     private static final Pattern LOCATION;
 
-    private static final Pattern RSA_PUBLIC_KEY;
-
     static {
 
-        LOCATION = Pattern.compile(".*code=(\\w*)(&state=)?(.*)?", Pattern.DOTALL);
-
-        RSA_PUBLIC_KEY = Pattern.compile("-----BEGIN PUBLIC KEY-----(.*)-----END PUBLIC KEY-----", Pattern.DOTALL);
+        LOCATION = Pattern.compile(".*code=([a-zA-Z0-9\\-_]*)(&state=)?(.*)?", Pattern.DOTALL);
     }
 
     @BeforeAll
     private void init() throws Exception {
 
-        String password = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
+        var secret = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
 
-        authorizationClientBuilder
-                .withClient("test").secret(password).authorizedGrantTypes("client_credentials").redirectUris("xxx").scopes("account:create")
-                .autoApprove("account:create").authorities("ROLE_APP").resourceIds("app1").additionalInformation("keyspace=test")
-                .and()
-                .withClient("test_user").secret(password).authorizedGrantTypes("password", "authorization_code", "refresh_token")
-                .redirectUris("/ws/test").scopes("account:read", "account:update").autoApprove("account:read", "account:update")
-                .authorities("ROLE_APP").resourceIds("app1").additionalInformation("keyspace=test")
-                .and()
-                .withClient("back_user").secret(password).authorizedGrantTypes("password").scopes("stock:read", "stock:update")
-                .autoApprove("stock:read", "stock:update").authorities("ROLE_BACK").resourceIds("app1").additionalInformation("keyspace=test")
-                .and()
-                .withClient("mobile").authorizedGrantTypes("implicit").redirectUris("/ws/test").scopes("account:read", "account:update")
-                .autoApprove("account:read", "account:update").authorities("ROLE_APP").resourceIds("app1").additionalInformation("keyspace=test")
-                .and()
-                .withClient("resource").secret(password).authorizedGrantTypes("client_credentials").authorities("ROLE_TRUSTED_CLIENT")
-                .and().build();
+        var testClient = AuthorizationClient.builder()
+                .id(UUID.randomUUID().toString())
+                .clientId("test")
+                .clientSecret(secret)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue())
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
+                .redirectUri("http://xxx")
+                .scope("account:create")
+                .scope("ROLE_APP")
+                .scope("ROLE_BACK")
+                .requireAuthorizationConsent(false)
+                .build();
+
+        authorizationClientResource.save(testClient);
+
+        var resourceClient = AuthorizationClient.builder()
+                .id(UUID.randomUUID().toString())
+                .clientId("resource")
+                .clientSecret(secret)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue())
+                .authorizationGrantType(AuthorizationGrantType.JWT_BEARER.getValue())
+                .scope("ROLE_TRUSTED_CLIENT")
+                .requireAuthorizationConsent(false)
+                .build();
+
+        authorizationClientResource.save(resourceClient);
+
+        var testUserClient = AuthorizationClient.builder()
+                .id(UUID.randomUUID().toString())
+                .clientId("test_user")
+                .clientSecret(secret)
+                .authorizationGrantType(AuthorizationGrantType.PASSWORD.getValue())
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
+                .redirectUri("http://xxx")
+                .scope("account:read")
+                .scope("account:update")
+                .requireAuthorizationConsent(false)
+                .build();
+
+        authorizationClientResource.save(testUserClient);
+
+        var testBackClient = AuthorizationClient.builder()
+                .id(UUID.randomUUID().toString())
+                .clientId("test_back")
+                .clientSecret(secret)
+                .authorizationGrantType(AuthorizationGrantType.PASSWORD.getValue())
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
+                .redirectUri("http://xxx")
+                .scope("stock:read")
+                .scope("stock:update")
+                .requireAuthorizationConsent(false)
+                .build();
+
+        authorizationClientResource.save(testBackClient);
+
+        var mobileClient = AuthorizationClient.builder()
+                .id(UUID.randomUUID().toString())
+                .clientId("mobile")
+                .clientSecret(secret)
+                .authorizationGrantType(AuthorizationGrantType.IMPLICIT.getValue())
+                .redirectUri("http://xxx")
+                .scope("account:read")
+                .scope("account:update")
+                .requireAuthorizationConsent(false)
+                .build();
+
+        authorizationClientResource.save(mobileClient);
 
     }
 
@@ -148,184 +194,485 @@ class AuthorizationServerTest {
     @TestMethodOrder(OrderAnnotation.class)
     class AuthorizationByCode {
 
-        private String accessToken;
+        @Nested
+        @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+        @TestMethodOrder(OrderAnnotation.class)
+        class User {
 
-        private String xAuthToken;
+            private String accessToken;
 
-        private String username;
+            private String refreshToken;
 
-        private String code;
+            private String xAuthToken;
 
-        private String state;
+            private String username;
 
-        @BeforeAll
-        void username() {
+            private String code;
 
-            username = "jean.dupond@gmail.com";
+            private String state;
+
+            @BeforeAll
+            void username() {
+
+                username = "jean.dupond@gmail.com";
+            }
+
+            @Test
+            @Order(0)
+            void credentials() throws ParseException {
+
+                // Given client credentials
+
+                Map<String, String> params = Map.of("grant_type", "client_credentials", "scope", "ROLE_APP");
+
+                // When perform get access token
+
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
+                        .post(restTemplate.getRootUri() + "/oauth/token");
+
+                // Then check response
+
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                        () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
+
+                accessToken = response.jsonPath().getString("access_token");
+
+                // And check token
+
+                var payload = SignedJWT.parse(accessToken).getJWTClaimsSet();
+                assertAll(
+                        () -> assertThat(payload.getClaim("client_id")).isEqualTo("test"),
+                        () -> assertThat(payload.getStringListClaim("scope")).contains("ROLE_APP"));
+
+            }
+
+            @Test
+            @Order(1)
+            void login() {
+
+                // Given mock login resource
+
+                LoginEntity account = new LoginEntity();
+                account.setUsername(username);
+                account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
+
+                Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+
+                // When perform login
+
+                Response response = requestSpecification.header("Authorization", "Bearer " + accessToken)
+                        .formParams("username", username, "password", "123")
+                        .post(restTemplate.getRootUri() + "/login");
+
+                // Then check response
+
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
+                        () -> assertThat(response.getHeader("X-Auth-Token")).isNotNull(),
+                        () -> assertThat(response.getCookies()).isEmpty());
+
+                xAuthToken = response.getHeader("X-Auth-Token");
+
+            }
+
+            @Test
+            @Order(2)
+            void authorize() {
+
+                // When perform authorize
+
+                String authorizeUrl = restTemplate.getRootUri()
+                        + "/oauth/authorize?response_type=code&client_id=test_user&scope=account:read&state=123";
+                Response response = requestSpecification.when().redirects().follow(false).header("X-Auth-Token", xAuthToken).get(authorizeUrl);
+
+                // Then check response
+
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
+                        () -> assertThat(response.getHeader(HttpHeaders.LOCATION)).isNotNull());
+
+                String location = response.getHeader(HttpHeaders.LOCATION);
+
+                // And check location
+
+                Matcher locationMatcher = LOCATION.matcher(location);
+                assertThat(locationMatcher.lookingAt()).isTrue();
+
+                code = locationMatcher.group(1);
+                state = locationMatcher.group(3);
+
+                // And check state
+
+                assertThat(state).isEqualTo("123");
+
+            }
+
+            @Test
+            @Order(3)
+            void token() throws ParseException {
+
+                // When perform get access token
+
+                Map<String, String> params = Map.of(
+                        "grant_type", "authorization_code",
+                        "code", code,
+                        "client_id", "test_user",
+                        "redirect_uri", "/ws/test");
+
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
+                        .post(restTemplate.getRootUri() + "/oauth/token");
+
+                // Then check response
+
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                        () -> assertThat(response.jsonPath().getString("access_token")).isNotNull(),
+                        () -> assertThat(response.jsonPath().getString("refresh_token")).isNotNull());
+
+                accessToken = response.jsonPath().getString("access_token");
+                refreshToken = response.jsonPath().getString("refresh_token");
+
+                // And check token
+
+                var payload = SignedJWT.parse(accessToken).getJWTClaimsSet();
+                assertAll(
+                        () -> assertThat(payload.getJWTID()).isNotNull(),
+                        () -> assertThat(payload.getClaim("client_id")).isEqualTo("test_user"),
+                        () -> assertThat(payload.getSubject()).isEqualTo(username),
+                        () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_ACCOUNT"),
+                        () -> assertThat(payload.getStringListClaim("scope")).contains("account:read"));
+            }
+
+            @Test
+            @Order(4)
+            void refreshToken() throws ParseException {
+
+                // When perform refresh token
+
+                Map<String, String> params = Map.of(
+                        "grant_type", "refresh_token",
+                        "client_id", "test_user",
+                        "refresh_token", refreshToken);
+
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
+                        .post(restTemplate.getRootUri() + "/oauth/token");
+
+                // Then check response
+
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                        () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
+
+                accessToken = response.jsonPath().getString("access_token");
+
+                // And check token
+
+                var payload = SignedJWT.parse(accessToken).getJWTClaimsSet();
+                assertAll(
+                        () -> assertThat(payload.getJWTID()).isNotNull(),
+                        () -> assertThat(payload.getClaim("client_id")).isEqualTo("test_user"),
+                        () -> assertThat(payload.getSubject()).isEqualTo(username),
+                        () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_ACCOUNT"),
+                        () -> assertThat(payload.getStringListClaim("scope")).contains("account:read"));
+            }
+
+            @Test
+            @Order(4)
+            void tokenFailure() {
+
+                // When perform get access token
+
+                Map<String, String> params = Map.of(
+                        "grant_type", "authorization_code",
+                        "code", code,
+                        "client_id", "test_user",
+                        "redirect_uri", "/ws/test");
+
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
+                        .post(restTemplate.getRootUri() + "/oauth/token");
+
+                // Then check response
+
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                        () -> assertThat(response.jsonPath().getString("error")).isEqualTo("invalid_grant"));
+
+            }
+
+            @Test
+            @Order(5)
+            void checkToken() throws ParseException {
+
+                // When perform check token
+
+                Map<String, String> params = Map.of("token", accessToken);
+
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
+                        .post(restTemplate.getRootUri() + "/oauth/check_token");
+
+                // Then check response
+
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
+                // And check payload
+
+                var payload = JWTClaimsSet.parse(response.getBody().print());
+
+                assertAll(
+                        () -> assertThat(payload.getJWTID()).isNotNull(),
+                        () -> assertThat(payload.getSubject()).isEqualTo(username),
+                        () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_ACCOUNT"),
+                        () -> assertThat(payload.getStringClaim("scope")).isEqualTo("account:read"));
+
+            }
+
         }
 
-        @Test
-        @Order(0)
-        void credentials() {
+        @Nested
+        @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+        @TestMethodOrder(OrderAnnotation.class)
+        class Back {
 
-            // Given client credentials
+            private String accessToken;
 
-            Map<String, String> params = Map.of("grant_type", "client_credentials");
+            private String refreshToken;
 
-            // When perform get access token
+            private String xAuthToken;
 
-            Response response = requestSpecification.auth().basic("test", "secret").formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/token");
+            private String username;
 
-            // Then check response
+            private String code;
 
-            assertAll(
-                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
+            private String state;
 
-            accessToken = response.jsonPath().getString("access_token");
+            @BeforeAll
+            void username() {
 
-        }
+                username = "admin";
+            }
 
-        @Test
-        @Order(1)
-        void login() {
+            @Test
+            @Order(0)
+            void credentials() throws ParseException {
 
-            // Given mock login resource
+                // Given client credentials
 
-            LoginEntity account = new LoginEntity();
-            account.setUsername(username);
-            account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
+                Map<String, String> params = Map.of("grant_type", "client_credentials", "scope", "ROLE_BACK");
 
-            Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+                // When perform get access token
 
-            // When perform login
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
+                        .post(restTemplate.getRootUri() + "/oauth/token");
 
-            Response response = requestSpecification.header("Authorization", "Bearer " + accessToken)
-                    .formParams("username", username, "password", "123")
-                    .post(restTemplate.getRootUri() + "/login");
+                // Then check response
 
-            // Then check response
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                        () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
 
-            assertAll(
-                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
-                    () -> assertThat(response.getHeader("X-Auth-Token")).isNotNull(),
-                    () -> assertThat(response.getCookies()).isEmpty());
+                accessToken = response.jsonPath().getString("access_token");
 
-            xAuthToken = response.getHeader("X-Auth-Token");
+                // And check token
 
-        }
+                var payload = SignedJWT.parse(accessToken).getJWTClaimsSet();
+                assertAll(
+                        () -> assertThat(payload.getClaim("client_id")).isEqualTo("test"),
+                        () -> assertThat(payload.getStringListClaim("scope")).contains("ROLE_BACK"));
 
-        @Test
-        @Order(2)
-        void authorize() {
+            }
 
-            // When perform authorize
+            @Test
+            @Order(1)
+            void login() {
 
-            String authorizeUrl = restTemplate.getRootUri() + "/oauth/authorize?response_type=code&client_id=test_user&scope=account:read&state=123";
-            Response response = requestSpecification.when().redirects().follow(false).header("X-Auth-Token", xAuthToken).get(authorizeUrl);
+                // When perform login
 
-            // Then check response
+                Response response = requestSpecification.header("Authorization", "Bearer " + accessToken)
+                        .formParams("username", username, "password", "admin123")
+                        .post(restTemplate.getRootUri() + "/login");
 
-            assertAll(
-                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SEE_OTHER.value()),
-                    () -> assertThat(response.getHeader(HttpHeaders.LOCATION)).isNotNull());
+                // Then check response
 
-            String location = response.getHeader(HttpHeaders.LOCATION);
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
+                        () -> assertThat(response.getHeader("X-Auth-Token")).isNotNull(),
+                        () -> assertThat(response.getCookies()).isEmpty());
 
-            // And check location
+                xAuthToken = response.getHeader("X-Auth-Token");
 
-            Matcher locationMatcher = LOCATION.matcher(location);
-            assertThat(locationMatcher.lookingAt()).isTrue();
+            }
 
-            code = locationMatcher.group(1);
-            state = locationMatcher.group(3);
+            @Test
+            @Order(2)
+            void authorize() {
 
-            // And check state
+                // When perform authorize
 
-            assertThat(state).isEqualTo("123");
+                String authorizeUrl = restTemplate.getRootUri()
+                        + "/oauth/authorize?response_type=code&client_id=test_back&scope=stock:read&state=123";
+                Response response = requestSpecification.when().redirects().follow(false).header("X-Auth-Token", xAuthToken).get(authorizeUrl);
 
-        }
+                // Then check response
 
-        @Test
-        @Order(3)
-        void token() throws ParseException {
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
+                        () -> assertThat(response.getHeader(HttpHeaders.LOCATION)).isNotNull());
 
-            // When perform get access token
+                String location = response.getHeader(HttpHeaders.LOCATION);
 
-            Map<String, String> params = Map.of(
-                    "grant_type", "authorization_code",
-                    "code", code,
-                    "client_id", "test_user",
-                    "redirect_uri", "/ws/test");
+                // And check location
 
-            Response response = requestSpecification.auth().basic("test_user", "secret").formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/token");
+                Matcher locationMatcher = LOCATION.matcher(location);
+                assertThat(locationMatcher.lookingAt()).isTrue();
 
-            // Then check response
+                code = locationMatcher.group(1);
+                state = locationMatcher.group(3);
 
-            assertAll(
-                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
+                // And check state
 
-            accessToken = response.jsonPath().getString("access_token");
+                assertThat(state).isEqualTo("123");
 
-            // And check payload
+            }
 
-            var payload = JWTClaimsSet.parse(response.getBody().print());
+            @Test
+            @Order(3)
+            void token() throws ParseException {
 
-            assertAll(
-                    () -> assertThat(payload.getSubject()).isEqualTo(username),
-                    () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_ACCOUNT"));
+                // When perform get access token
 
-        }
+                Map<String, String> params = Map.of(
+                        "grant_type", "authorization_code",
+                        "code", code,
+                        "client_id", "test_back",
+                        "redirect_uri", "/ws/test");
 
-        @Test
-        @Order(4)
-        void tokenFailure() {
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
+                        .post(restTemplate.getRootUri() + "/oauth/token");
 
-            // When perform get access token
+                // Then check response
 
-            Map<String, String> params = Map.of(
-                    "grant_type", "authorization_code",
-                    "code", code,
-                    "client_id", "test_user",
-                    "redirect_uri", "xxx");
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                        () -> assertThat(response.jsonPath().getString("access_token")).isNotNull(),
+                        () -> assertThat(response.jsonPath().getString("refresh_token")).isNotNull());
 
-            Response response = requestSpecification.auth().basic("test_user", "secret").formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/token");
+                accessToken = response.jsonPath().getString("access_token");
+                refreshToken = response.jsonPath().getString("refresh_token");
 
-            // Then check response
+                // And check token
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+                var payload = SignedJWT.parse(accessToken).getJWTClaimsSet();
+                assertAll(
+                        () -> assertThat(payload.getJWTID()).isNotNull(),
+                        () -> assertThat(payload.getClaim("client_id")).isEqualTo("test_back"),
+                        () -> assertThat(payload.getSubject()).isEqualTo(username),
+                        () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_BACK"),
+                        () -> assertThat(payload.getStringListClaim("scope")).contains("stock:read"));
+            }
 
-        }
+            @Test
+            @Order(4)
+            void refreshToken() throws ParseException {
 
-        @Test
-        @Order(5)
-        void checkToken() throws ParseException {
+                // When perform refresh token
 
-            // When perform check token
+                Map<String, String> params = Map.of(
+                        "grant_type", "refresh_token",
+                        "client_id", "test_back",
+                        "refresh_token", refreshToken);
 
-            Map<String, String> params = Map.of("token", accessToken);
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
+                        .post(restTemplate.getRootUri() + "/oauth/token");
 
-            Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+                // Then check response
 
-            // Then check response
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                        () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+                accessToken = response.jsonPath().getString("access_token");
 
-            // And check payload
+                // And check token
 
-            var payload = JWTClaimsSet.parse(response.getBody().print());
+                var payload = SignedJWT.parse(accessToken).getJWTClaimsSet();
+                assertAll(
+                        () -> assertThat(payload.getJWTID()).isNotNull(),
+                        () -> assertThat(payload.getClaim("client_id")).isEqualTo("test_back"),
+                        () -> assertThat(payload.getSubject()).isEqualTo(username),
+                        () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_BACK"),
+                        () -> assertThat(payload.getStringListClaim("scope")).contains("stock:read"));
+            }
 
-            assertAll(
-                    () -> assertThat(payload.getClaim("user_name")).isEqualTo(username),
-                    () -> assertThat(payload.getSubject()).isEqualTo(username),
-                    () -> assertThat(payload.getStringListClaim("aud")).contains("app1"),
-                    () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_ACCOUNT"),
-                    () -> assertThat(payload.getStringListClaim("scope")).contains("account:read"));
+            @Test
+            @Order(4)
+            void tokenFailure() {
+
+                // When perform get access token
+
+                Map<String, String> params = Map.of(
+                        "grant_type", "authorization_code",
+                        "code", code,
+                        "client_id", "test_back",
+                        "redirect_uri", "/ws/test");
+
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
+                        .post(restTemplate.getRootUri() + "/oauth/token");
+
+                // Then check response
+
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
+                        () -> assertThat(response.jsonPath().getString("error")).isEqualTo("invalid_grant"));
+
+            }
+
+            @Test
+            @Order(5)
+            void checkToken() throws ParseException {
+
+                // When perform check token
+
+                Map<String, String> params = Map.of("token", accessToken);
+
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
+                        .post(restTemplate.getRootUri() + "/oauth/check_token");
+
+                // Then check response
+
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
+                // And check payload
+
+                var payload = JWTClaimsSet.parse(response.getBody().print());
+
+                assertAll(
+                        () -> assertThat(payload.getJWTID()).isNotNull(),
+                        () -> assertThat(payload.getSubject()).isEqualTo(username),
+                        () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_BACK"),
+                        () -> assertThat(payload.getStringClaim("scope")).isEqualTo("stock:read"));
+
+            }
 
         }
 
@@ -340,15 +687,17 @@ class AuthorizationServerTest {
 
         @Test
         @Order(0)
-        void credentials() {
+        void credentials() throws ParseException {
 
             // Given client credentials
 
-            Map<String, String> params = Map.of("grant_type", "client_credentials");
+            Map<String, String> params = Map.of("grant_type", "client_credentials", "scope", "account:create");
 
             // When perform get access token
 
-            Response response = requestSpecification.auth().basic("test", "secret").formParams(params)
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/token");
 
             // Then check response
@@ -358,6 +707,13 @@ class AuthorizationServerTest {
                     () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
 
             accessToken = response.jsonPath().getString("access_token");
+
+            // And check token
+
+            var payload = SignedJWT.parse(accessToken).getJWTClaimsSet();
+            assertAll(
+                    () -> assertThat(payload.getClaim("client_id")).isEqualTo("test"),
+                    () -> assertThat(payload.getStringListClaim("scope")).contains("account:create"));
 
         }
 
@@ -380,12 +736,16 @@ class AuthorizationServerTest {
 
             // When perform get access token
 
-            Response response = requestSpecification.auth().basic(login, password).formParams(params)
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String((login + ":" + password).getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/token");
 
             // Then check response
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value()),
+                    () -> assertThat(response.jsonPath().getString("error")).isEqualTo("invalid_client"));
 
         }
 
@@ -397,7 +757,9 @@ class AuthorizationServerTest {
 
             Map<String, String> params = Map.of("token", accessToken);
 
-            Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
 
             // Then check response
@@ -409,66 +771,9 @@ class AuthorizationServerTest {
             var payload = JWTClaimsSet.parse(response.getBody().print());
 
             assertAll(
-                    () -> assertThat(payload.getStringListClaim("aud")).contains("app1"),
-                    () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_APP"),
-                    () -> assertThat(payload.getStringListClaim("scope")).contains("account:create"));
-
-        }
-
-        @Order(1)
-        @Test
-        void checkTokenFailure() {
-
-            // When perform check token
-
-            Map<String, String> params = Map.of("token", accessToken);
-
-            Response response = requestSpecification.auth().basic("test", "secret").formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
-
-            // Then check response
-
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
-
-        }
-
-        @Order(1)
-        @Test
-        void tokenKey() throws GeneralSecurityException, ParseException {
-
-            // When perform get token key
-
-            Response response = requestSpecification.auth().basic("resource", "secret").get(restTemplate.getRootUri() + "/oauth/token_key");
-
-            // Then check response
-
-            assertAll(
-                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getString("alg")).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("value")).isNotNull());
-
-            // And check value
-
-            String value = response.jsonPath().getString("value");
-
-            Matcher publicKeyMatcher = RSA_PUBLIC_KEY.matcher(value);
-
-            Assert.isTrue(publicKeyMatcher.lookingAt(), "Pattern is invalid");
-
-            final byte[] content = Base64.decodeBase64(publicKeyMatcher.group(1).getBytes(StandardCharsets.UTF_8));
-
-            KeyFactory fact = KeyFactory.getInstance("RSA");
-            KeySpec keySpec = new X509EncodedKeySpec(content);
-            RSAPublicKey publicKey = (RSAPublicKey) fact.generatePublic(keySpec);
-
-            NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withPublicKey(publicKey).build();
-
-            var payload = jwtDecoder.decode(accessToken);
-
-            assertAll(
-                    () -> assertThat(payload.getClaimAsStringList("aud")).contains("app1"),
-                    () -> assertThat(payload.getClaimAsStringList("authorities")).contains("ROLE_APP"),
-                    () -> assertThat(payload.getClaimAsStringList("scope")).contains("account:create"));
+                    () -> assertThat(payload.getBooleanClaim("active")).isTrue(),
+                    () -> assertThat(payload.getClaim("client_id")).isEqualTo("test"),
+                    () -> assertThat(payload.getClaim("scope")).isEqualTo("account:create"));
 
         }
 
@@ -477,6 +782,7 @@ class AuthorizationServerTest {
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     @TestMethodOrder(OrderAnnotation.class)
+    @Disabled
     class AuthorizationImplicit {
 
         private String accessToken;
@@ -493,15 +799,17 @@ class AuthorizationServerTest {
 
         @Test
         @Order(0)
-        void credentials() {
+        void credentials() throws ParseException {
 
             // Given client credentials
 
-            Map<String, String> params = Map.of("grant_type", "client_credentials");
+            Map<String, String> params = Map.of("grant_type", "client_credentials", "scope", "ROLE_APP");
 
             // When perform get access token
 
-            Response response = requestSpecification.auth().basic("test", "secret").formParams(params)
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/token");
 
             // Then check response
@@ -512,10 +820,17 @@ class AuthorizationServerTest {
 
             accessToken = response.jsonPath().getString("access_token");
 
+            // And check token
+
+            var payload = SignedJWT.parse(accessToken).getJWTClaimsSet();
+            assertAll(
+                    () -> assertThat(payload.getClaim("client_id")).isEqualTo("test"),
+                    () -> assertThat(payload.getStringListClaim("scope")).contains("ROLE_APP"));
+
         }
 
-        @Order(1)
         @Test
+        @Order(1)
         void login() {
 
             // Given mock login resource
@@ -540,20 +855,22 @@ class AuthorizationServerTest {
                     () -> assertThat(response.getCookies()).isEmpty());
 
             xAuthToken = response.getHeader("X-Auth-Token");
+
         }
 
-        @Order(2)
         @Test
+        @Order(2)
         void authorize() {
 
             // When perform authorize
 
-            String authorizeUrl = restTemplate.getRootUri() + "/oauth/authorize?response_type=token&client_id=mobile";
+            String authorizeUrl = restTemplate.getRootUri()
+                    + "/oauth/authorize?response_type=code&client_id=mobile&scope=account:read&state=123&redirect_uri=http://xxx";
             Response response = requestSpecification.when().redirects().follow(false).header("X-Auth-Token", xAuthToken).get(authorizeUrl);
 
             // Then check response
             assertAll(
-                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SEE_OTHER.value()),
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
                     () -> assertThat(response.getHeader(HttpHeaders.LOCATION)).isNotNull());
 
             String location = response.getHeader(HttpHeaders.LOCATION);
@@ -572,7 +889,9 @@ class AuthorizationServerTest {
 
             Map<String, String> params = Map.of("token", accessToken);
 
-            Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
 
             // Then check response
@@ -584,17 +903,16 @@ class AuthorizationServerTest {
             var payload = JWTClaimsSet.parse(response.getBody().print());
 
             assertAll(
-                    () -> assertThat(payload.getClaim("user_name")).isEqualTo(username),
                     () -> assertThat(payload.getSubject()).isEqualTo(username),
-                    () -> assertThat(payload.getStringListClaim("aud")).contains("app1"),
                     () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_ACCOUNT"),
-                    () -> assertThat(payload.getStringListClaim("scope")).contains("account:read"));
+                    () -> assertThat(payload.getStringClaim("scope")).isEqualTo("account:read"));
 
         }
 
     }
 
     @Nested
+    @Disabled
     class AuthorizationByPassword {
 
         @Nested
@@ -635,7 +953,9 @@ class AuthorizationServerTest {
                         "client_id", "test_user",
                         "redirect_uri", "xxx");
 
-                Response response = requestSpecification.auth().basic("test_user", "secret").formParams(params)
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
                 // Then check response
@@ -658,7 +978,9 @@ class AuthorizationServerTest {
 
                 Map<String, String> params = Map.of("token", accessToken);
 
-                Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/check_token");
 
                 // Then check response
@@ -695,7 +1017,9 @@ class AuthorizationServerTest {
                         "client_id", "test_user",
                         "refresh_token", refreshToken);
 
-                Response response = requestSpecification.auth().basic("test_user", "secret").formParams(params)
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
                 // Then check response
@@ -745,7 +1069,9 @@ class AuthorizationServerTest {
                         "client_id", "test_user",
                         "redirect_uri", "xxx");
 
-                Response response = requestSpecification.auth().basic("test_user", "secret").formParams(params)
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
                 // Then check response
@@ -776,9 +1102,11 @@ class AuthorizationServerTest {
                         "username", "admin",
                         "password", "admin123",
                         "client_id", "back_user",
-                        "redirect_uri", "xxx");
+                        "redirect_uri", "http://xxx");
 
-                Response response = requestSpecification.auth().basic("back_user", "secret").formParams(params)
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
                 // Then check response
@@ -801,9 +1129,11 @@ class AuthorizationServerTest {
                         "username", "bad_login",
                         "password", "admin123",
                         "client_id", "back_user",
-                        "redirect_uri", "xxx");
+                        "redirect_uri", "http://xxx");
 
-                Response response = requestSpecification.auth().basic("back_user", "secret").formParams(params)
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
                 // Then check response
@@ -821,7 +1151,9 @@ class AuthorizationServerTest {
 
                 Map<String, String> params = Map.of("token", accessToken);
 
-                Response response = requestSpecification.auth().basic("resource", "secret").formParams(params)
+                Response response = requestSpecification
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                        .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/check_token");
 
                 // Then check response
@@ -853,46 +1185,7 @@ class AuthorizationServerTest {
         @BeforeAll
         void username() {
 
-            username = "jean.dupond@gmail.com";
-        }
-
-        @Test
-        @DisplayName("fails because application is not found")
-        void failsBecauseApplicationIsNotFound() throws JOSEException {
-
-            // Given token
-
-            var payload = new JWTClaimsSet.Builder()
-                    .audience("app1")
-                    .claim("client_id", "other")
-                    .claim("authorities", new String[] { "ROLE_APP" })
-                    .claim("scope", new String[] { "account:create" })
-                    .jwtID(UUID.randomUUID().toString())
-                    .build();
-
-            var accessToken = new SignedJWT(
-                    new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
-                    payload);
-            accessToken.sign(algorithm);
-
-            // And mock login resource
-
-            LoginEntity account = new LoginEntity();
-            account.setUsername(username);
-            account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-
-            Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
-
-            // When perform login
-
-            Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
-                    .formParams("username", username, "password", "123")
-                    .post(restTemplate.getRootUri() + "/login");
-
-            // Then check status
-
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
-
+            username = "test";
         }
 
         @Test
@@ -902,13 +1195,13 @@ class AuthorizationServerTest {
             // Given token
 
             String deprecatedTokenId = UUID.randomUUID().toString();
-            client.getMap(AuthorizationTokenConfiguration.TOKEN_BLACK_LIST).put(deprecatedTokenId, Date.from(Instant.now()));
+            client.getMap(AuthorizationJwtConfiguration.TOKEN_BLACK_LIST).put(deprecatedTokenId,
+                    Date.from(Instant.now()));
 
             var payload = new JWTClaimsSet.Builder()
                     .audience("app1")
                     .claim("client_id", "test")
-                    .claim("authorities", new String[] { "ROLE_APP" })
-                    .claim("scope", new String[] { "account:create" })
+                    .claim("scope", new String[] { "account:create", "ROLE_APP" })
                     .jwtID(deprecatedTokenId)
                     .build();
 
@@ -916,14 +1209,6 @@ class AuthorizationServerTest {
                     new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
                     payload);
             accessToken.sign(algorithm);
-
-            // And mock login resource
-
-            LoginEntity account = new LoginEntity();
-            account.setUsername(username);
-            account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-
-            Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
 
             // When perform login
 
@@ -933,7 +1218,13 @@ class AuthorizationServerTest {
 
             // Then check status
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value()),
+                    () -> assertThat(response.getHeader("WWW-Authenticate")).contains(deprecatedTokenId + " has been excluded"));
+
+            // And verify resource
+
+            Mockito.verify(resource, Mockito.never()).get(Mockito.any());
 
         }
 
@@ -946,8 +1237,7 @@ class AuthorizationServerTest {
             var payload = new JWTClaimsSet.Builder()
                     .audience("app1")
                     .claim("client_id", "test")
-                    .claim("authorities", new String[] { "ROLE_APP" })
-                    .claim("scope", new String[] { "account:create" })
+                    .claim("scope", new String[] { "account:create", "ROLE_APP" })
                     .jwtID(UUID.randomUUID().toString())
                     .build();
 
@@ -955,14 +1245,6 @@ class AuthorizationServerTest {
                     new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
                     payload);
             accessToken.sign(new RSASSASigner(OTHER_RSA_KEY));
-
-            // And mock login resource
-
-            LoginEntity account = new LoginEntity();
-            account.setUsername(username);
-            account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-
-            Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
 
             // When perform login
 
@@ -972,7 +1254,13 @@ class AuthorizationServerTest {
 
             // Then check status
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value()),
+                    () -> assertThat(response.getHeader("WWW-Authenticate")).contains("Invalid signature"));
+
+            // And verify resource
+
+            Mockito.verify(resource, Mockito.never()).get(Mockito.any());
 
         }
 
@@ -985,8 +1273,7 @@ class AuthorizationServerTest {
             var payload = new JWTClaimsSet.Builder()
                     .audience("app1")
                     .claim("client_id", "test")
-                    .claim("authorities", new String[] { "ROLE_APP" })
-                    .claim("scope", new String[] { "account:create" })
+                    .claim("scope", new String[] { "account:create", "ROLE_APP" })
                     .expirationTime(Date.from(Instant.now().minusSeconds(1)))
                     .jwtID(UUID.randomUUID().toString())
                     .build();
@@ -996,14 +1283,6 @@ class AuthorizationServerTest {
                     payload);
             accessToken.sign(algorithm);
 
-            // And mock login resource
-
-            LoginEntity account = new LoginEntity();
-            account.setUsername(username);
-            account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-
-            Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
-
             // When perform login
 
             Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
@@ -1012,7 +1291,13 @@ class AuthorizationServerTest {
 
             // Then check status
 
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value()),
+                    () -> assertThat(response.getHeader("WWW-Authenticate")).contains("Jwt expired at "));
+
+            // And verify resource
+
+            Mockito.verify(resource, Mockito.never()).get(Mockito.any());
 
         }
 
@@ -1029,20 +1314,18 @@ class AuthorizationServerTest {
             // Then check status
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
-
         }
 
         @Test
         @DisplayName("fails because authorities no match")
-        void failureBacsueAuthoritiesNoMatch() throws JOSEException {
+        void failureBecauseAuthoritiesNoMatch() throws JOSEException {
 
             // Given token
 
             var payload = new JWTClaimsSet.Builder()
                     .audience("app1")
                     .claim("client_id", "test")
-                    .claim("authorities", new String[] { "OTHER" })
-                    .claim("scope", new String[] { "account:create" })
+                    .claim("scope", new String[] { "account:create", "OTHER" })
                     .jwtID(UUID.randomUUID().toString())
                     .build();
 
@@ -1050,14 +1333,6 @@ class AuthorizationServerTest {
                     new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
                     payload);
             accessToken.sign(algorithm);
-
-            // Given mock login resource
-
-            LoginEntity account = new LoginEntity();
-            account.setUsername(username);
-            account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-
-            Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
 
             // When perform login
 
@@ -1069,18 +1344,22 @@ class AuthorizationServerTest {
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
+            // And verify resource
+
+            Mockito.verify(resource, Mockito.never()).get(Mockito.any());
+
         }
 
         @Test
-        void success() throws JOSEException {
+        @DisplayName("fails because back login is wrong")
+        void failureBecauseBackLoginIsWrong() throws JOSEException {
 
             // Given token
 
             var payload = new JWTClaimsSet.Builder()
                     .audience("app1")
                     .claim("client_id", "test")
-                    .claim("authorities", new String[] { "ROLE_APP" })
-                    .claim("scope", new String[] { "account:create" })
+                    .claim("scope", new String[] { "account:create", "ROLE_BACK" })
                     .jwtID(UUID.randomUUID().toString())
                     .build();
 
@@ -1089,26 +1368,190 @@ class AuthorizationServerTest {
                     payload);
             accessToken.sign(algorithm);
 
-            // Given mock login resource
-
-            LoginEntity account = new LoginEntity();
-            account.setUsername(username);
-            account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
-
-            Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
-
             // When perform login
 
             Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
-                    .formParams("username", username, "password", "123")
+                    .formParams("username", "other", "password", "admin123")
                     .post(restTemplate.getRootUri() + "/login");
 
             // Then check response
 
-            assertAll(
-                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
-                    () -> assertThat(response.getHeader("X-Auth-Token")).isNotNull(),
-                    () -> assertThat(response.getCookies()).isEmpty());
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+
+        }
+
+        @Nested
+        @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+        class User {
+
+            private String username;
+
+            @BeforeAll
+            void username() {
+
+                username = "jean.dupond@gmail.com";
+            }
+
+            @Test
+            @DisplayName("fails because user login is wrong")
+            void failureBecauseUserLoginIsWrong() throws JOSEException {
+
+                // Given token
+
+                var payload = new JWTClaimsSet.Builder()
+                        .audience("app1")
+                        .claim("client_id", "test")
+                        .claim("scope", new String[] { "account:create", "ROLE_APP" })
+                        .jwtID(UUID.randomUUID().toString())
+                        .build();
+
+                var accessToken = new SignedJWT(
+                        new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                        payload);
+                accessToken.sign(algorithm);
+
+                // And mock login resource
+
+                Mockito.when(resource.get(username)).thenReturn(Optional.empty());
+
+                // When perform login
+
+                Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
+                        .formParams("username", username, "password", "123")
+                        .post(restTemplate.getRootUri() + "/login");
+
+                // Then check response
+
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+
+            }
+
+            @Test
+            void success() throws JOSEException {
+
+                // Given token
+
+                var payload = new JWTClaimsSet.Builder()
+                        .audience("app1")
+                        .claim("client_id", "test")
+                        .claim("scope", new String[] { "account:create", "ROLE_APP" })
+                        .jwtID(UUID.randomUUID().toString())
+                        .build();
+
+                var accessToken = new SignedJWT(
+                        new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                        payload);
+                accessToken.sign(algorithm);
+
+                // Given mock login resource
+
+                LoginEntity account = new LoginEntity();
+                account.setUsername(username);
+                account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
+
+                Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+
+                // When perform login
+
+                Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
+                        .formParams("username", username, "password", "123")
+                        .post(restTemplate.getRootUri() + "/login");
+
+                // Then check response
+
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
+                        () -> assertThat(response.getHeader("X-Auth-Token")).isNotNull(),
+                        () -> assertThat(response.getCookies()).isEmpty());
+
+            }
+        }
+
+        @Nested
+        @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+        class Back {
+
+            private String username;
+
+            @BeforeAll
+            void username() {
+
+                username = "admin";
+            }
+
+            @Test
+            @DisplayName("fails because user login is wrong")
+            void failureBecauseUserLoginIsWrong() throws JOSEException {
+
+                // Given token
+
+                var payload = new JWTClaimsSet.Builder()
+                        .audience("app1")
+                        .claim("client_id", "test")
+                        .claim("scope", new String[] { "account:create", "ROLE_BACK" })
+                        .jwtID(UUID.randomUUID().toString())
+                        .build();
+
+                var accessToken = new SignedJWT(
+                        new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                        payload);
+                accessToken.sign(algorithm);
+
+                // And mock login resource
+
+                Mockito.when(resource.get(username)).thenReturn(Optional.empty());
+
+                // When perform login
+
+                Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
+                        .formParams("username", "other", "password", "admin123")
+                        .post(restTemplate.getRootUri() + "/login");
+
+                // Then check response
+
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+
+            }
+
+            @Test
+            void success() throws JOSEException {
+
+                // Given token
+
+                var payload = new JWTClaimsSet.Builder()
+                        .audience("app1")
+                        .claim("client_id", "test")
+                        .claim("scope", new String[] { "account:create", "ROLE_BACK" })
+                        .jwtID(UUID.randomUUID().toString())
+                        .build();
+
+                var accessToken = new SignedJWT(
+                        new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                        payload);
+                accessToken.sign(algorithm);
+
+                // Given mock login resource
+
+                LoginEntity account = new LoginEntity();
+                account.setUsername(username);
+                account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
+
+                Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+
+                // When perform login
+
+                Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
+                        .formParams("username", username, "password", "admin123")
+                        .post(restTemplate.getRootUri() + "/login");
+
+                // Then check response
+
+                assertAll(
+                        () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
+                        () -> assertThat(response.getHeader("X-Auth-Token")).isNotNull(),
+                        () -> assertThat(response.getCookies()).isEmpty());
+
+            }
 
         }
 

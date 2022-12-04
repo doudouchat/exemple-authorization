@@ -5,11 +5,6 @@
 		<ignoreVersion type="regex">(?i).*(alpha|beta|RC|M)(?:.?-?\d+)?</ignoreVersion>
 	</ignoreVersions>
 	<rules>
-		<rule groupId="org.springframework.security.oauth" artifactId="spring-security-oauth2" comparisonMethod="maven">
-			<ignoreVersions>
-				<ignoreVersion type="regex">2.(4|5).(?:-?\d+).RELEASE</ignoreVersion>
-			</ignoreVersions>
-		</rule>
 		<rule groupId="org.apache.tomcat" comparisonMethod="maven">
 			<ignoreVersions>
 				<ignoreVersion type="regex">10.(.*)</ignoreVersion>

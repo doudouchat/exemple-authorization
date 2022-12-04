@@ -52,7 +52,7 @@ public class AuthorizationJwtConfiguration {
 
         @Override
         public OAuth2TokenValidatorResult validate(Jwt jwt) {
-            if (client.getMap(TOKEN_BLACK_LIST).containsKey(jwt.getId())) {
+            if (jwt.getId() != null && client.getMap(TOKEN_BLACK_LIST).containsKey(jwt.getId())) {
                 return OAuth2TokenValidatorResult.failure(new OAuth2Error("custom_code", jwt.getId() + " has been excluded", null));
             }
             return OAuth2TokenValidatorResult.success();

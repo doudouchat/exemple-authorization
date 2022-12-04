@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.util.ResourceUtils;
 
 import com.exemple.authorization.common.LoggingFilter;
 import com.exemple.authorization.core.AuthorizationTestConfiguration;
@@ -51,8 +50,13 @@ class SwaggerTest {
         assertThat(response.getStatusCode()).isEqualTo(200);
 
         // And check paths swagger
-        List<String> expectedPaths = ImmutableList
-                .copyOf(MAPPER.readTree(ResourceUtils.getFile("classpath:model/swagger.json")).get("paths").fieldNames());
+        var expectedPaths = List.of(
+                // "/oauth/authorize",
+                // "/oauth/check_token",
+                // "/oauth/token",
+                // "/oauth/token_key",
+                // "/oauth/confirm_access",
+                "/error");
         Iterable<String> paths = ImmutableList.copyOf(MAPPER.readTree(response.getBody().print()).get("paths").fieldNames());
         assertThat(paths).containsExactlyInAnyOrderElementsOf(expectedPaths);
 

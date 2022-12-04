@@ -59,7 +59,7 @@ public class LoginITStepDefinitions {
                 .header("Authorization", "Bearer " + authorizationContext.getAccessToken())
                 .head("/ws/v1/logins/" + username);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.getStatusCode()).as("username %s not accessible", username).isEqualTo(HttpStatus.NO_CONTENT.value());
 
     }
 

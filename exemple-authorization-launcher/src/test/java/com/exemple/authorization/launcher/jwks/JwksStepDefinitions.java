@@ -21,7 +21,7 @@ public class JwksStepDefinitions {
     @When("get jwks")
     public void jwks() {
 
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).get("/.well-known/jwks.json");
+        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).get("/oauth/jwks");
 
         context.setResponse(response);
 

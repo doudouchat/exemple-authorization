@@ -3,10 +3,13 @@ package com.exemple.authorization.launcher.token;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,13 +29,15 @@ public class AuthorizationStepDefinitions {
     @Autowired
     private AuthorizationTestContext context;
 
-    @Given("get access token by client credentials to {string}")
-    public void tokenByClientCredentials(String client) {
+    @Given("get access token by client credentials to {string} and scopes {string}")
+    public void tokenByClientCredentials(String client, String scope) {
 
-        Map<String, Object> params = Map.of("grant_type", "client_credentials");
+        Map<String, Object> params = Map.of(
+                "grant_type", "client_credentials",
+                "scope", scope);
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .auth().basic(client, "secret")
+                .header("Authorization", "Basic " + Base64.encodeBase64String((client + ":secret").getBytes(StandardCharsets.UTF_8)))
                 .formParams(params).post("/oauth/token");
 
         assertAll(
@@ -52,10 +57,12 @@ public class AuthorizationStepDefinitions {
                 "username", username,
                 "password", password,
                 "client_id", "test_user",
-                "redirect_uri", "xxx");
+                "redirect_uri", "http://xxx");
 
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
-                .basic("test_user", "secret").formParams(params).post("/oauth/token");
+        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .formParams(params)
+                .post("/oauth/token");
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
@@ -74,10 +81,12 @@ public class AuthorizationStepDefinitions {
                 "username", username,
                 "password", password,
                 "client_id", "test_user",
-                "redirect_uri", "xxx");
+                "redirect_uri", "http://xxx");
 
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
-                .basic("test_user", "secret").formParams(params).post("/oauth/token");
+        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .formParams(params)
+                .post("/oauth/token");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
@@ -91,10 +100,12 @@ public class AuthorizationStepDefinitions {
                 "username", username,
                 "password", password,
                 "client_id", "test_user",
-                "redirect_uri", "xxx");
+                "redirect_uri", "http://xxx");
 
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
-                .basic("test_user", "secret").formParams(params).post("/oauth/token");
+        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .formParams(params)
+                .post("/oauth/token");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
@@ -108,10 +119,12 @@ public class AuthorizationStepDefinitions {
                 "username", back,
                 "password", password,
                 "client_id", "back_user",
-                "redirect_uri", "xxx");
+                "redirect_uri", "http://xxx");
 
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).auth()
-                .basic("back_user", "secret").formParams(params).post("/oauth/token");
+        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
+                .header("Authorization", "Basic " + Base64.encodeBase64String("back_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .formParams(params)
+                .post("/oauth/token");
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
@@ -126,6 +139,7 @@ public class AuthorizationStepDefinitions {
     public void login(String username, String password) {
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
+                .header("App", "test")
                 .header("Authorization", "Bearer " + context.getAccessToken())
                 .formParams("username", username, "password", password)
                 .post("/login");
@@ -140,6 +154,7 @@ public class AuthorizationStepDefinitions {
     public void loginIsBad(String username, String password) {
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
+                .header("App", "test")
                 .header("Authorization", "Bearer " + context.getAccessToken())
                 .formParams("username", username, "password", password)
                 .post("/login");
@@ -152,6 +167,7 @@ public class AuthorizationStepDefinitions {
     public void loginIsUnauthorized(String username, String password) {
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
+                .header("App", "test")
                 .header("Authorization", "Bearer " + context.getAccessToken())
                 .formParams("username", username, "password", password)
                 .post("/login");
@@ -172,10 +188,9 @@ public class AuthorizationStepDefinitions {
                 .header("X-Auth-Token", xAuthToken)
                 .queryParam("response_type", "code")
                 .queryParam("client_id", "test_user")
-                .queryParam("scope", scopes.column(0).toArray())
+                .queryParam("scope", scopes.column(0).stream().collect(Collectors.joining(" ")))
                 .get("/oauth/authorize");
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SEE_OTHER.value());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value());
 
         context.setResponse(response);
 
@@ -196,7 +211,7 @@ public class AuthorizationStepDefinitions {
                 .get("/oauth/authorize");
 
         assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SEE_OTHER.value()),
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
                 () -> assertThat(response.getHeader(HttpHeaders.LOCATION)).isNotNull());
 
         String location = response.getHeader(HttpHeaders.LOCATION);
@@ -216,7 +231,7 @@ public class AuthorizationStepDefinitions {
 
         String location = context.getResponse().getHeader(HttpHeaders.LOCATION);
 
-        Matcher locationMatcher = Pattern.compile(".*code=(\\w*)(&state=)?(.*)?", Pattern.DOTALL).matcher(location);
+        Matcher locationMatcher = Pattern.compile(".*code=([a-zA-Z0-9\\-_]*)(&state=)?(.*)?", Pattern.DOTALL).matcher(location);
         assertThat(locationMatcher.lookingAt()).as("location %s is unexpected", location).isTrue();
 
         String code = locationMatcher.group(1);
@@ -225,11 +240,12 @@ public class AuthorizationStepDefinitions {
                 "grant_type", "authorization_code",
                 "code", code,
                 "client_id", "test_user",
-                "redirect_uri", "xxx");
+                "redirect_uri", "/ws/test");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .auth().basic("test_user", "secret")
-                .formParams(params).post("/oauth/token");
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .formParams(params)
+                .post("/oauth/token");
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
@@ -251,8 +267,9 @@ public class AuthorizationStepDefinitions {
                 "refresh_token", refreshToken);
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .auth().basic("test_user", "secret")
-                .formParams(params).post("/oauth/token");
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .formParams(params)
+                .post("/oauth/token");
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),

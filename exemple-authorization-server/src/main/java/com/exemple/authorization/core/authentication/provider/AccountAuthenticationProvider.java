@@ -2,7 +2,6 @@ package com.exemple.authorization.core.authentication.provider;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,9 +25,9 @@ public class AccountAuthenticationProvider extends DaoAuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
-
-        return ((AbstractAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority).anyMatch("ROLE_APP"::equals);
+        var authenticationContext = SecurityContextHolder.getContext().getAuthentication();
+        return authenticationContext != null
+                && authenticationContext.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch("SCOPE_ROLE_APP"::equals);
     }
 
 }
