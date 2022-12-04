@@ -7,8 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.util.Assert;
 
+import com.exemple.authorization.core.client.resource.AuthorizationClientResourceConfiguration;
+
 @Configuration
-@Import(AuthorizationClientConfiguration.class)
+@Import(AuthorizationClientResourceConfiguration.class)
 public class AuthorizationClientTestConfiguration {
 
     @Value("${authorization.zookeeper.port}")

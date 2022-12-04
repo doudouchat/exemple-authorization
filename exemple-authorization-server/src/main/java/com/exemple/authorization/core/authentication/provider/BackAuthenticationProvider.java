@@ -4,7 +4,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,15 +43,15 @@ public class BackAuthenticationProvider extends DaoAuthenticationProvider {
                 throw new BadCredentialsException(username);
             }
 
-            return user;
+            return User.withUserDetails(user).build();
         });
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-
-        return ((AbstractAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority).anyMatch("ROLE_BACK"::equals);
+        var authenticationContext = SecurityContextHolder.getContext().getAuthentication();
+        return authenticationContext != null && authenticationContext.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).anyMatch("SCOPE_ROLE_BACK"::equals);
     }
 
 }

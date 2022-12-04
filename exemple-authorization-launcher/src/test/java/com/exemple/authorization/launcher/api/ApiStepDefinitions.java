@@ -23,7 +23,7 @@ public class ApiStepDefinitions {
                 .header("Authorization", "Bearer " + authorizationContext.getAccessToken())
                 .get("/account/" + username);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getStatusCode()).as("account is not accessible").isEqualTo(HttpStatus.OK.value());
     }
 
     @Then("account {string} is unauthorized")

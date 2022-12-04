@@ -1,7 +1,8 @@
+@ignore
 Feature: authorization by code implicit
 
   Background: 
-    Given get access token by client credentials to 'test'
+    Given get access token by client credentials to 'test' and scopes 'ROLE_APP'
     And create username 'jean.dupond@gmail.com' with password 'mdp'
 
   Scenario: authorization by code implicit

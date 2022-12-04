@@ -12,20 +12,18 @@ import com.exemple.authorization.application.core.ApplicationConfiguration;
 import com.exemple.authorization.core.ApiConfiguration;
 import com.exemple.authorization.core.AuthorizationConfiguration;
 import com.exemple.authorization.core.authentication.AuthenticationConfiguration;
-import com.exemple.authorization.core.client.AuthorizationClientConfiguration;
+import com.exemple.authorization.core.client.resource.AuthorizationClientResourceConfiguration;
 import com.exemple.authorization.core.rsa.KeystoreConfiguration;
 import com.exemple.authorization.core.session.HazelcastHttpSessionConfiguration;
 import com.exemple.authorization.core.swagger.SwaggerConfiguration;
-import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
 
 @SpringBootApplication(exclude = CassandraAutoConfiguration.class)
 @Import({ AuthorizationConfiguration.class,
         AuthenticationConfiguration.class,
-        AuthorizationTokenConfiguration.class,
         HazelcastHttpSessionConfiguration.class,
         SwaggerConfiguration.class,
-        AuthorizationClientConfiguration.class,
+        AuthorizationClientResourceConfiguration.class,
         ApiConfiguration.class,
         ApplicationConfiguration.class,
         ResourceConfiguration.class,

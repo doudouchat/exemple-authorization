@@ -32,7 +32,20 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- COMMON -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-authorization-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- SPRING BOOT -->
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -83,11 +96,11 @@
 			<artifactId>hazelcast</artifactId>
 		</dependency>
 
-		<!-- OAUTH -->
+		<!-- SPRING OAUTH 2 -->
 
 		<dependency>
-			<groupId>org.springframework.security.oauth</groupId>
-			<artifactId>spring-security-oauth2</artifactId>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-authorization-server</artifactId>
 		</dependency>
 
 		<!-- CURATOR -->
@@ -108,13 +121,6 @@
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-boot-starter</artifactId>
-		</dependency>
-
-		<!-- JWT -->
-
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-jwt</artifactId>
 		</dependency>
 
 		<!-- COMMONS APACHE -->

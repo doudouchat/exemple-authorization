@@ -3,6 +3,7 @@ package com.exemple.authorization.launcher.core;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 
@@ -20,13 +21,16 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.core.ApplicationConfiguration;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
-import com.exemple.authorization.core.client.AuthorizationClientBuilder;
-import com.exemple.authorization.core.client.AuthorizationClientConfiguration;
+import com.exemple.authorization.core.client.AuthorizationClient;
+import com.exemple.authorization.core.client.resource.AuthorizationClientResource;
+import com.exemple.authorization.core.client.resource.AuthorizationClientResourceConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
 @Configuration
-@Import({ ResourceConfiguration.class, ApplicationConfiguration.class, AuthorizationClientConfiguration.class })
+@Import({ ResourceConfiguration.class, ApplicationConfiguration.class, AuthorizationClientResourceConfiguration.class })
 @ComponentScan(basePackages = "com.exemple.authorization.launcher", excludeFilters = @ComponentScan.Filter(SpringBootApplication.class))
 public class IntegrationTestConfiguration {
 
@@ -53,7 +57,7 @@ public class IntegrationTestConfiguration {
     private ApplicationDetailService applicationDetailService;
 
     @Autowired
-    private AuthorizationClientBuilder authorizationClientBuilder;
+    private AuthorizationClientResource authorizationClientResource;
 
     @Autowired
     private CqlSession session;
@@ -108,37 +112,81 @@ public class IntegrationTestConfiguration {
     @PostConstruct
     public void initAuthorization() throws Exception {
 
-        String password = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
+        var secret = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
 
-        authorizationClientBuilder
+        var testClient = AuthorizationClient.builder()
+                .id(UUID.randomUUID().toString())
+                .clientId("test")
+                .clientSecret(secret)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue())
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
+                .redirectUri("http://xxx")
+                .scope("account")
+                .scope("login:update")
+                .scope("login:head")
+                .scope("ROLE_APP")
+                .requireAuthorizationConsent(false)
+                .build();
 
-                .withClient("test").secret(password).authorizedGrantTypes("client_credentials").redirectUris("xxx")
-                .scopes("account", "login:update", "login:head").autoApprove("account", "login:update", "login:head").authorities("ROLE_APP")
-                .resourceIds("exemple").additionalInformation("keyspace=test")
+        authorizationClientResource.save(testClient);
 
-                .and()
+        var resourceClient = AuthorizationClient.builder()
+                .id(UUID.randomUUID().toString())
+                .clientId("resource")
+                .clientSecret(secret)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue())
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
+                .authorizationGrantType(AuthorizationGrantType.JWT_BEARER.getValue())
+                .scope("ROLE_TRUSTED_CLIENT")
+                .requireAuthorizationConsent(false)
+                .build();
 
-                .withClient("test_user").secret(password).authorizedGrantTypes("password", "authorization_code", "implicit", "refresh_token")
-                .redirectUris("xxx")
-                .scopes("account", "login:head", "login:update", "login:read", "login:delete")
-                .autoApprove("account", "login:head", "login:update", "login:read", "login:delete").authorities("ROLE_APP").resourceIds("exemple")
-                .additionalInformation("keyspace=test")
+        authorizationClientResource.save(resourceClient);
 
-                .and()
+        var testUserClient = AuthorizationClient.builder()
+                .id(UUID.randomUUID().toString())
+                .clientId("test_user")
+                .clientSecret(secret)
+                .authorizationGrantType(AuthorizationGrantType.PASSWORD.getValue())
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
+                .redirectUri("http://xxx")
+                .scope("account")
+                .scope("login:update")
+                .scope("login:head")
+                .scope("login:read")
+                .scope("login:delete")
+                .requireAuthorizationConsent(false)
+                .build();
 
-                .withClient("back_user").secret(password).authorizedGrantTypes("password").scopes("back").autoApprove("back").authorities("ROLE_BACK")
-                .resourceIds("exemple").additionalInformation("keyspace=test")
+        authorizationClientResource.save(testUserClient);
 
-                .and()
+        var testBackClient = AuthorizationClient.builder()
+                .id(UUID.randomUUID().toString())
+                .clientId("test_back")
+                .clientSecret(secret)
+                .authorizationGrantType(AuthorizationGrantType.PASSWORD.getValue())
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
+                .redirectUri("http://xxx")
+                .scope("ROLE_BACK")
+                .requireAuthorizationConsent(false)
+                .build();
 
-                .withClient("admin").secret(password).authorizedGrantTypes("client_credentials").scopes("xxx").autoApprove("xxx")
-                .authorities("ROLE_TRUSTED_CLIENT").resourceIds("exemple").additionalInformation("keyspace=test")
+        authorizationClientResource.save(testBackClient);
 
-                .and()
+        var adminClient = AuthorizationClient.builder()
+                .id(UUID.randomUUID().toString())
+                .clientId("admin")
+                .clientSecret(secret)
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
+                .redirectUri("http://xxx")
+                .scope("ROLE_TRUSTED_CLIENT")
+                .requireAuthorizationConsent(false)
+                .build();
 
-                .withClient("resource").secret(password).authorizedGrantTypes("client_credentials").authorities("ROLE_TRUSTED_CLIENT")
+        authorizationClientResource.save(adminClient);
 
-                .and().build();
     }
 
     @SneakyThrows

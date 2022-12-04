@@ -4,11 +4,10 @@ CREATE KEYSPACE IF NOT EXISTS test
    'datacenter1' : 1
 };
 
-USE test;
-
-CREATE TABLE IF NOT EXISTS login (
+CREATE TABLE IF NOT EXISTS test.login (
 	username text PRIMARY KEY,
 	password text,
 	disabled boolean,
 	account_locked boolean
 );
+	

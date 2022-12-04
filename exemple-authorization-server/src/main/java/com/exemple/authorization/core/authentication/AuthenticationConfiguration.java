@@ -1,83 +1,86 @@
 package com.exemple.authorization.core.authentication;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.IOException;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import com.exemple.authorization.core.authentication.filter.AuthenticationFilter;
+import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.authentication.provider.AccountAuthenticationProvider;
 import com.exemple.authorization.core.authentication.provider.BackAuthenticationProvider;
-import com.exemple.authorization.core.resource.keyspace.AuthorizationResourceKeyspace;
+import com.exemple.authorization.resource.core.ResourceExecutionContext;
 
 import lombok.RequiredArgsConstructor;
 
 @Configuration
-@ComponentScan(basePackages = "com.exemple.authorization.core.authentication", basePackageClasses = AuthorizationResourceKeyspace.class)
+@ComponentScan(basePackages = "com.exemple.authorization.core.authentication")
 @RequiredArgsConstructor
-public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
+public class AuthenticationConfiguration {
 
-    private final DefaultTokenServices tokenServices;
+    public static final String APP_HEADER = "app";
 
     private final AccountAuthenticationProvider accountAuthenticationProvider;
 
     private final BackAuthenticationProvider backAuthenticationProvider;
 
-    private final AuthorizationResourceKeyspace authorizationResourceKeyspace;
+    private final JwtDecoder decoder;
 
-    @Autowired
-    public void globalUserDetails(final AuthenticationManagerBuilder auth) {
+    private final ApplicationDetailService applicationDetailService;
 
-        auth.eraseCredentials(false).authenticationProvider(accountAuthenticationProvider).authenticationProvider(backAuthenticationProvider)
-                .authenticationProvider(new AuthenticationProvider() {
-
-                    @Override
-                    public Authentication authenticate(Authentication authentication) {
-                        throw new AuthenticationServiceException("Bad Credentials");
-                    }
-
-                    @Override
-                    public boolean supports(Class<?> authentication) {
-                        return true;
-                    }
-
-                });
-    }
-
-    @Override
     @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public AuthenticationManager authenticationManager() {
+
+        return new ProviderManager(new JwtAuthenticationProvider(decoder), accountAuthenticationProvider, backAuthenticationProvider);
+
     }
 
-    @Override
-    public void configure(WebSecurity web) {
-
-        web.ignoring().antMatchers(HttpMethod.OPTIONS, "/oauth/token");
-    }
-
-    @Override
-    protected void configure(final HttpSecurity http) throws Exception {
-
-        var filter = new AuthenticationFilter(tokenServices, authorizationResourceKeyspace, "ROLE_APP");
-        filter.setAuthenticationManager(authenticationManagerBean());
+    @Bean
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .requestMatchers()
-                .antMatchers("/login", "/oauth/**").and()
-                .addFilter(filter)
-                .authorizeRequests()
-                .anyRequest().authenticated().and().csrf().disable();
+                .antMatcher("/login")
+                .addFilterBefore(new BearerTokenAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new InitKeyspaceFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilter(new UsernamePasswordAuthenticationFilter(authenticationManager()))
+                .authorizeHttpRequests()
+                .anyRequest().authenticated().and()
+                .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/login")));
 
+        return http.build();
+
+    }
+
+    class InitKeyspaceFilter implements Filter {
+
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
+            var httpRequest = (HttpServletRequest) request;
+            var applicationName = httpRequest.getHeader(APP_HEADER);
+            if (applicationName != null) {
+                applicationDetailService.get(applicationName)
+                        .ifPresent(applicationDetail -> ResourceExecutionContext.get().setKeyspace(applicationDetail.getKeyspace()));
+            }
+
+            chain.doFilter(request, response);
+
+        }
     }
 }

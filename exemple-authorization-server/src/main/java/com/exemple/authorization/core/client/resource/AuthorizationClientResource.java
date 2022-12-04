@@ -1,18 +1,16 @@
-package com.exemple.authorization.core.client.impl;
+package com.exemple.authorization.core.client.resource;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.oauth2.provider.ClientDetails;
-import org.springframework.security.oauth2.provider.client.BaseClientDetails;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import com.exemple.authorization.core.client.AuthorizationClientService;
+import com.exemple.authorization.core.client.AuthorizationClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -20,37 +18,37 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-@Service
+@Component
 @RequiredArgsConstructor
 @Slf4j
-public class AuthorizationClientServiceImpl implements AuthorizationClientService {
+public class AuthorizationClientResource {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Qualifier("authorizationClientCuratorFramework")
     private final CuratorFramework client;
 
-    @Override
     @SneakyThrows
-    public ClientDetails get(String clientId) {
+    public Optional<AuthorizationClient> get(String clientId) {
 
         try {
 
-            return MAPPER.readValue(client.getData().forPath("/" + clientId), BaseClientDetails.class);
+            return Optional.of(MAPPER.readValue(client.getData().forPath("/" + clientId), AuthorizationClient.class));
 
         } catch (KeeperException.NoNodeException e) {
 
-            throw new BadCredentialsException("Client '" + clientId + "' not exists", e);
+            LOG.debug("Client '" + clientId + "' not exists", e);
+            return Optional.empty();
         }
 
     }
 
-    @Override
-    public void put(String clientId, ClientDetails clientDetails) {
+    public void save(AuthorizationClient client) {
 
-        LOG.debug("Put Authorization client {} ", clientId);
+        LOG.debug("Put Authorization client {} {}", client.getClientId(), client.getId());
 
-        createAuthorization(clientId, MAPPER.convertValue(clientDetails, JsonNode.class));
+        createAuthorization(client.getClientId(), MAPPER.convertValue(client, JsonNode.class));
+        createAuthorization(client.getId(), MAPPER.convertValue(client, JsonNode.class));
 
     }
 

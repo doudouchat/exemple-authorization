@@ -1,6 +1,5 @@
 package com.exemple.authorization.core;
 
-import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Optional;
@@ -9,21 +8,17 @@ import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import com.exemple.authorization.AuthorizationJwtConfiguration;
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.authentication.AuthenticationConfiguration;
 import com.exemple.authorization.core.client.AuthorizationClientTestConfiguration;
-import com.exemple.authorization.core.resource.keyspace.AuthorizationResourceKeyspace;
 import com.exemple.authorization.core.session.HazelcastHttpSessionConfiguration;
-import com.exemple.authorization.core.token.AuthorizationTokenConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSSigner;
-import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
@@ -31,10 +26,9 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 @Configuration
 @Import({ AuthorizationConfiguration.class,
         AuthenticationConfiguration.class,
-        AuthorizationTokenConfiguration.class,
         HazelcastHttpSessionConfiguration.class,
-        AuthorizationClientTestConfiguration.class })
-@ComponentScan(basePackageClasses = AuthorizationResourceKeyspace.class)
+        AuthorizationClientTestConfiguration.class,
+        AuthorizationJwtConfiguration.class })
 @EnableAutoConfiguration(exclude = CassandraAutoConfiguration.class)
 public class AuthorizationTestConfiguration {
 
@@ -78,10 +72,5 @@ public class AuthorizationTestConfiguration {
         Mockito.when(service.get(Mockito.anyString())).thenReturn(Optional.of(detail));
 
         return service;
-    }
-
-    @Bean
-    public JWSSigner signer(PrivateKey privateKey) {
-        return new RSASSASigner(privateKey);
     }
 }
