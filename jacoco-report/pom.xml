@@ -32,6 +32,14 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- COMMON -->
+
+		<dependency>
+			<groupId>exemple</groupId>
+			<artifactId>exemple-authorization-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- SERVER -->
 
 		<dependency>

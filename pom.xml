@@ -15,6 +15,7 @@
 
 	<modules>
 		<module>exemple-authorization-resource</module>
+		<module>exemple-authorization-common</module>
 		<module>exemple-authorization-application</module>
 		<module>exemple-authorization-server</module>
 		<module>exemple-authorization-api</module>
@@ -27,8 +28,8 @@
 		<connection>scm:git:git://github.com/doudouchat/exemple-authorization.git</connection>
 		<developerConnection>scm:git:https://github.com/doudouchat/exemple-authorization.git</developerConnection>
 		<url>https://github.com/doudouchat/exemple-authorization</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 
 	<distributionManagement>
 		<repository>

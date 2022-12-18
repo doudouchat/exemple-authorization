@@ -11,14 +11,11 @@ import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
-import com.exemple.authorization.core.feature.authorization.AuthorizationFeatureConfiguration;
 import com.exemple.authorization.core.feature.authorization.AuthorizationFeatureFilter;
 import com.exemple.authorization.password.properties.PasswordProperties;
 
 @Configuration
-@Import(AuthorizationFeatureConfiguration.class)
 @ApplicationPath("/ws")
 @ComponentScan(basePackages = { "com.exemple.authorization.disconnection", "com.exemple.authorization.password", "com.exemple.authorization.login" })
 @EnableConfigurationProperties(PasswordProperties.class)

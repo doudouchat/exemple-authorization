@@ -7,6 +7,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
+import com.exemple.authorization.AuthorizationJwtConfiguration;
 import com.exemple.authorization.application.core.ApplicationConfiguration;
 import com.exemple.authorization.core.ApiConfiguration;
 import com.exemple.authorization.core.AuthorizationConfiguration;
@@ -28,6 +29,7 @@ import com.exemple.authorization.resource.core.ResourceConfiguration;
         ApiConfiguration.class,
         ApplicationConfiguration.class,
         ResourceConfiguration.class,
+        AuthorizationJwtConfiguration.class,
         KeystoreConfiguration.class })
 @PropertySource("classpath:default.properties")
 public class AuthorizationServerApplication extends SpringBootServletInitializer {

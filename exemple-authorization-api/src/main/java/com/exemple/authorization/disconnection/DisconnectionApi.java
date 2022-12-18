@@ -17,8 +17,8 @@ import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.exemple.authorization.AuthorizationJwtConfiguration;
 import com.exemple.authorization.common.security.AuthorizationContextSecurity;
-import com.exemple.authorization.core.feature.authorization.AuthorizationFeatureConfiguration;
 import com.hazelcast.core.HazelcastInstance;
 
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class DisconnectionApi {
 
         Assert.notNull(jwt.getExpiresAt(), JwtClaimNames.EXP + " is required in accessToken");
 
-        client.getMap(AuthorizationFeatureConfiguration.TOKEN_BLACK_LIST)
+        client.getMap(AuthorizationJwtConfiguration.TOKEN_BLACK_LIST)
                 .put(jwt.getId(), jwt.getExpiresAt(), ChronoUnit.SECONDS.between(Instant.now(), jwt.getExpiresAt()), TimeUnit.SECONDS);
     }
 
