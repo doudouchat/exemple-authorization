@@ -1,4 +1,4 @@
-package com.exemple.authorization.core.feature.authorization;
+package com.exemple.authorization;
 
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
-public class AuthorizationFeatureConfiguration {
+public class AuthorizationJwtConfiguration {
 
     public static final String TOKEN_BLACK_LIST = "token.black_list";
 

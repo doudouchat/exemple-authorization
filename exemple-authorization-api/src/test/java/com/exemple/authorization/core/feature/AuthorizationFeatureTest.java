@@ -21,12 +21,12 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 
+import com.exemple.authorization.AuthorizationJwtConfiguration;
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.common.LoggingFilter;
 import com.exemple.authorization.core.AuthorizationTestConfiguration;
 import com.exemple.authorization.core.feature.FeatureTestConfiguration.TestFilter;
-import com.exemple.authorization.core.feature.authorization.AuthorizationFeatureConfiguration;
 import com.hazelcast.core.HazelcastInstance;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -182,7 +182,7 @@ class AuthorizationFeatureTest {
         // Given token
 
         String deprecatedTokenId = UUID.randomUUID().toString();
-        hazelcastInstance.getMap(AuthorizationFeatureConfiguration.TOKEN_BLACK_LIST).put(deprecatedTokenId, Date.from(Instant.now()));
+        hazelcastInstance.getMap(AuthorizationJwtConfiguration.TOKEN_BLACK_LIST).put(deprecatedTokenId, Date.from(Instant.now()));
 
         var payload = new JWTClaimsSet.Builder()
                 .subject("john_doe")

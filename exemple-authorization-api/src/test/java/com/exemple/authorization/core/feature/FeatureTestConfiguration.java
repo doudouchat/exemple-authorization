@@ -10,11 +10,15 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+
+import com.exemple.authorization.AuthorizationJwtConfiguration;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
 @Configuration
+@Import(AuthorizationJwtConfiguration.class)
 @Primary
 public class FeatureTestConfiguration extends FeatureConfiguration {
 
