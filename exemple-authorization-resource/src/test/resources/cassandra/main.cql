@@ -1,23 +1,6 @@
-CREATE KEYSPACE IF NOT EXISTS test 
-  WITH REPLICATION = { 
-   'class' : 'NetworkTopologyStrategy', 
-   'datacenter1' : 1
-};
+USE main;
 
-CREATE KEYSPACE IF NOT EXISTS main 
-  WITH REPLICATION = { 
-   'class' : 'NetworkTopologyStrategy', 
-   'datacenter1' : 1
-};
-
-CREATE TABLE IF NOT EXISTS test.login (
-	username text PRIMARY KEY,
-	password text,
-	disabled boolean,
-	account_locked boolean
-);
-
-CREATE TABLE IF NOT EXISTS main.oauth2 (
+CREATE TABLE IF NOT EXISTS oauth2 (
 	id text PRIMARY KEY,
 	registered_client_id text,
 	principal_name text,
@@ -41,7 +24,7 @@ CREATE TABLE IF NOT EXISTS main.oauth2 (
 	refresh_token_metadata text
 );
 
-CREATE INDEX IF NOT EXISTS oauth2_authorization_code ON main.oauth2 ( authorization_code_value );
+CREATE INDEX IF NOT EXISTS oauth2_authorization_code ON oauth2 ( authorization_code_value );
 
-CREATE INDEX IF NOT EXISTS oauth2_refresh_token ON main.oauth2 ( refresh_token_value );
+CREATE INDEX IF NOT EXISTS oauth2_refresh_token ON oauth2 ( refresh_token_value );
 	

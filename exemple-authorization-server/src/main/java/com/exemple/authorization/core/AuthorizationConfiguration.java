@@ -1,6 +1,7 @@
 package com.exemple.authorization.core;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
@@ -26,6 +27,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.exemple.authorization.core.client.AuthorizationClientRepository;
 import com.exemple.authorization.core.jwk.AuthorizationJwkConfiguration;
+import com.exemple.authorization.core.token.AuthorizationOAuth2Repository;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
@@ -33,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @Import({ AuthorizationJwkConfiguration.class, AuthorizationClientRepository.class })
+@ComponentScan(basePackageClasses = AuthorizationOAuth2Repository.class)
 @RequiredArgsConstructor
 public class AuthorizationConfiguration {
 

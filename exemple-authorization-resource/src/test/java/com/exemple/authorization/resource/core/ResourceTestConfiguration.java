@@ -90,6 +90,7 @@ public class ResourceTestConfiguration extends ResourceCassandraConfiguration {
 
         executeScript("classpath:cassandra/keyspace.cql", session::execute);
         executeScript("classpath:cassandra/test.cql", session::execute);
+        executeScript("classpath:cassandra/main.cql", session::execute);
         executeScript("classpath:cassandra/exec.cql", session::execute);
 
     }
