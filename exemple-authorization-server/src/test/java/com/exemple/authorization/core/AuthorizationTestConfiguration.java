@@ -2,7 +2,9 @@ package com.exemple.authorization.core;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -18,6 +20,8 @@ import com.exemple.authorization.core.authentication.AuthenticationConfiguration
 import com.exemple.authorization.core.client.AuthorizationClientTestConfiguration;
 import com.exemple.authorization.core.session.HazelcastHttpSessionConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
+import com.exemple.authorization.resource.oauth2.OAuth2Resource;
+import com.exemple.authorization.resource.oauth2.model.OAuth2Entity;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -57,6 +61,33 @@ public class AuthorizationTestConfiguration {
     @Bean
     public LoginResource loginResource() {
         return Mockito.mock(LoginResource.class);
+    }
+
+    @Bean
+    public OAuth2Resource OAuth2Resource() {
+        Map<String, OAuth2Entity> authorizations = new ConcurrentHashMap<>();
+
+        return new OAuth2Resource(null) {
+
+            @Override
+            public void save(OAuth2Entity oauth2) {
+                authorizations.put(oauth2.getId(), oauth2);
+            }
+
+            @Override
+            public Optional<OAuth2Entity> findByAuthorizationCodeValue(String token) {
+                return authorizations.values().stream()
+                        .filter(entity -> token.equals(entity.getAuthorizationCodeValue()))
+                        .findAny();
+            }
+
+            @Override
+            public Optional<OAuth2Entity> findByRefreshTokenValue(String token) {
+                return authorizations.values().stream()
+                        .filter(entity -> token.equals(entity.getRefreshTokenValue()))
+                        .findAny();
+            }
+        };
     }
 
     @Bean

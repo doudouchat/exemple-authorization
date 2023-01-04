@@ -1556,4 +1556,167 @@ class AuthorizationServerTest {
         }
 
     }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class Instrospection {
+
+        private String username;
+
+        @BeforeAll
+        void username() {
+
+            username = "jean.dupond@gmail.com";
+        }
+
+        @Test
+        @DisplayName("fails because token is in black list")
+        void failsBecauseTokenIsInBlackList() throws JOSEException {
+
+            // Given token
+
+            String deprecatedTokenId = UUID.randomUUID().toString();
+            client.getMap(AuthorizationJwtConfiguration.TOKEN_BLACK_LIST).put(deprecatedTokenId,
+                    Date.from(Instant.now()));
+
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("client_id", "test")
+                    .subject(username)
+                    .claim("scope", new String[] { "account:read" })
+                    .jwtID(deprecatedTokenId)
+                    .build();
+
+            var accessToken = new SignedJWT(
+                    new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                    payload);
+            accessToken.sign(algorithm);
+
+            // When perform check token
+
+            Map<String, String> params = Map.of("token", accessToken.serialize());
+
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+
+            // Then check response
+
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(response.jsonPath().getBoolean("active")).isFalse());
+        }
+
+        @Test
+        @DisplayName("fails because public key doesn't check signature")
+        void failsBecausePublicKeyDoesntCheckSignature() throws JOSEException {
+
+            // Given token
+
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("client_id", "test")
+                    .subject(username)
+                    .claim("scope", new String[] { "account:read" })
+                    .jwtID(UUID.randomUUID().toString())
+                    .build();
+
+            var accessToken = new SignedJWT(
+                    new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                    payload);
+            accessToken.sign(new RSASSASigner(OTHER_RSA_KEY));
+
+            // When perform check token
+
+            Map<String, String> params = Map.of("token", accessToken.serialize());
+
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+
+            // Then check response
+
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(response.jsonPath().getBoolean("active")).isFalse());
+        }
+
+        @Test
+        @DisplayName("fails because public token is deprecated")
+        void failsBecauseTokenIsDeprecated() throws JOSEException {
+
+            // Given token
+
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("client_id", "test")
+                    .subject(username)
+                    .claim("scope", new String[] { "account:read" })
+                    .expirationTime(Date.from(Instant.now().minusSeconds(1)))
+                    .jwtID(UUID.randomUUID().toString())
+                    .build();
+
+            var accessToken = new SignedJWT(
+                    new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                    payload);
+            accessToken.sign(algorithm);
+
+            // When perform check token
+
+            Map<String, String> params = Map.of("token", accessToken.serialize());
+
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+
+            // Then check response
+
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(response.jsonPath().getBoolean("active")).isFalse());
+        }
+
+        @Test
+        void success() throws JOSEException, ParseException {
+
+            // Given token
+
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("client_id", "test")
+                    .subject(username)
+                    .claim("scope", new String[] { "account:read" })
+                    .jwtID(UUID.randomUUID().toString())
+                    .build();
+
+            var accessToken = new SignedJWT(
+                    new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                    payload);
+            accessToken.sign(algorithm);
+
+            // When perform check token
+
+            Map<String, String> params = Map.of("token", accessToken.serialize());
+
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+
+            // Then check response
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
+            // And check payload
+
+            var responsePayload = JWTClaimsSet.parse(response.getBody().print());
+
+            assertAll(
+                    () -> assertThat(responsePayload.getJWTID()).isNotNull(),
+                    () -> assertThat(responsePayload.getBooleanClaim("active")).isTrue(),
+                    () -> assertThat(responsePayload.getSubject()).isEqualTo(username),
+                    () -> assertThat(responsePayload.getStringClaim("scope")).isEqualTo("account:read"));
+
+        }
+
+    }
 }
