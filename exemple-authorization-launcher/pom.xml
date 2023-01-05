@@ -472,6 +472,14 @@
 													<date>default</date>
 												</log>
 											</run>
+											<copy>
+												<entries>
+													<entry>
+														<containerPath>/usr/local/tomcat/logs</containerPath>
+														<hostDirectory>${project.build.directory}</hostDirectory>
+													</entry>
+												</entries>
+											</copy>
 										</image>
 									</images>
 								</configuration>
