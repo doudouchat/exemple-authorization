@@ -116,13 +116,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- SWAGGER -->
-
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-boot-starter</artifactId>
-		</dependency>
-
 		<!-- COMMONS APACHE -->
 
 		<dependency>
