@@ -60,7 +60,7 @@ class LoginApiTest {
     public static final String URL = "/ws/v1/logins";
 
     @BeforeEach
-    private void before() {
+    void before() {
 
         Mockito.reset(loginResource);
 

@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.ws.rs.core.SecurityContext;
-
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -52,6 +50,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import jakarta.ws.rs.core.SecurityContext;
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -83,7 +82,7 @@ class NewPasswordApiTest {
     private RequestSpecification requestSpecification;
 
     @BeforeEach
-    private void before() {
+    void before() {
 
         Mockito.reset(loginResource);
 

@@ -48,7 +48,7 @@ public class AuthorizationConfiguration {
         RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
 
         http
-                .requestMatcher(endpointsMatcher).authorizeHttpRequests().antMatchers("/**").permitAll().and()
+                .securityMatcher(endpointsMatcher).authorizeHttpRequests().requestMatchers("/**").permitAll().and()
                 .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
                 .apply(authorizationServerConfigurer);
 

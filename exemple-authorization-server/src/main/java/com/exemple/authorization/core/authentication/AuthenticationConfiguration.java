@@ -2,13 +2,6 @@ package com.exemple.authorization.core.authentication;
 
 import java.io.IOException;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -17,16 +10,27 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.session.hazelcast.HazelcastIndexedSessionRepository;
+import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.authentication.provider.AccountAuthenticationProvider;
 import com.exemple.authorization.core.authentication.provider.BackAuthenticationProvider;
 import com.exemple.authorization.resource.core.ResourceExecutionContext;
+import com.hazelcast.core.HazelcastInstance;
 
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -52,15 +56,21 @@ public class AuthenticationConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, HazelcastInstance sessionHazelcastInstance) throws Exception {
+
+        var sessionStrategy = new RegisterSessionAuthenticationStrategy(
+                new SpringSessionBackedSessionRegistry<>(new HazelcastIndexedSessionRepository(sessionHazelcastInstance)));
+
+        var filter = new UsernamePasswordAuthenticationFilter();
+        filter.setAuthenticationManager(authenticationManager());
+        filter.setSessionAuthenticationStrategy(sessionStrategy);
+        filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
 
         http
-                .antMatcher("/login")
+                .securityMatcher("/login")
                 .addFilterBefore(new BearerTokenAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new InitKeyspaceFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilter(new UsernamePasswordAuthenticationFilter(authenticationManager()))
-                .authorizeHttpRequests()
-                .anyRequest().authenticated().and()
+                .addFilter(filter)
                 .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/login")));
 
         return http.build();

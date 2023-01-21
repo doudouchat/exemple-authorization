@@ -3,10 +3,9 @@ package com.exemple.authorization.common.security;
 import java.security.Principal;
 import java.util.Collection;
 
-import javax.ws.rs.core.SecurityContext;
-
 import org.springframework.security.oauth2.jwt.Jwt;
 
+import jakarta.ws.rs.core.SecurityContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

@@ -5,8 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +33,7 @@ import com.exemple.authorization.resource.core.ResourceConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 
 @Configuration

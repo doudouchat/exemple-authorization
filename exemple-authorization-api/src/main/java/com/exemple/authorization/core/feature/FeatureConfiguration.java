@@ -2,8 +2,6 @@ package com.exemple.authorization.core.feature;
 
 import java.util.logging.Level;
 
-import javax.ws.rs.ApplicationPath;
-
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -14,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.exemple.authorization.core.feature.authorization.AuthorizationFeatureFilter;
 import com.exemple.authorization.password.properties.PasswordProperties;
+
+import jakarta.ws.rs.ApplicationPath;
 
 @Configuration
 @ApplicationPath("/ws")

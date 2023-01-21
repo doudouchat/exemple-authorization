@@ -26,12 +26,12 @@
 		<!-- GROOVY -->
 
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
+			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
+			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy-xml</artifactId>
 		</dependency>
 
@@ -52,11 +52,12 @@
 			<artifactId>java-driver-mapper-runtime</artifactId>
 		</dependency>
 
-		<!-- JAVAX ANNOTATION -->
+		<!-- JARKATA ANNOTATION -->
 
 		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>javax.annotation-api</artifactId>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- TEST -->

@@ -6,8 +6,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.UUID;
 
-import javax.validation.Valid;
-
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +20,7 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 

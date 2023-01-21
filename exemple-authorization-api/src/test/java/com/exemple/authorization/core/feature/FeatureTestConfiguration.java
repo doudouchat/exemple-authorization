@@ -1,13 +1,5 @@
 package com.exemple.authorization.core.feature;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.SecurityContext;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -16,6 +8,13 @@ import org.springframework.context.annotation.Primary;
 import com.exemple.authorization.AuthorizationJwtConfiguration;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.SecurityContext;
 
 @Configuration
 @Import(AuthorizationJwtConfiguration.class)
@@ -47,11 +46,11 @@ public class FeatureTestConfiguration extends FeatureConfiguration {
     public static class TestApi {
 
         @GET
-        @Produces(javax.ws.rs.core.MediaType.APPLICATION_JSON)
+        @Produces(jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
         @RolesAllowed("test:read")
-        public javax.ws.rs.core.Response get() {
+        public jakarta.ws.rs.core.Response get() {
 
-            return javax.ws.rs.core.Response.ok().build();
+            return jakarta.ws.rs.core.Response.ok().build();
 
         }
 
