@@ -13,8 +13,7 @@ authorization:
 spring:
    hazelcast:
       config: file:${project.build.testOutputDirectory}/hazelcast.yaml
-   mvc:
-      pathmatch:
-         matching-strategy: ant_path_matcher
 hazelcast:
    port: ${hazelcast.port}
+springdoc:
+   api-docs.enabled: false

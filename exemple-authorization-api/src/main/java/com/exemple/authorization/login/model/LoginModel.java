@@ -1,11 +1,10 @@
 package com.exemple.authorization.login.model;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Null;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Null;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;

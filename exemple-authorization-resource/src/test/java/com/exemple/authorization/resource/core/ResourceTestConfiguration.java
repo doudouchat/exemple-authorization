@@ -9,8 +9,6 @@ import java.nio.file.Paths;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +26,7 @@ import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.exemple.authorization.resource.core.cassandra.ResourceCassandraConfiguration;
 
+import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 

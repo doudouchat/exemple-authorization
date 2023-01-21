@@ -29,7 +29,7 @@ class JwkSetApiTest {
     private RequestSpecification requestSpecification;
 
     @BeforeEach
-    private void before() {
+    void before() {
 
         requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG));
 

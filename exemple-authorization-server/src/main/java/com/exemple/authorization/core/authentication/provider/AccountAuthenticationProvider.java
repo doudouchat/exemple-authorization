@@ -1,7 +1,5 @@
 package com.exemple.authorization.core.authentication.provider;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.authorization.core.authentication.account.AccountDetailsService;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component

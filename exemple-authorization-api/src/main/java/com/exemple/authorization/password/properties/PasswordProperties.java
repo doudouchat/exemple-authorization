@@ -1,12 +1,10 @@
 package com.exemple.authorization.password.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import lombok.Getter;
 
-@ConstructorBinding
 @ConfigurationProperties(prefix = "authorization.password")
 @Getter
 public class PasswordProperties {

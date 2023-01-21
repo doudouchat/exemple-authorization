@@ -104,7 +104,7 @@ class AuthorizationServerTest {
     }
 
     @BeforeAll
-    private void init() throws Exception {
+    void init() throws Exception {
 
         var secret = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
 
@@ -169,7 +169,7 @@ class AuthorizationServerTest {
                 .id(UUID.randomUUID().toString())
                 .clientId("mobile")
                 .clientSecret(secret)
-                .authorizationGrantType(AuthorizationGrantType.IMPLICIT.getValue())
+                .authorizationGrantType("implicit")
                 .redirectUri("http://xxx")
                 .scope("account:read")
                 .scope("account:update")
@@ -181,7 +181,7 @@ class AuthorizationServerTest {
     }
 
     @BeforeEach
-    private void before() {
+    void before() {
 
         Mockito.reset(resource);
 

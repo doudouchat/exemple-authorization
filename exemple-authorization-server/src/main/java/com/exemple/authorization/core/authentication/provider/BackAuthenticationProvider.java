@@ -2,8 +2,6 @@ package com.exemple.authorization.core.authentication.provider;
 
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class BackAuthenticationProvider extends DaoAuthenticationProvider {

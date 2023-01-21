@@ -8,8 +8,6 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.ws.rs.core.SecurityContext;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +41,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import jakarta.ws.rs.core.SecurityContext;
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -82,7 +81,7 @@ class AuthorizationFeatureTest {
     private RequestSpecification requestSpecification;
 
     @BeforeEach
-    private void before() {
+    void before() {
 
         requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG));
         testFilter.context = null;
