@@ -1,11 +1,14 @@
 package com.exemple.authorization.core;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.OAuth2Token;
@@ -28,6 +31,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import com.exemple.authorization.core.client.AuthorizationClientRepository;
 import com.exemple.authorization.core.jwk.AuthorizationJwkConfiguration;
 import com.exemple.authorization.core.token.AuthorizationOAuth2Repository;
+import com.exemple.authorization.core.token.provider.RevokeTokenProvider;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
@@ -41,11 +45,19 @@ public class AuthorizationConfiguration {
 
     private final JWKSource<SecurityContext> jwkSource;
 
+    private final RevokeTokenProvider revokeTokenProvider;
+
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
         var authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
         RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
+
+        authorizationServerConfigurer.tokenRevocationEndpoint(tokenRevocationEndpoint -> tokenRevocationEndpoint
+                .authenticationProviders((List<AuthenticationProvider> providers) -> {
+                    providers.clear();
+                    providers.add(revokeTokenProvider);
+                }));
 
         http
                 .securityMatcher(endpointsMatcher).authorizeHttpRequests().requestMatchers("/**").permitAll().and()
@@ -92,6 +104,7 @@ public class AuthorizationConfiguration {
                 .tokenEndpoint("/oauth/token")
                 .tokenIntrospectionEndpoint("/oauth/check_token")
                 .jwkSetEndpoint("/oauth/jwks")
+                .tokenRevocationEndpoint("/oauth/revoke_token")
                 .build();
     }
 }
