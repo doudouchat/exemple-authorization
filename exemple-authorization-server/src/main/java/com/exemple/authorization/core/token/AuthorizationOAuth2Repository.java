@@ -64,12 +64,18 @@ public class AuthorizationOAuth2Repository implements OAuth2AuthorizationService
             return entity.map(mapper::toObject).orElse(null);
         }
 
+        return findByToken(token).orElse(null);
+
+    }
+
+    public Optional<OAuth2Authorization> findByToken(String token) {
+
         try {
             var jwt = decoder.decode(token);
-            return buildOAuth2Authorization(jwt);
+            return Optional.of(buildOAuth2Authorization(jwt));
         } catch (JwtException e) {
             LOG.debug("token is invalid", e);
-            return null;
+            return Optional.empty();
         }
     }
 
