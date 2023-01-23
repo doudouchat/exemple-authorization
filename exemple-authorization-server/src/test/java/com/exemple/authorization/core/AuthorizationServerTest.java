@@ -1719,4 +1719,140 @@ class AuthorizationServerTest {
         }
 
     }
+
+    @Nested
+    class Revocation {
+
+        @Test
+        void revokeJwtToken() throws JOSEException {
+
+            // setup token
+
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("client_id", "test_user")
+                    .subject("jean.dupond@gmail.com")
+                    .claim("scope", new String[] { "account:read" })
+                    .expirationTime(Date.from(Instant.now().plusSeconds(10)))
+                    .jwtID(UUID.randomUUID().toString())
+                    .build();
+
+            var accessToken = new SignedJWT(
+                    new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                    payload);
+            accessToken.sign(algorithm);
+            Map<String, String> params = Map.of("token", accessToken.serialize());
+
+            // When perform revoke token
+
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/revoke_token");
+
+            // Then check response
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
+            // And check token
+
+            Response checkResponse = RestAssured.given().filters(new LoggingFilter(LOG))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+
+            assertAll(
+                    () -> assertThat(checkResponse.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(checkResponse.jsonPath().getBoolean("active")).isFalse());
+
+        }
+
+        @Test
+        void revokeDeprecatedToken() throws JOSEException {
+
+            // setup token
+
+            var payload = new JWTClaimsSet.Builder()
+                    .claim("client_id", "test_user")
+                    .subject("jean.dupond@gmail.com")
+                    .claim("scope", new String[] { "account:read" })
+                    .expirationTime(Date.from(Instant.now().minusSeconds(10)))
+                    .jwtID(UUID.randomUUID().toString())
+                    .build();
+
+            var accessToken = new SignedJWT(
+                    new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                    payload);
+            accessToken.sign(algorithm);
+            Map<String, String> params = Map.of("token", accessToken.serialize());
+
+            // When perform revoke token
+
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/revoke_token");
+
+            // Then check response
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
+            // And check token
+
+            Response checkResponse = RestAssured.given().filters(new LoggingFilter(LOG))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+
+            assertAll(
+                    () -> assertThat(checkResponse.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(checkResponse.jsonPath().getBoolean("active")).isFalse());
+
+        }
+
+        private static Stream<Arguments> revokeJwtTokenFailure() {
+
+            var payloadWithoutId = new JWTClaimsSet.Builder()
+                    .claim("client_id", "test_user")
+                    .subject("jean.dupond@gmail.com")
+                    .claim("scope", new String[] { "account:read" })
+                    .expirationTime(Date.from(Instant.now().plusSeconds(10)))
+                    .build();
+
+            var payloadWithoutExp = new JWTClaimsSet.Builder()
+                    .claim("client_id", "test_user")
+                    .subject("jean.dupond@gmail.com")
+                    .claim("scope", new String[] { "account:read" })
+                    .jwtID(UUID.randomUUID().toString())
+                    .build();
+
+            return Stream.of(
+                    Arguments.of(payloadWithoutId),
+                    Arguments.of(payloadWithoutExp));
+        }
+
+        @ParameterizedTest
+        @MethodSource
+        void revokeJwtTokenFailure(JWTClaimsSet payload) throws JOSEException {
+
+            // setup token
+            var accessToken = new SignedJWT(
+                    new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
+                    payload);
+            accessToken.sign(algorithm);
+            Map<String, String> params = Map.of("token", accessToken.serialize());
+
+            // When perform revoke token
+
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/revoke_token");
+
+            // Then check response
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        }
+
+    }
 }
