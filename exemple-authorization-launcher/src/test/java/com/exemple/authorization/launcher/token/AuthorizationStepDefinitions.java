@@ -21,6 +21,7 @@ import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Transpose;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
@@ -276,6 +277,19 @@ public class AuthorizationStepDefinitions {
                 () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
 
         context.setAccessToken(response.jsonPath().getString("access_token"));
+    }
+
+    @When("disconnection")
+    public void disconnection() {
+
+        Map<String, String> params = Map.of("token", context.getAccessToken());
+
+        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
+                .formParams(params)
+                .post("/oauth/revoke_token");
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
     }
 
 }

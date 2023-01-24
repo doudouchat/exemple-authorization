@@ -39,18 +39,6 @@ public class LoginITStepDefinitions {
 
     }
 
-    @When("disconnection")
-    public void disconnection() {
-
-        Response response = JsonRestTemplate.authorization()
-                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
-                .header("Authorization", "Bearer " + authorizationContext.getAccessToken())
-                .post("/ws/v1/disconnection");
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-
-    }
-
     @And("username {string} exists")
     public void checkUsername(String username) {
 
