@@ -249,7 +249,6 @@ class LoginApiTest {
                 """
                 [
                   {
-                    "path": "/username",
                     "code": "username",
                     "message": "[%username] already exists"
                     }
@@ -487,7 +486,6 @@ class LoginApiTest {
                 """
                 [
                   {
-                    "path": "/toUsername",
                     "code": "username",
                     "message": "[%username] already exists"
                     }

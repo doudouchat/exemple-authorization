@@ -33,7 +33,7 @@ public class LoginResource {
 
     }
 
-    public void save(LoginEntity source) throws UsernameAlreadyExistsException {
+    public void save(LoginEntity source) {
         boolean notExists = dao().create(source);
 
         if (!notExists) {

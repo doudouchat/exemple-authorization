@@ -5,7 +5,7 @@ import java.text.MessageFormat;
 import lombok.Getter;
 
 @Getter
-public class UsernameAlreadyExistsException extends Exception {
+public class UsernameAlreadyExistsException extends RuntimeException {
 
     protected static final String EXCEPTION_MESSAGE = "Login {0} already exists";
 

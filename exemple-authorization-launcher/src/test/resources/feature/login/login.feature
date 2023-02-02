@@ -53,6 +53,6 @@ Feature: login
     When change username from 'jean.dupond@gmail.com' to 'jean.dupont@gmail.com' fails because
       """
       [
-				{"code":"username","path":"/toUsername","message":"[jean.dupont@gmail.com] already exists"}
+				{"code":"username","message":"[jean.dupont@gmail.com] already exists"}
       ]
       """
