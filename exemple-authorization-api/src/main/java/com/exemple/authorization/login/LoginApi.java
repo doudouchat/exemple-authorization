@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
-import com.exemple.authorization.login.exception.LoginAlreadyExistsException;
 import com.exemple.authorization.login.exception.LoginNotFoundException;
 import com.exemple.authorization.login.model.CopyLoginModel;
 import com.exemple.authorization.login.model.LoginModel;
@@ -80,8 +79,7 @@ public class LoginApi {
 
     })
     @RolesAllowed({ "login:create", "login:update" })
-    public Response update(@PathParam("username") String username, @Valid @NotNull LoginModel source, @Context UriInfo uriInfo)
-            throws UsernameAlreadyExistsException {
+    public Response update(@PathParam("username") String username, @Valid @NotNull LoginModel source, @Context UriInfo uriInfo) {
 
         Optional<LoginEntity> origin = loginResource.get(username);
 
@@ -129,7 +127,7 @@ public class LoginApi {
 
     })
     @RolesAllowed({ "login:create", "login:update" })
-    public Response copy(@Valid @NotNull CopyLoginModel copy, @Context UriInfo uriInfo) throws LoginNotFoundException, LoginAlreadyExistsException {
+    public Response copy(@Valid @NotNull CopyLoginModel copy, @Context UriInfo uriInfo) throws LoginNotFoundException {
 
         checkIfUsernameHasRight(copy.getFromUsername(), servletContext.getSecurityContext());
 
@@ -138,12 +136,7 @@ public class LoginApi {
 
         origin.setUsername(copy.getToUsername());
 
-        try {
-            loginResource.save(origin);
-        } catch (UsernameAlreadyExistsException e) {
-            throw new LoginAlreadyExistsException(e.getUsername(), "/toUsername", e);
-        }
-
+        loginResource.save(origin);
         loginResource.delete(copy.getFromUsername());
 
         var builder = uriInfo.getBaseUriBuilder();
@@ -160,24 +153,6 @@ public class LoginApi {
         public Response toResponse(UsernameAlreadyExistsException exception) {
 
             Map<String, Object> cause = Map.of(
-                    "path", "/username",
-                    "code", "username",
-                    "message", "[".concat(exception.getUsername()).concat("] already exists"));
-
-            return Response.status(Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON).entity(Collections.singletonList(cause)).build();
-
-        }
-
-    }
-
-    @Provider
-    public static class LoginAlreadyExistsExceptionMapper implements ExceptionMapper<LoginAlreadyExistsException> {
-
-        @Override
-        public Response toResponse(LoginAlreadyExistsException exception) {
-
-            Map<String, Object> cause = Map.of(
-                    "path", exception.getPath(),
                     "code", "username",
                     "message", "[".concat(exception.getUsername()).concat("] already exists"));
 
