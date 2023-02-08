@@ -129,7 +129,6 @@ class AuthorizationServerTest {
                 .clientSecret(secret)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue())
                 .authorizationGrantType(AuthorizationGrantType.JWT_BEARER.getValue())
-                .scope("ROLE_TRUSTED_CLIENT")
                 .requireAuthorizationConsent(false)
                 .build();
 

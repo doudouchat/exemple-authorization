@@ -105,6 +105,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- AWAITILITY -->
+
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- CUCUMBER -->
 
 		<dependency>
@@ -241,7 +249,8 @@
 										<portName>cassandra.port</portName>
 										<portName>hazelcast.port</portName>
 										<portName>zookeeper.port</portName>
-										<portName>kafka.port</portName>
+										<portName>kafka.internal_port</portName>
+										<portName>kafka.client_port</portName>
 									</portNames>
 								</configuration>
 							</execution>
@@ -428,6 +437,40 @@
 														<status>200</status>
 													</http>
 													<time>30000</time>
+												</wait>
+												<log>
+													<date>default</date>
+												</log>
+											</run>
+										</image>
+									</images>
+								</configuration>
+							</execution>
+							<execution>
+								<id>start_kafka</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<images>
+										<image>
+											<name>bitnami/kafka:${kafka.version}</name>
+											<alias>kafka</alias>
+											<run>
+												<ports>
+													<port>${kafka.client_port}:9092</port>
+													<port>${kafka.internal_port}:9093</port>
+												</ports>
+												<env>
+													<ALLOW_PLAINTEXT_LISTENER>yes</ALLOW_PLAINTEXT_LISTENER>
+													<KAFKA_CFG_ZOOKEEPER_CONNECT>172.17.0.1:${zookeeper.port}</KAFKA_CFG_ZOOKEEPER_CONNECT>
+													<KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP>CLIENT:PLAINTEXT,INTERNAL:PLAINTEXT</KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP>
+													<KAFKA_CFG_LISTENERS>CLIENT://:9092,INTERNAL://:9093</KAFKA_CFG_LISTENERS>
+													<KAFKA_CFG_ADVERTISED_LISTENERS>CLIENT://localhost:${kafka.client_port},INTERNAL://172.17.0.1:${kafka.internal_port}</KAFKA_CFG_ADVERTISED_LISTENERS>
+													<KAFKA_CFG_INTER_BROKER_LISTENER_NAME>INTERNAL</KAFKA_CFG_INTER_BROKER_LISTENER_NAME>
+												</env>
+												<wait>
+													<time>10000</time>
 												</wait>
 												<log>
 													<date>default</date>
