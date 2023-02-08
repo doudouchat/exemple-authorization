@@ -9,7 +9,7 @@ authorization:
       alias: mytest
       password: mypass
    kafka:
-      bootstrap-servers: 172.17.0.1:${kafka.port}
+      bootstrap-servers: 172.17.0.1:${kafka.internal_port}
 application:
    zookeeper:
       host: 172.17.0.1:${zookeeper.port}

@@ -1,9 +1,14 @@
 package com.exemple.authorization.launcher.password;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
+import java.time.Duration;
 import java.util.Map;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.authorization.launcher.common.JsonRestTemplate;
@@ -20,6 +25,9 @@ public class PasswordITStepDefinitions {
     private PasswordTestContext context;
 
     @Autowired
+    private KafkaConsumer<String, Map<String, Object>> consumerNewPassword;
+
+    @Autowired
     private AuthorizationTestContext authorizationContext;
 
     @When("new password for {string}")
@@ -28,23 +36,23 @@ public class PasswordITStepDefinitions {
         Map<String, Object> newPassword = Map.of("login", username);
 
         Response response = JsonRestTemplate.authorization()
-                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_ADMIN)
+                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
                 .header("Authorization", "Bearer " + authorizationContext.getAccessToken())
                 .body(newPassword).post("/ws/v1/new_password");
 
         context.setResponse(response);
 
-        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getStatusCode()).isEqualTo(204);
 
     }
 
-    @When("change password {string} for username {string} by admin")
+    @When("change password {string} for username {string}")
     public void update(String password, String username) {
 
         Map<String, Object> body = Map.of("password", password);
 
         Response response = JsonRestTemplate.authorization()
-                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_ADMIN)
+                .header(IntegrationTestConfiguration.APP_HEADER, IntegrationTestConfiguration.APP_USER)
                 .header("Authorization", "Bearer " + authorizationContext.getAccessToken())
                 .body(body).put("/ws/v1/logins/" + username);
 
@@ -53,11 +61,14 @@ public class PasswordITStepDefinitions {
     }
 
     @And("get password token")
-    public void getAccessToken() {
+    public void getAccessToken() throws InterruptedException {
 
-        assertThat(context.getResponse().jsonPath().getString("token")).isNotNull();
+        ConsumerRecords<String, Map<String, Object>> records = consumerNewPassword.poll(Duration.ofSeconds(5));
 
-        authorizationContext.setAccessToken(context.getResponse().jsonPath().getString("token"));
+        await().atMost(Duration.ofSeconds(10))
+                .untilAsserted(() -> assertThat(records).extracting(ConsumerRecord::value).anyMatch(value -> value.containsKey("token")));
+
+        authorizationContext.setAccessToken(records.iterator().next().value().get("token").toString());
 
     }
 }

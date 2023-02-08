@@ -8,7 +8,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -237,131 +236,6 @@ class NewPasswordApiTest {
 
             ConsumerRecords<String, Map<String, Object>> records = this.consumerKafka.poll(Duration.ofSeconds(1));
             await().during(Duration.ofSeconds(1)).untilAsserted(() -> assertThat(records).isEmpty());
-
-        }
-
-    }
-
-    @Nested
-    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    @TestMethodOrder(OrderAnnotation.class)
-    class TrustedPassword {
-
-        private String username;
-
-        private String token;
-
-        @BeforeAll
-        void username() {
-
-            username = "jean.dupond@gmail.com";
-        }
-
-        @Order(0)
-        @Test
-        void passwordTrustedClient() throws JOSEException {
-
-            // Given token
-
-            var payload = new JWTClaimsSet.Builder()
-                    .claim("authorities", new String[] { "ROLE_TRUSTED_CLIENT" })
-                    .claim("client_id", "clientId1")
-                    .jwtID(UUID.randomUUID().toString())
-                    .build();
-
-            var accessToken = new SignedJWT(
-                    new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
-                    payload);
-            accessToken.sign(algorithm);
-
-            // And mock login resource
-
-            LoginEntity account = new LoginEntity();
-            account.setUsername(username);
-
-            Map<String, Object> newPassword = Map.of("login", username);
-
-            Mockito.when(loginResource.get(username)).thenReturn(Optional.of(account));
-
-            // When perform create password
-
-            Response response = requestSpecification.contentType(ContentType.JSON)
-                    .header("Authorization", "Bearer " + accessToken.serialize())
-                    .header("app", "app")
-                    .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
-
-            // Then check response
-
-            assertAll(
-                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getString("token")).isNotNull());
-
-            // And check security context
-
-            assertAll(
-                    () -> assertThat(testFilter.context.getUserPrincipal().getName()).isEqualTo("clientId1"),
-                    () -> assertThat(testFilter.context.isUserInRole("ROLE_TRUSTED_CLIENT")).isTrue(),
-                    () -> assertThat(testFilter.context.isSecure()).isTrue(),
-                    () -> assertThat(testFilter.context.getAuthenticationScheme()).isEqualTo(SecurityContext.BASIC_AUTH));
-
-            token = response.jsonPath().getString("token");
-
-        }
-
-        @Order(1)
-        @Test
-        void checkToken() throws ParseException {
-
-            // When decode token
-
-            NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withPublicKey(publicKey).build();
-
-            var payload = jwtDecoder.decode(token);
-
-            // Then check payload
-
-            assertAll(
-                    () -> assertThat(payload.getSubject()).isEqualTo(username),
-                    () -> assertThat(payload.getClaimAsStringList("authorities")).contains("ROLE_TRUSTED_CLIENT"),
-                    () -> assertThat(payload.getClaimAsStringList("scope")).contains("login:read", "login:update"),
-                    () -> assertThat(payload.getExpiresAt()).isEqualTo(Instant.now(clock).plusSeconds(expiryTime)),
-                    () -> assertThat(payload.getId()).isNotNull());
-
-        }
-
-        @Test
-        void passwordTrustedClientButLoginIsNotFound() throws JOSEException {
-
-            // Given token
-
-            var payload = new JWTClaimsSet.Builder()
-                    .claim("authorities", new String[] { "ROLE_TRUSTED_CLIENT" })
-                    .claim("client_id", "clientId1")
-                    .jwtID(UUID.randomUUID().toString())
-                    .build();
-
-            var accessToken = new SignedJWT(
-                    new JWSHeader.Builder(JWSAlgorithm.RS256).build(),
-                    payload);
-            accessToken.sign(algorithm);
-
-            // And mock login resource
-
-            Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
-
-            // When perform create password
-
-            Map<String, Object> newPassword = Map.of("login", username);
-            Response response = requestSpecification.contentType(ContentType.JSON)
-                    .header("Authorization", "Bearer " + accessToken.serialize())
-                    .header("app", "app")
-                    .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
-
-            // Then check response
-
-            assertAll(
-                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.getBody().asString()).isEqualTo("{}"));
 
         }
 

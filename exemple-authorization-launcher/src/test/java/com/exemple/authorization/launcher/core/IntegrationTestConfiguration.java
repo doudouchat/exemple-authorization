@@ -3,9 +3,17 @@ package com.exemple.authorization.launcher.core;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
@@ -18,6 +26,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -48,8 +57,6 @@ public class IntegrationTestConfiguration {
 
     public static final String APP_USER = "test";
 
-    public static final String APP_ADMIN = "admin";
-
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
@@ -60,6 +67,9 @@ public class IntegrationTestConfiguration {
 
     @Autowired
     private CqlSession session;
+
+    @Value("${authorization.kafka.bootstrap-servers}")
+    private String bootstrapAddress;
 
     private final Resource[] scripts;
 
@@ -80,6 +90,32 @@ public class IntegrationTestConfiguration {
         return propertySourcesPlaceholderConfigurer;
     }
 
+    @Bean
+    public KafkaConsumer<String, Map<String, Object>> consumerNewPassword() {
+        Map<String, Object> props = Map.of(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress,
+                ConsumerConfig.GROUP_ID_CONFIG, "test",
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        return new KafkaConsumer<>(props);
+    }
+
+    @PostConstruct
+    public void suscribeConsumerNewPassword() throws Exception {
+
+        consumerNewPassword().subscribe(List.of("new_password"), new ConsumerRebalanceListener() {
+
+            @Override
+            public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+            }
+
+            @Override
+            public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+                consumerNewPassword().seekToBeginning(partitions);
+            }
+        });
+    }
+
     @PostConstruct
     public void initSchema() {
 
@@ -96,15 +132,6 @@ public class IntegrationTestConfiguration {
                 .build();
 
         applicationDetailService.put("test", MAPPER.convertValue(detail, JsonNode.class));
-
-        // ADMIN
-
-        ApplicationDetail adminDetail = ApplicationDetail.builder()
-                .keyspace("test")
-                .clientId("admin")
-                .build();
-
-        applicationDetailService.put("admin", MAPPER.convertValue(adminDetail, JsonNode.class));
 
     }
 
@@ -136,7 +163,6 @@ public class IntegrationTestConfiguration {
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue())
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
                 .authorizationGrantType(AuthorizationGrantType.JWT_BEARER.getValue())
-                .scope("ROLE_TRUSTED_CLIENT")
                 .requireAuthorizationConsent(false)
                 .build();
 
@@ -173,18 +199,6 @@ public class IntegrationTestConfiguration {
                 .build();
 
         authorizationClientResource.save(testBackClient);
-
-        var adminClient = AuthorizationClient.builder()
-                .id(UUID.randomUUID().toString())
-                .clientId("admin")
-                .clientSecret(secret)
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
-                .redirectUri("http://xxx")
-                .scope("ROLE_TRUSTED_CLIENT")
-                .requireAuthorizationConsent(false)
-                .build();
-
-        authorizationClientResource.save(adminClient);
 
     }
 

@@ -1,12 +1,9 @@
 package com.exemple.authorization.password;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +22,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -49,29 +45,17 @@ public class NewPasswordApi {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({ "ROLE_APP", "ROLE_TRUSTED_CLIENT" })
+    @RolesAllowed("ROLE_APP")
     public Response post(@NotNull @Valid NewPassword newPassword, @NotBlank @HeaderParam(FeatureConfiguration.APP_HEADER) String app) {
 
         AuthorizationContextSecurity securityContext = (AuthorizationContextSecurity) servletContext.getSecurityContext();
-
-        Optional<String> accessToken = loginResource.get(newPassword.getLogin())
-                .map((LoginEntity login) -> accessTokenBuilder.createAccessToken(newPassword, app, securityContext));
-
-        if (securityContext.isUserInRole("ROLE_TRUSTED_CLIENT")) {
-
-            Map<String, Object> data = new HashMap<>();
-            accessToken.ifPresent(token -> data.put("token", token));
-            return Response.status(Status.OK).entity(data).build();
-
-        }
-
-        accessToken.ifPresent((String token) -> {
-            Map<String, Object> data = Map.of(
-                    "token", token);
-            Message<Map<String, Object>> message = MessageBuilder.withPayload(data).setHeader(KafkaHeaders.TOPIC, "new_password").build();
-            template.send(message);
-        });
+        loginResource.get(newPassword.getLogin())
+                .map((LoginEntity login) -> accessTokenBuilder.createAccessToken(newPassword, app, securityContext))
+                .ifPresent((String token) -> {
+                    var data = Map.of("token", token);
+                    var message = MessageBuilder.withPayload(data).setHeader(KafkaHeaders.TOPIC, "new_password").build();
+                    template.send(message);
+                });
 
         return Response.status(Status.NO_CONTENT).build();
 
