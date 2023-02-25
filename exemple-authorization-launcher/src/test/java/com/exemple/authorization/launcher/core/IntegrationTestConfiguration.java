@@ -5,28 +5,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -68,8 +60,8 @@ public class IntegrationTestConfiguration {
     @Autowired
     private CqlSession session;
 
-    @Value("${authorization.kafka.bootstrap-servers}")
-    private String bootstrapAddress;
+    @Autowired
+    private KafkaConsumer<?, ?> consumerNewPassword;
 
     private final Resource[] scripts;
 
@@ -78,32 +70,10 @@ public class IntegrationTestConfiguration {
 
     }
 
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-
-        PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
-
-        YamlPropertiesFactoryBean properties = new YamlPropertiesFactoryBean();
-        properties.setResources(new ClassPathResource("exemple-authorization-test.yml"));
-
-        propertySourcesPlaceholderConfigurer.setProperties(properties.getObject());
-        return propertySourcesPlaceholderConfigurer;
-    }
-
-    @Bean
-    public KafkaConsumer<String, Map<String, Object>> consumerNewPassword() {
-        Map<String, Object> props = Map.of(
-                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress,
-                ConsumerConfig.GROUP_ID_CONFIG, "test",
-                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        return new KafkaConsumer<>(props);
-    }
-
     @PostConstruct
     public void suscribeConsumerNewPassword() throws Exception {
 
-        consumerNewPassword().subscribe(List.of("new_password"), new ConsumerRebalanceListener() {
+        consumerNewPassword.subscribe(List.of("new_password"), new ConsumerRebalanceListener() {
 
             @Override
             public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
@@ -111,7 +81,7 @@ public class IntegrationTestConfiguration {
 
             @Override
             public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-                consumerNewPassword().seekToBeginning(partitions);
+                consumerNewPassword.seekToBeginning(partitions);
             }
         });
     }

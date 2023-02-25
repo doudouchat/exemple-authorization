@@ -1,0 +1,8 @@
+authorization:
+   resource:
+      cassandra:
+         version: ${cassandra-version}
+         resource_configuration: classpath:cassandra.conf
+spring:
+   main:
+      allow-bean-definition-overriding: true

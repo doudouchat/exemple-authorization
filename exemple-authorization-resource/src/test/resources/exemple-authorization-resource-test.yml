@@ -1,5 +1,0 @@
-authorization:
-   resource:
-      cassandra:
-         version: ${cassandra-version}
-         resource_configuration: classpath:cassandra.conf
