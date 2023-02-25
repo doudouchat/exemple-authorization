@@ -9,13 +9,15 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.authorization.resource.core.ResourceExecutionContext;
 import com.exemple.authorization.resource.core.ResourceTestConfiguration;
 import com.exemple.authorization.resource.oauth2.model.OAuth2Entity;
 
-@SpringJUnitConfig(ResourceTestConfiguration.class)
+@SpringBootTest(classes = ResourceTestConfiguration.class)
+@ActiveProfiles("test")
 class OAuth2ResourceTest {
 
     @Autowired

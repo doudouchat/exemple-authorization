@@ -38,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.authorization.AuthorizationJwtConfiguration;
 import com.exemple.authorization.common.LoggingFilter;
@@ -65,6 +66,7 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
+@ActiveProfiles("test")
 class AuthorizationServerTest {
 
     private static final RSAKey OTHER_RSA_KEY;

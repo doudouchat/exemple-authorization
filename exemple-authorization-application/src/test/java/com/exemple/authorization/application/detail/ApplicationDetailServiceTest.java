@@ -13,14 +13,16 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.core.ApplicationTestConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringJUnitConfig(ApplicationTestConfiguration.class)
+@SpringBootTest(classes = ApplicationTestConfiguration.class)
+@ActiveProfiles("test")
 class ApplicationDetailServiceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();

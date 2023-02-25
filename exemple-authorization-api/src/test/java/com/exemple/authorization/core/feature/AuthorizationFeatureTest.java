@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.authorization.AuthorizationJwtConfiguration;
 import com.exemple.authorization.application.common.model.ApplicationDetail;
@@ -47,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ActiveProfiles("test")
 class AuthorizationFeatureTest {
 
     public static final RSAKey OTHER_RSA_KEY;
