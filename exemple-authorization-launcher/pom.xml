@@ -397,7 +397,7 @@
 								<configuration>
 									<images>
 										<image>
-											<name>zookeeper:3.8.0</name>
+											<name>zookeeper:3.8.1</name>
 											<alias>zookeeper</alias>
 											<run>
 												<ports>
