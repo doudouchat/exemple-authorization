@@ -477,6 +477,7 @@
 													<KAFKA_CFG_LISTENERS>CLIENT://:9092,INTERNAL://:9093</KAFKA_CFG_LISTENERS>
 													<KAFKA_CFG_ADVERTISED_LISTENERS>CLIENT://localhost:${kafka.client_port},INTERNAL://172.17.0.1:${kafka.internal_port}</KAFKA_CFG_ADVERTISED_LISTENERS>
 													<KAFKA_CFG_INTER_BROKER_LISTENER_NAME>INTERNAL</KAFKA_CFG_INTER_BROKER_LISTENER_NAME>
+													<KAFKA_ENABLE_KRAFT>no</KAFKA_ENABLE_KRAFT>
 												</env>
 												<wait>
 													<time>10000</time>
