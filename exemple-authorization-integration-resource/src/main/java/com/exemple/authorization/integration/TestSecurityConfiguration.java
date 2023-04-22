@@ -7,9 +7,9 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal;
@@ -27,10 +27,12 @@ public class TestSecurityConfiguration {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .authorizeHttpRequests().requestMatchers("/actuator/**").permitAll()
-                .anyRequest().authenticated().and()
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::opaqueToken);
-
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/actuator/**").permitAll()
+                        .anyRequest()
+                        .authenticated())
+                .oauth2ResourceServer(oAuth2ResourceServerConfigurer -> oAuth2ResourceServerConfigurer
+                        .opaqueToken(Customizer.withDefaults()));
         return http.build();
 
     }
