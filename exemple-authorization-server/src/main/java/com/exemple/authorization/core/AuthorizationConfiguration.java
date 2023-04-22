@@ -60,7 +60,9 @@ public class AuthorizationConfiguration {
                 }));
 
         http
-                .securityMatcher(endpointsMatcher).authorizeHttpRequests().requestMatchers("/**").permitAll().and()
+                .securityMatcher(endpointsMatcher)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/**").permitAll())
                 .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
                 .apply(authorizationServerConfigurer);
 
