@@ -25,6 +25,7 @@ jobs:
          uses: whelk-io/maven-settings-xml-action@v21
          with:
             repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
+            plugin_repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
       -  name: Build with Maven
          run: mvn clean verify -Pauthorization,it
 
