@@ -1,3 +1,11 @@
+logging:
+   pattern:
+      console: "%d %-5p: %C - %m%n"
+   level:
+      root: WARN
+      com.exemple.authorization: DEBUG
+      com.datastax.oss.driver: INFO
+      com.hazelcast: INFO
 authorization:
    resource:
       cassandra:
