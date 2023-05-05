@@ -1,3 +1,10 @@
+logging:
+   pattern:
+      console: "%d %-5p: %C - %m%n"
+   level:
+      root: WARN
+      com.exemple.authorization: DEBUG
+      com.datastax.oss.driver: INFO
 authorization:
    zookeeper:
       host: 127.0.0.1:${zmp.clientPort}

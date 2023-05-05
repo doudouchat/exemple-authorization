@@ -1,3 +1,9 @@
+logging:
+   pattern:
+      console: "%d %-5p: %C - %m%n"
+   level:
+      root: WARN
+      com.exemple.authorization: DEBUG
 authorization:
    certificat:
       location: file:${project.parent.basedir}/certificat/mytest.jks
