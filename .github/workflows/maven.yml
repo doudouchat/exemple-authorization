@@ -27,8 +27,7 @@ jobs:
             repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
             plugin_repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
       -  name: Build with Maven
-         run: mvn clean verify -Pauthorization,it
-
+         run: mvn --batch-mode clean verify -Pauthorization,it -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
       -  name: display logs authorization
          if: ${{ always() }}
          run: cat exemple-authorization-launcher/target/logs/archive/*.log
