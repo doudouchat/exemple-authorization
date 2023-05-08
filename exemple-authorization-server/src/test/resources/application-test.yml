@@ -16,3 +16,6 @@ authorization:
       sleepMsBetweenRetries: 1000
       ttlMs:
          product: 30000
+spring:
+   hazelcast:
+      config: file:${project.build.testOutputDirectory}/hazelcast.yaml

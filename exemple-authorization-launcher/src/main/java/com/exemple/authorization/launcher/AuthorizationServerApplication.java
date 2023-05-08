@@ -4,6 +4,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
@@ -17,6 +18,9 @@ import com.exemple.authorization.core.rsa.KeystoreConfiguration;
 import com.exemple.authorization.core.session.HazelcastHttpSessionConfiguration;
 import com.exemple.authorization.core.swagger.SwaggerConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
+import com.hazelcast.client.HazelcastClient;
+import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.core.HazelcastInstance;
 
 @SpringBootApplication(exclude = CassandraAutoConfiguration.class)
 @Import({ AuthorizationConfiguration.class,
@@ -35,6 +39,12 @@ public class AuthorizationServerApplication extends SpringBootServletInitializer
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(AuthorizationServerApplication.class);
+    }
+
+    @Bean
+    public HazelcastInstance client() {
+        var clientConfig = ClientConfig.load();
+        return HazelcastClient.newHazelcastClient(clientConfig);
     }
 
 }
