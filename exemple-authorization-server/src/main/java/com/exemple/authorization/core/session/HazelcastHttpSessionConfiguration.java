@@ -11,8 +11,6 @@ import org.springframework.session.hazelcast.config.annotation.web.http.EnableHa
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 
-import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.config.AttributeConfig;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.IndexConfig;
@@ -47,12 +45,6 @@ public class HazelcastHttpSessionConfiguration {
         config.getSerializationConfig().addSerializerConfig(serializerConfig);
 
         return Hazelcast.newHazelcastInstance(config);
-    }
-
-    @Bean
-    public HazelcastInstance client() {
-        var clientConfig = ClientConfig.load();
-        return HazelcastClient.newHazelcastClient(clientConfig);
     }
 
 }
