@@ -21,6 +21,12 @@ jobs:
             path: ~/.m2
             key: ${{ runner.os }}-m2-${{ hashFiles('/pom.xml') }}
             restore-keys: ${{ runner.os }}-m2
+      -  name: Cache SonarCloud packages
+         uses: actions/cache@v3
+         with:
+            path: ~/.sonar/cache
+            key: ${{ runner.os }}-sonar
+            restore-keys: ${{ runner.os }}-sonar
       -  name: maven-settings-xml-action
          uses: whelk-io/maven-settings-xml-action@v21
          with:
@@ -28,6 +34,11 @@ jobs:
             plugin_repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
       -  name: Build with Maven
          run: mvn --batch-mode clean verify -Pauthorization,it -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+      -  name: Analyse
+         env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+         run: mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.organization=doudouchat -Dsonar.projectKey=doudouchat_exemple-authorization -Dsonar.host.url=https://sonarcloud.io
       -  name: display logs authorization
          if: ${{ always() }}
          run: cat exemple-authorization-launcher/target/logs/archive/*.log
