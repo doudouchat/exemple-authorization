@@ -407,7 +407,7 @@
 													<port>${zookeeper.port}:2181</port>
 												</ports>
 												<wait>
-													<time>5000</time>
+													<time>20000</time>
 												</wait>
 												<log>
 													<date>default</date>
