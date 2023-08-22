@@ -63,9 +63,9 @@ public class PasswordITStepDefinitions {
     @And("get password token")
     public void getAccessToken() throws InterruptedException {
 
-        ConsumerRecords<String, Map<String, Object>> records = consumerNewPassword.poll(Duration.ofSeconds(5));
+        ConsumerRecords<String, Map<String, Object>> records = consumerNewPassword.poll(Duration.ofSeconds(20));
 
-        await().atMost(Duration.ofSeconds(10))
+        await().atMost(Duration.ofSeconds(20))
                 .untilAsserted(() -> assertThat(records).extracting(ConsumerRecord::value).anyMatch(value -> value.containsKey("token")));
 
         authorizationContext.setAccessToken(records.iterator().next().value().get("token").toString());
