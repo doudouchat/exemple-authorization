@@ -400,7 +400,7 @@
 								<configuration>
 									<images>
 										<image>
-											<name>zookeeper:3.8.2</name>
+											<name>zookeeper:3.9.0</name>
 											<alias>zookeeper</alias>
 											<run>
 												<ports>
