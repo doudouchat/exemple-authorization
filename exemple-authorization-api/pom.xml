@@ -96,13 +96,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- COMMONS APACHE -->
-
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
-
 		<!-- REST ASSURED -->
 
 		<dependency>
