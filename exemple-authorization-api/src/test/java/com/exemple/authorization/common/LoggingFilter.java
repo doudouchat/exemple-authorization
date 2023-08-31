@@ -1,12 +1,10 @@
 package com.exemple.authorization.common;
 
+import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.io.output.NullOutputStream;
 import org.slf4j.Logger;
 
 import io.restassured.filter.Filter;
@@ -38,24 +36,16 @@ public class LoggingFilter implements Filter {
 
         int counter = COUNTER.incrementAndGet();
 
-        try {
-            String log = RequestPrinter.print(requestSpec, requestSpec.getMethod(), requestSpec.getURI(), LogDetail.ALL, Collections.emptySet(),
-                    new PrintStream(NullOutputStream.NULL_OUTPUT_STREAM, true, StandardCharsets.UTF_8.name()), true);
-            this.log.debug("Request {}\n{}", counter, log);
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        }
+        String requestLog = RequestPrinter.print(requestSpec, requestSpec.getMethod(), requestSpec.getURI(), LogDetail.ALL, Collections.emptySet(),
+                new PrintStream(OutputStream.nullOutputStream()), true);
+        this.log.debug("Request {}\n{}", counter, requestLog);
 
         Response response = ctx.next(requestSpec, responseSpec);
 
-        try {
-            String log = ResponsePrinter.print(response, response,
-                    new PrintStream(NullOutputStream.NULL_OUTPUT_STREAM, true, StandardCharsets.UTF_8.name()),
-                    LogDetail.ALL, true, Collections.emptySet());
-            this.log.debug("Response {}\n{}", counter, log);
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        }
+        String responseLog = ResponsePrinter.print(response, response,
+                new PrintStream(OutputStream.nullOutputStream()),
+                LogDetail.ALL, true, Collections.emptySet());
+        this.log.debug("Response {}\n{}", counter, responseLog);
 
         return response;
     }

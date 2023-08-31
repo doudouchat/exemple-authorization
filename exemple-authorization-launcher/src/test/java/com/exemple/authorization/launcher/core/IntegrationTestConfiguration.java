@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
@@ -174,7 +173,7 @@ public class IntegrationTestConfiguration {
 
     @SneakyThrows
     private static String[] splitScript(Resource script) {
-        return FileUtils.readFileToString(script.getFile(), StandardCharsets.UTF_8).trim().split(";");
+        return script.getContentAsString(StandardCharsets.UTF_8).trim().split(";");
     }
 
 }
