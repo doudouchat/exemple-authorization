@@ -24,12 +24,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.kafka.test.EmbeddedKafkaZKBroker;
 
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.feature.FeatureTestConfiguration;
 import com.exemple.authorization.core.keyspace.ApiResourceKeyspace;
 import com.exemple.authorization.resource.login.LoginResource;
+import com.hazelcast.config.Config;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -83,7 +87,7 @@ public class AuthorizationTestConfiguration {
     @Bean
     public EmbeddedKafkaBroker embeddedKafka() {
 
-        EmbeddedKafkaBroker embeddedKafka = new EmbeddedKafkaBroker(1, true, "new_password").brokerProperty(KafkaConfig.LogDirsProp(),
+        var embeddedKafka = new EmbeddedKafkaZKBroker(1, true, "new_password").brokerProperty(KafkaConfig.LogDirsProp(),
                 logDir + "/" + UUID.randomUUID());
         embeddedKafka.kafkaPorts(kafkaPort);
 
@@ -120,5 +124,11 @@ public class AuthorizationTestConfiguration {
         Mockito.when(service.get(Mockito.anyString())).thenReturn(Optional.of(detail));
 
         return service;
+    }
+
+    @Bean("hazelcastClient")
+    public HazelcastInstance client() {
+        var config = Config.load();
+        return Hazelcast.newHazelcastInstance(config);
     }
 }

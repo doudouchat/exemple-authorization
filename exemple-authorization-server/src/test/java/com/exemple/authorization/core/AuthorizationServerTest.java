@@ -30,6 +30,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -94,6 +95,7 @@ class AuthorizationServerTest {
     private AuthorizationClientResource authorizationClientResource;
 
     @Autowired
+    @Qualifier("hazelcastClient")
     private HazelcastInstance client;
 
     private RequestSpecification requestSpecification;

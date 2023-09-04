@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RevokeTokenProvider implements AuthenticationProvider {
 
+    @Qualifier("hazelcastClient")
     private final HazelcastInstance client;
 
     private final AuthorizationOAuth2Repository authorizationService;
@@ -44,9 +46,9 @@ public class RevokeTokenProvider implements AuthenticationProvider {
     public boolean supports(Class<?> authentication) {
         return OAuth2TokenRevocationAuthenticationToken.class.isAssignableFrom(authentication);
     }
-    
+
     private void revokeToken(Token<Jwt> token) {
-        
+
         if (token.getToken().getId() == null) {
             throw new OAuth2AuthenticationException(new OAuth2Error("custom_code", "jti is missing", null));
         }

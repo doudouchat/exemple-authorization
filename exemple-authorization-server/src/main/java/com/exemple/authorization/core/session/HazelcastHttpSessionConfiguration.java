@@ -28,7 +28,7 @@ public class HazelcastHttpSessionConfiguration {
         return HeaderHttpSessionIdResolver.xAuthToken();
     }
 
-    @Bean
+    @Bean("hazelcastSession")
     @SpringSessionHazelcastInstance
     public HazelcastInstance sessionHazelcastInstance() {
 

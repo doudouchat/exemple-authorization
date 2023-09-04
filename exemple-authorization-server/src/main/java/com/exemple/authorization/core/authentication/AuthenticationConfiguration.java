@@ -2,6 +2,7 @@ package com.exemple.authorization.core.authentication;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -56,7 +57,9 @@ public class AuthenticationConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, HazelcastInstance sessionHazelcastInstance) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
+            @Qualifier("hazelcastSession") HazelcastInstance sessionHazelcastInstance)
+            throws Exception {
 
         var sessionStrategy = new RegisterSessionAuthenticationStrategy(
                 new SpringSessionBackedSessionRegistry<>(new HazelcastIndexedSessionRepository(sessionHazelcastInstance)));

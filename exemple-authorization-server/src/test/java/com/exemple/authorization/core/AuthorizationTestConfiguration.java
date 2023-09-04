@@ -22,16 +22,20 @@ import com.exemple.authorization.core.session.HazelcastHttpSessionConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.oauth2.OAuth2Resource;
 import com.exemple.authorization.resource.oauth2.model.OAuth2Entity;
+import com.hazelcast.config.Config;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 
 @Configuration
-@Import({ AuthorizationConfiguration.class,
+@Import({
+        AuthorizationClientTestConfiguration.class,
+        AuthorizationConfiguration.class,
         AuthenticationConfiguration.class,
         HazelcastHttpSessionConfiguration.class,
-        AuthorizationClientTestConfiguration.class,
         AuthorizationJwtConfiguration.class })
 @EnableAutoConfiguration(exclude = CassandraAutoConfiguration.class)
 public class AuthorizationTestConfiguration {
@@ -103,5 +107,12 @@ public class AuthorizationTestConfiguration {
         Mockito.when(service.get(Mockito.anyString())).thenReturn(Optional.of(detail));
 
         return service;
+    }
+
+    @Bean("hazelcastClient")
+    public HazelcastInstance client() {
+        var config = Config.load();
+        config.setClusterName("dev");
+        return Hazelcast.newHazelcastInstance(config);
     }
 }
