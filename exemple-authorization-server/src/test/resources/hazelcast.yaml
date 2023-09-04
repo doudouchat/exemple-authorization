@@ -3,7 +3,7 @@ hazelcast:
    network:
       port:
          port: ${hazelcast.port}
-         auto-increment: false
+         auto-increment: true
       join:
          tcp-ip:
             enabled: false

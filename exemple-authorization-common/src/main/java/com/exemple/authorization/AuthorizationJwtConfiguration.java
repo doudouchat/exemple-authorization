@@ -4,6 +4,7 @@ import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
@@ -27,6 +28,7 @@ public class AuthorizationJwtConfiguration {
 
     public static final String TOKEN_BLACK_LIST = "token.black_list";
 
+    @Qualifier("hazelcastClient")
     private final HazelcastInstance client;
 
     @Bean

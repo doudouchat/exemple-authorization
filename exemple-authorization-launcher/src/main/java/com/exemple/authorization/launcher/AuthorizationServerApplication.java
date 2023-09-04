@@ -41,7 +41,7 @@ public class AuthorizationServerApplication extends SpringBootServletInitializer
         return application.sources(AuthorizationServerApplication.class);
     }
 
-    @Bean
+    @Bean("hazelcastClient")
     public HazelcastInstance client() {
         var clientConfig = ClientConfig.load();
         return HazelcastClient.newHazelcastClient(clientConfig);
