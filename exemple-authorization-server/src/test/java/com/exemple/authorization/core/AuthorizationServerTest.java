@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -150,6 +151,18 @@ class AuthorizationServerTest {
                 .build();
 
         authorizationClientResource.save(testUserClient);
+
+        var testUserPKCEClient = AuthorizationClient.builder()
+                .id(UUID.randomUUID().toString())
+                .clientId("test_user_pkce")
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE.getValue())
+                .redirectUri("http://xxx")
+                .scope("account:read")
+                .scope("account:update")
+                .build();
+
+        authorizationClientResource.save(testUserPKCEClient);
 
         var testBackClient = AuthorizationClient.builder()
                 .id(UUID.randomUUID().toString())
@@ -677,6 +690,196 @@ class AuthorizationServerTest {
 
         }
 
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @TestMethodOrder(OrderAnnotation.class)
+    class AuthorizationByPKCE {
+
+        private String accessToken;
+
+        private String xAuthToken;
+
+        private String username;
+
+        private String code;
+
+        private String state;
+
+        private String codeVerifier;
+
+        @BeforeAll
+        void username() {
+
+            username = "jean.dupond@gmail.com";
+        }
+
+        @Test
+        @Order(0)
+        void credentials() throws ParseException {
+
+            // Given client credentials
+
+            Map<String, String> params = Map.of("grant_type", "client_credentials", "scope", "ROLE_APP");
+
+            // When perform get access token
+
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/token");
+
+            // Then check response
+
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
+
+            accessToken = response.jsonPath().getString("access_token");
+
+            // And check token
+
+            var payload = SignedJWT.parse(accessToken).getJWTClaimsSet();
+            assertAll(
+                    () -> assertThat(payload.getClaim("client_id")).isEqualTo("test"),
+                    () -> assertThat(payload.getStringListClaim("scope")).contains("ROLE_APP"));
+
+        }
+
+        @Test
+        @Order(1)
+        void login() {
+
+            // Given mock login resource
+
+            LoginEntity account = new LoginEntity();
+            account.setUsername(username);
+            account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
+
+            Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+
+            // When perform login
+
+            Response response = requestSpecification.header("Authorization", "Bearer " + accessToken)
+                    .formParams("username", username, "password", "123")
+                    .post(restTemplate.getRootUri() + "/login");
+
+            // Then check response
+
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
+                    () -> assertThat(response.getHeader("X-Auth-Token")).isNotNull(),
+                    () -> assertThat(response.getCookies()).isEmpty());
+
+            xAuthToken = response.getHeader("X-Auth-Token");
+
+        }
+
+        @Test
+        @Order(2)
+        void authorize() {
+
+            // setup code verifier
+            codeVerifier = UUID.randomUUID().toString();
+
+            var digest = DigestUtils.sha256(codeVerifier);
+            var codeChallenge = Base64.encodeBase64URLSafeString(digest);
+
+            // When perform authorize
+
+            String authorizeUrl = restTemplate.getRootUri()
+                    + "/oauth/authorize?response_type=code&client_id=test_user_pkce&scope=account:read&state=123&code_challenge="
+                    + codeChallenge
+                    + "&code_challenge_method=S256";
+            Response response = requestSpecification.when().redirects().follow(false).header("X-Auth-Token", xAuthToken).get(authorizeUrl);
+
+            // Then check response
+
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
+                    () -> assertThat(response.getHeader(HttpHeaders.LOCATION)).isNotNull());
+
+            String location = response.getHeader(HttpHeaders.LOCATION);
+
+            // And check location
+
+            Matcher locationMatcher = LOCATION.matcher(location);
+            assertThat(locationMatcher.lookingAt()).isTrue();
+
+            code = locationMatcher.group(1);
+            state = locationMatcher.group(3);
+
+            // And check state
+
+            assertThat(state).isEqualTo("123");
+
+        }
+
+        @Test
+        @Order(3)
+        void token() throws ParseException {
+
+            // When perform get access token
+
+            Map<String, String> params = Map.of(
+                    "grant_type", "authorization_code",
+                    "code", code,
+                    "code_verifier", codeVerifier,
+                    "client_id", "test_user_pkce",
+                    "redirect_uri", "/ws/test");
+
+            Response response = requestSpecification
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/token");
+
+            // Then check response
+
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
+
+            accessToken = response.jsonPath().getString("access_token");
+
+            // And check token
+
+            var payload = SignedJWT.parse(accessToken).getJWTClaimsSet();
+            assertAll(
+                    () -> assertThat(payload.getJWTID()).isNotNull(),
+                    () -> assertThat(payload.getClaim("client_id")).isEqualTo("test_user_pkce"),
+                    () -> assertThat(payload.getSubject()).isEqualTo(username),
+                    () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_ACCOUNT"),
+                    () -> assertThat(payload.getStringListClaim("scope")).contains("account:read"));
+        }
+
+        @Test
+        @Order(4)
+        void checkToken() throws ParseException {
+
+            // When perform check token
+
+            Map<String, String> params = Map.of("token", accessToken);
+
+            Response response = requestSpecification
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .formParams(params)
+                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+
+            // Then check response
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
+            // And check payload
+
+            var payload = JWTClaimsSet.parse(response.getBody().print());
+
+            assertAll(
+                    () -> assertThat(payload.getJWTID()).isNotNull(),
+                    () -> assertThat(payload.getSubject()).isEqualTo(username),
+                    () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_ACCOUNT"),
+                    () -> assertThat(payload.getStringClaim("scope")).isEqualTo("account:read"));
+
+        }
     }
 
     @Nested
