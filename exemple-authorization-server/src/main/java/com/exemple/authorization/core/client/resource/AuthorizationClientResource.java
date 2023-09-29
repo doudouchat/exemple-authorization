@@ -1,6 +1,5 @@
 package com.exemple.authorization.core.client.resource;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import org.apache.curator.framework.CuratorFramework;
@@ -54,7 +53,7 @@ public class AuthorizationClientResource {
 
     private PersistentNode createAuthorization(String clientId, JsonNode data) {
 
-        var node = new PersistentNode(client, CreateMode.PERSISTENT, false, "/" + clientId, data.toString().getBytes(StandardCharsets.UTF_8));
+        var node = new PersistentNode(client, CreateMode.PERSISTENT, false, "/" + clientId, data.toString().getBytes());
         node.start();
 
         return node;

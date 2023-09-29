@@ -3,7 +3,6 @@ package com.exemple.authorization.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
@@ -242,7 +241,7 @@ class AuthorizationServerTest {
                 // When perform get access token
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -337,7 +336,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "/ws/test");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -374,7 +373,7 @@ class AuthorizationServerTest {
                         "refresh_token", refreshToken);
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -410,7 +409,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "/ws/test");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -431,7 +430,7 @@ class AuthorizationServerTest {
                 Map<String, String> params = Map.of("token", accessToken);
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -487,7 +486,7 @@ class AuthorizationServerTest {
                 // When perform get access token
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -574,7 +573,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "/ws/test");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -611,7 +610,7 @@ class AuthorizationServerTest {
                         "refresh_token", refreshToken);
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -647,7 +646,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "/ws/test");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -668,7 +667,7 @@ class AuthorizationServerTest {
                 Map<String, String> params = Map.of("token", accessToken);
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -726,7 +725,7 @@ class AuthorizationServerTest {
             // When perform get access token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -861,7 +860,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken);
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -900,7 +899,7 @@ class AuthorizationServerTest {
             // When perform get access token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -941,7 +940,7 @@ class AuthorizationServerTest {
             // When perform get access token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String((login + ":" + password).getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String((login + ":" + password).getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -962,7 +961,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken);
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -1012,7 +1011,7 @@ class AuthorizationServerTest {
             // When perform get access token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -1094,7 +1093,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken);
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -1158,7 +1157,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "xxx");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -1183,7 +1182,7 @@ class AuthorizationServerTest {
                 Map<String, String> params = Map.of("token", accessToken);
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -1222,7 +1221,7 @@ class AuthorizationServerTest {
                         "refresh_token", refreshToken);
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -1274,7 +1273,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "xxx");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -1309,7 +1308,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "http://xxx");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -1336,7 +1335,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "http://xxx");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/token");
 
@@ -1356,7 +1355,7 @@ class AuthorizationServerTest {
                 Map<String, String> params = Map.of("token", accessToken);
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                         .formParams(params)
                         .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -1800,7 +1799,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken.serialize());
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -1834,7 +1833,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken.serialize());
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -1869,7 +1868,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken.serialize());
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -1902,7 +1901,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken.serialize());
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -1949,7 +1948,7 @@ class AuthorizationServerTest {
             // When perform revoke token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/revoke_token");
 
@@ -1960,7 +1959,7 @@ class AuthorizationServerTest {
             // And check token
 
             Response checkResponse = RestAssured.given().filters(new LoggingFilter(LOG))
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -1992,7 +1991,7 @@ class AuthorizationServerTest {
             // When perform revoke token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/revoke_token");
 
@@ -2003,7 +2002,7 @@ class AuthorizationServerTest {
             // And check token
 
             Response checkResponse = RestAssured.given().filters(new LoggingFilter(LOG))
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/check_token");
 
@@ -2048,7 +2047,8 @@ class AuthorizationServerTest {
             // When perform revoke token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret"
+                            .getBytes()))
                     .formParams(params)
                     .post(restTemplate.getRootUri() + "/oauth/revoke_token");
 

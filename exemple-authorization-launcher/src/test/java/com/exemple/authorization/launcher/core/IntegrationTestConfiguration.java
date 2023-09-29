@@ -1,7 +1,7 @@
 package com.exemple.authorization.launcher.core;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -173,7 +173,7 @@ public class IntegrationTestConfiguration {
 
     @SneakyThrows
     private static String[] splitScript(Resource script) {
-        return script.getContentAsString(StandardCharsets.UTF_8).trim().split(";");
+        return script.getContentAsString(Charset.defaultCharset()).trim().split(";");
     }
 
 }
