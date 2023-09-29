@@ -3,7 +3,6 @@ package com.exemple.authorization.launcher.token;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,7 +37,7 @@ public class AuthorizationStepDefinitions {
                 "scope", scope);
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String((client + ":secret").getBytes(StandardCharsets.UTF_8)))
+                .header("Authorization", "Basic " + Base64.encodeBase64String((client + ":secret").getBytes()))
                 .formParams(params).post("/oauth/token");
 
         assertAll(
@@ -61,7 +60,7 @@ public class AuthorizationStepDefinitions {
                 "redirect_uri", "http://xxx");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                 .formParams(params)
                 .post("/oauth/token");
 
@@ -85,7 +84,7 @@ public class AuthorizationStepDefinitions {
                 "redirect_uri", "http://xxx");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                 .formParams(params)
                 .post("/oauth/token");
 
@@ -104,7 +103,7 @@ public class AuthorizationStepDefinitions {
                 "redirect_uri", "http://xxx");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                 .formParams(params)
                 .post("/oauth/token");
 
@@ -123,7 +122,7 @@ public class AuthorizationStepDefinitions {
                 "redirect_uri", "http://xxx");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("back_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .header("Authorization", "Basic " + Base64.encodeBase64String("back_user:secret".getBytes()))
                 .formParams(params)
                 .post("/oauth/token");
 
@@ -244,7 +243,7 @@ public class AuthorizationStepDefinitions {
                 "redirect_uri", "/ws/test");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                 .formParams(params)
                 .post("/oauth/token");
 
@@ -268,7 +267,7 @@ public class AuthorizationStepDefinitions {
                 "refresh_token", refreshToken);
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes(StandardCharsets.UTF_8)))
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                 .formParams(params)
                 .post("/oauth/token");
 

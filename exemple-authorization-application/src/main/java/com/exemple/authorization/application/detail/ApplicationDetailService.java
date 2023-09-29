@@ -1,6 +1,5 @@
 package com.exemple.authorization.application.detail;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import org.apache.curator.framework.CuratorFramework;
@@ -58,7 +57,7 @@ public class ApplicationDetailService {
 
     private PersistentNode createDetail(String application, JsonNode detail) {
 
-        var node = new PersistentNode(client, CreateMode.PERSISTENT, false, "/" + application, detail.toString().getBytes(StandardCharsets.UTF_8));
+        var node = new PersistentNode(client, CreateMode.PERSISTENT, false, "/" + application, detail.toString().getBytes());
         node.start();
 
         return node;
