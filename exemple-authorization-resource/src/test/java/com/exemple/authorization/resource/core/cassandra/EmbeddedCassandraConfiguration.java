@@ -21,7 +21,7 @@ public class EmbeddedCassandraConfiguration {
     @ServiceConnection
     public CassandraContainer<?> embeddedServer(EmbeddedCassandraConfigurationProperties properties) {
 
-        return new CassandraContainer<>("cassandra:" + properties.getVersion())
+        return new CassandraContainer<>("cassandra:" + properties.version())
                 .withExposedPorts(9042)
                 .waitingFor(Wait.forLogMessage(".*Startup complete.*\\n", 1))
                 .withLogConsumer(new Slf4jLogConsumer(LOG));
