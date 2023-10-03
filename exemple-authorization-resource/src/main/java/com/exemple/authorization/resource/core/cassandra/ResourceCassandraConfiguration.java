@@ -22,7 +22,7 @@ public class ResourceCassandraConfiguration {
     public ResourceCassandraConfiguration(
             ResourceConfigurationProperties resourceProperties)
             throws FileNotFoundException {
-        this.cassandraResource = ResourceUtils.getFile(resourceProperties.getCassandra().getResourceConfiguration());
+        this.cassandraResource = ResourceUtils.getFile(resourceProperties.cassandra().resourceConfiguration());
     }
 
     @Bean

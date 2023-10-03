@@ -42,7 +42,7 @@ public class AccessTokenBuilder {
         var applicationDetail = applicationDetailService.get(app).orElseThrow(() -> new NotFoundApplicationException(app));
 
         var expiresAt = Date.from(Instant.now(clock)
-                .plus(ObjectUtils.defaultIfNull(applicationDetail.getExpiryTimePassword(), passwordProperties.getExpiryTime()),
+                .plus(ObjectUtils.defaultIfNull(applicationDetail.getExpiryTimePassword(), passwordProperties.expiryTime()),
                         ChronoUnit.SECONDS));
 
         var payload = new JWTClaimsSet.Builder()

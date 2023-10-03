@@ -24,10 +24,10 @@ public class ApplicationConfiguration {
     public CuratorFramework applicationCuratorFramework() {
 
         var client = CuratorFrameworkFactory.newClient(
-                applicationProperties.getZookeeper().getHost(),
-                applicationProperties.getZookeeper().getSessionTimeout(),
-                applicationProperties.getZookeeper().getConnectionTimeout(),
-                new RetryNTimes(applicationProperties.getZookeeper().getRetry(), applicationProperties.getZookeeper().getSleepMsBetweenRetries()));
+                applicationProperties.zookeeper().host(),
+                applicationProperties.zookeeper().sessionTimeout(),
+                applicationProperties.zookeeper().connectionTimeout(),
+                new RetryNTimes(applicationProperties.zookeeper().retry(), applicationProperties.zookeeper().sleepMsBetweenRetries()));
 
         client.getConnectionStateListenable().addListener((c, state) -> LOG.debug("State changed to: {}", state));
 
