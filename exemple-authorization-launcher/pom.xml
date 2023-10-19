@@ -328,7 +328,7 @@
 											<build>
 												<dockerFile>${basedir}/../Dockerfile</dockerFile>
 												<args>
-													<VERSION_TOMCAT>${tomcat.version}-jdk21-openjdk</VERSION_TOMCAT>
+													<VERSION_TOMCAT>${tomcat.version}-jdk21</VERSION_TOMCAT>
 												</args>
 											</build>
 										</image>
