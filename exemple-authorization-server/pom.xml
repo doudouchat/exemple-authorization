@@ -41,7 +41,7 @@
 		</dependency>
 
 		<!-- SPRING BOOT -->
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -144,6 +144,7 @@
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- AWAITILITY -->
