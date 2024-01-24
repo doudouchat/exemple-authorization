@@ -19,24 +19,14 @@
 
 		<dependencies>
 
-			<dependency>
-				<groupId>io.cucumber</groupId>
-				<artifactId>cucumber-java</artifactId>
-				<version>7.15.0</version>
-				<scope>test</scope>
-			</dependency>
+			<!-- CUCUMBER -->
 
 			<dependency>
 				<groupId>io.cucumber</groupId>
-				<artifactId>cucumber-spring</artifactId>
+				<artifactId>cucumber-bom</artifactId>
 				<version>7.15.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>io.cucumber</groupId>
-				<artifactId>cucumber-junit-platform-engine</artifactId>
-				<version>7.15.0</version>
-				<scope>test</scope>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 		</dependencies>
