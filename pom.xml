@@ -49,7 +49,7 @@
 
 		<!-- VERSION -->
 		<cassandra-version>4.1.3</cassandra-version>
-		<jacoco-version>0.8.9</jacoco-version>
+		<jacoco-version>0.8.11</jacoco-version>
 
 		<!-- SONAR -->
 		<sonar.coverage.exclusions>**/test/**/*.java</sonar.coverage.exclusions>
