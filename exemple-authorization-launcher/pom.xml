@@ -154,7 +154,7 @@
 				<plugin>
 					<groupId>io.fabric8</groupId>
 					<artifactId>docker-maven-plugin</artifactId>
-					<version>0.42.0</version>
+					<version>0.44.0</version>
 				</plugin>
 
 				<!-- TEST INTEGRATION -->
@@ -195,6 +195,11 @@
 
 		<profile>
 			<id>authorization</id>
+
+			<properties>
+				<docker.buildArg.VERSION_TOMCAT>${tomcat.version}-jdk21</docker.buildArg.VERSION_TOMCAT>
+				<docker.buildArg.VERSION_OPENJDK>${maven.compiler.target}-jdk-buster</docker.buildArg.VERSION_OPENJDK>
+			</properties>
 
 			<dependencies>
 
@@ -311,9 +316,6 @@
 											<name>exemple-authorization</name>
 											<build>
 												<dockerFile>${basedir}/../Dockerfile</dockerFile>
-												<args>
-													<VERSION_TOMCAT>${tomcat.version}-jdk21</VERSION_TOMCAT>
-												</args>
 											</build>
 										</image>
 									</images>
@@ -331,9 +333,6 @@
 											<name>exemple-resource-test</name>
 											<build>
 												<dockerFile>${project.parent.basedir}/exemple-authorization-integration-resource/Dockerfile</dockerFile>
-												<args>
-													<VERSION_OPENJDK>${maven.compiler.target}-jdk-buster</VERSION_OPENJDK>
-												</args>
 											</build>
 										</image>
 									</images>
