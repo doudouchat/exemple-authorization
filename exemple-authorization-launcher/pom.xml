@@ -8,13 +8,6 @@
 	<artifactId>exemple-authorization-launcher</artifactId>
 	<packaging>war</packaging>
 
-	<properties>
-
-		<!-- SONAR -->
-		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
-
-	</properties>
-
 	<dependencyManagement>
 
 		<dependencies>

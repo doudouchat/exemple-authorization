@@ -22,7 +22,6 @@
 		<module>exemple-authorization-api</module>
 		<module>exemple-authorization-launcher</module>
 		<module>exemple-authorization-integration-resource</module>
-		<module>jacoco-report</module>
 	</modules>
 
 	<scm>
