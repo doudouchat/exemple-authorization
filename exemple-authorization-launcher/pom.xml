@@ -537,7 +537,7 @@
 														<method>GET</method>
 														<status>200</status>
 													</http>
-													<time>60000</time>
+													<time>90000</time>
 												</wait>
 												<log>
 													<date>default</date>
