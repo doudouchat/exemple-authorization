@@ -375,7 +375,7 @@
 								<configuration>
 									<images>
 										<image>
-											<name>zookeeper:3.9.0</name>
+											<name>zookeeper:3.9.2</name>
 											<alias>zookeeper</alias>
 											<run>
 												<ports>
