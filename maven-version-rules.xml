@@ -4,11 +4,4 @@
 		<ignoreVersion type="regex">(?i).*redhat(?:-?\d+)?</ignoreVersion>
 		<ignoreVersion type="regex">(?i).*(alpha|beta|RC|M)(?:.?-?\d+)?</ignoreVersion>
 	</ignoreVersions>
-	<rules>
-		<rule groupId="org.apache.tomcat" comparisonMethod="maven">
-			<ignoreVersions>
-				<ignoreVersion type="regex">10.(.*)</ignoreVersion>
-			</ignoreVersions>
-		</rule>
-	</rules>
 </ruleset>
