@@ -198,7 +198,7 @@
 
 			<properties>
 				<docker.buildArg.VERSION_TOMCAT>${tomcat.version}-jdk21</docker.buildArg.VERSION_TOMCAT>
-				<docker.buildArg.VERSION_OPENJDK>${maven.compiler.target}-jdk-buster</docker.buildArg.VERSION_OPENJDK>
+				<docker.buildArg.VERSION_OPENJDK>${maven.compiler.target}-jdk</docker.buildArg.VERSION_OPENJDK>
 			</properties>
 
 			<dependencies>
