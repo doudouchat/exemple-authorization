@@ -1,4 +1,4 @@
-ARG VERSION_TOMCAT
+ARG VERSION_TOMCAT=latest
 FROM tomcat:$VERSION_TOMCAT
 LABEL maintener=EXEMPLE
 COPY exemple-authorization-launcher/target/*.war /usr/local/tomcat/webapps/ExempleAuthorization.war
