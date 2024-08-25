@@ -15,8 +15,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.OAuth2TokenIntrospectionClaimNames;
-import org.springframework.security.oauth2.server.resource.introspection.NimbusOpaqueTokenIntrospector;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
+import org.springframework.security.oauth2.server.resource.introspection.SpringOpaqueTokenIntrospector;
 import org.springframework.security.web.SecurityFilterChain;
 
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -49,7 +49,7 @@ public class TestSecurityConfiguration {
         private final OpaqueTokenIntrospector delegate;
 
         public CustomAuthoritiesOpaqueTokenIntrospector(String introspectionUri, String clientId, String clientSecret) {
-            delegate = new NimbusOpaqueTokenIntrospector(introspectionUri, clientId, clientSecret);
+            delegate = new SpringOpaqueTokenIntrospector(introspectionUri, clientId, clientSecret);
         }
 
         public OAuth2AuthenticatedPrincipal introspect(String token) {

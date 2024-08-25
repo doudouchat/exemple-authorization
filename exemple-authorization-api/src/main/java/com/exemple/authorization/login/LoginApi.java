@@ -26,10 +26,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.HEAD;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -53,17 +55,16 @@ public class LoginApi {
     private ContainerRequestContext servletContext;
 
     @HEAD
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{username}")
     @Operation(tags = "login")
     @RolesAllowed("login:head")
-    public Response check(@NotBlank @PathParam("username") String username) {
+    public void check(@NotBlank @PathParam("username") String username) {
 
-        if (loginResource.get(username).isPresent()) {
+        if (loginResource.get(username).isEmpty()) {
 
-            return Response.status(Status.NO_CONTENT).build();
+            throw new NotFoundException();
         }
-
-        return Response.status(Status.NOT_FOUND).build();
 
     }
 
@@ -95,7 +96,7 @@ public class LoginApi {
 
             loginResource.update(entity);
 
-            response = Response.status(Status.NO_CONTENT).build();
+            response = Response.noContent().build();
 
         } else {
 

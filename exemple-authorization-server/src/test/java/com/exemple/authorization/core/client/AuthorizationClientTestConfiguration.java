@@ -1,27 +1,21 @@
 package com.exemple.authorization.core.client;
 
-import org.apache.curator.test.TestingServer;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.util.Assert;
+import org.springframework.test.context.DynamicPropertyRegistrar;
+import org.testcontainers.containers.GenericContainer;
 
 import com.exemple.authorization.core.client.resource.AuthorizationClientResourceConfiguration;
+import com.exemple.authorization.core.zookeeper.EmbeddedZookeeperConfiguration;
 
 @Configuration
-@Import(AuthorizationClientResourceConfiguration.class)
+@Import({ AuthorizationClientResourceConfiguration.class, EmbeddedZookeeperConfiguration.class })
 public class AuthorizationClientTestConfiguration {
 
-    @Value("${authorization.zookeeper.port}")
-    private int port;
-
-    @Bean(destroyMethod = "close")
-    public TestingServer embeddedZookeeper() throws Exception {
-
-        Assert.isTrue(port != 0, "Port must be required");
-
-        return new TestingServer(port, true);
+    @Bean
+    public DynamicPropertyRegistrar applicationProperties(GenericContainer<?> embeddedZookeeper) {
+        return registry -> registry.add("authorization.zookeeper.host", () -> "127.0.0.1:" + embeddedZookeeper.getMappedPort(2181));
     }
 
 }

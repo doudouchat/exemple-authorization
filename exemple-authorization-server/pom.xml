@@ -110,12 +110,6 @@
 			<artifactId>curator-recipes</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- COMMONS APACHE -->
 
 		<dependency>
@@ -144,6 +138,14 @@
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- TEST CONTAINER -->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-testcontainers</artifactId>
 			<scope>test</scope>
 		</dependency>
 
