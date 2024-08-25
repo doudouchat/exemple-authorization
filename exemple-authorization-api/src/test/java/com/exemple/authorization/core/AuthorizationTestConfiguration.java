@@ -39,8 +39,6 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 
-import kafka.server.KafkaConfig;
-
 @Configuration
 @Import({ ApiConfiguration.class, FeatureTestConfiguration.class })
 @ComponentScan(basePackageClasses = ApiResourceKeyspace.class)
@@ -87,8 +85,8 @@ public class AuthorizationTestConfiguration {
     @Bean
     public EmbeddedKafkaBroker embeddedKafka() {
 
-        var embeddedKafka = new EmbeddedKafkaZKBroker(1, true, "new_password").brokerProperty(KafkaConfig.LogDirsProp(),
-                logDir + "/" + UUID.randomUUID());
+        var embeddedKafka = new EmbeddedKafkaZKBroker(1, true, "new_password")
+                .brokerProperty("log.dirs",logDir + "/" + UUID.randomUUID());
         embeddedKafka.kafkaPorts(kafkaPort);
 
         return embeddedKafka;

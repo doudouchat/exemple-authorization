@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.testcontainers.containers.CassandraContainer;
+import org.testcontainers.cassandra.CassandraContainer;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
@@ -16,7 +16,7 @@ import com.exemple.authorization.resource.core.cassandra.EmbeddedCassandraConfig
 public class ResourceTestConfiguration {
 
     @Autowired
-    private CassandraContainer<?> cassandraContainer;
+    private CassandraContainer cassandraContainer;
 
     @Bean
     @Primary

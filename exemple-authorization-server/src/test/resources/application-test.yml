@@ -8,8 +8,6 @@ logging:
       org.apache.zookeeper: INFO
 authorization:
    zookeeper:
-      host: 127.0.0.1:${zmp.clientPort}
-      port: ${zmp.clientPort}
       sessionTimeout: 30000
       connectionTimeout: 10000
       retry: 3
@@ -19,3 +17,5 @@ authorization:
 spring:
    hazelcast:
       config: file:${project.build.testOutputDirectory}/hazelcast.yaml
+zookeeper:
+   version: ${zookeeper.version}
