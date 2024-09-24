@@ -3,6 +3,9 @@ on:
 - push
 - pull_request
 - workflow_dispatch
+concurrency:
+  group: ${{ github.repository }}
+  cancel-in-progress: false
 env:
    MAVEN_OPTS: -Xmx1g
 jobs:
