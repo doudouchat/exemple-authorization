@@ -108,7 +108,7 @@ class AuthorizationServerTest {
     }
 
     @BeforeAll
-    void init() throws Exception {
+    void init() {
 
         var secret = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
 
@@ -922,7 +922,7 @@ class AuthorizationServerTest {
 
         }
 
-        private Stream<Arguments> credentialsFailure() {
+        Stream<Arguments> credentialsFailure() {
 
             return Stream.of(
                     // bad password
@@ -1234,7 +1234,7 @@ class AuthorizationServerTest {
                         () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
             }
 
-            private Stream<Arguments> passwordFailure() {
+            Stream<Arguments> passwordFailure() {
 
                 LoginEntity account1 = new LoginEntity();
                 account1.setUsername("jean.dupond@gmail.com");
@@ -2014,7 +2014,7 @@ class AuthorizationServerTest {
 
         }
 
-        private static Stream<Arguments> revokeJwtTokenFailure() {
+        static Stream<Arguments> revokeJwtTokenFailure() {
 
             var payloadWithoutId = new JWTClaimsSet.Builder()
                     .claim("client_id", "test_user")

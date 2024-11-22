@@ -5,7 +5,6 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.security.interfaces.RSAPublicKey;
-import java.text.ParseException;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.Map;
@@ -166,16 +165,16 @@ class NewPasswordApiTest {
 
             ConsumerRecords<String, Map<String, Object>> records = this.consumerKafka.poll(Duration.ofSeconds(1));
             await().untilAsserted(() -> assertThat(records).hasSize(1));
-            ConsumerRecord<String, Map<String, Object>> record = records.iterator().next();
-            assertThat(record.value()).hasFieldOrProperty("token");
+            ConsumerRecord<String, Map<String, Object>> event = records.iterator().next();
+            assertThat(event.value()).hasFieldOrProperty("token");
 
-            token = (String) record.value().get("token");
+            token = (String) event.value().get("token");
 
         }
 
         @Order(1)
         @Test
-        void checkToken() throws ParseException {
+        void checkToken() {
 
             // When decode token
 
