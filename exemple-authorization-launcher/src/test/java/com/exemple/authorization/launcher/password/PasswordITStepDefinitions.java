@@ -61,7 +61,7 @@ public class PasswordITStepDefinitions {
     }
 
     @And("get password token")
-    public void getAccessToken() throws InterruptedException {
+    public void getAccessToken() {
 
         ConsumerRecords<String, Map<String, Object>> records = consumerNewPassword.poll(Duration.ofSeconds(20));
 

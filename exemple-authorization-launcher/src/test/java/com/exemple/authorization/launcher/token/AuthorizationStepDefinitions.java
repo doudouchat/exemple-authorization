@@ -166,13 +166,7 @@ public class AuthorizationStepDefinitions {
     @Given("login to {string} and password {string} is unauthorized")
     public void loginIsUnauthorized(String username, String password) {
 
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("App", "test")
-                .header("Authorization", "Bearer " + context.getAccessToken())
-                .formParams("username", username, "password", password)
-                .post("/login");
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        loginIsBad(username, password);
 
     }
 
