@@ -49,9 +49,9 @@
 		<maven.compiler.target>21</maven.compiler.target>
 
 		<!-- VERSION -->
-		<cassandra-version>5.0.2</cassandra-version>
-		<zookeeper-version>3.9.3</zookeeper-version>
-		<jacoco-version>0.8.12</jacoco-version>
+		<cassandra.version>5.0.2</cassandra.version>
+		<zookeeper.version>3.9.3</zookeeper.version>
+		<jacoco.version>0.8.12</jacoco.version>
 
 		<!-- SONAR -->
 		<sonar.coverage.exclusions>**/test/**/*.java</sonar.coverage.exclusions>
@@ -232,7 +232,7 @@
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>${jacoco-version}</version>
+					<version>${jacoco.version}</version>
 					<executions>
 						<execution>
 							<id>prepare-jacoco-ut-agent</id>

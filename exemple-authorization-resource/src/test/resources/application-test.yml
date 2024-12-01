@@ -8,7 +8,7 @@ logging:
 authorization:
    resource:
       cassandra:
-         version: ${cassandra-version}
+         version: ${cassandra.version}
          resource_configuration: classpath:cassandra.conf
 spring:
    main:
