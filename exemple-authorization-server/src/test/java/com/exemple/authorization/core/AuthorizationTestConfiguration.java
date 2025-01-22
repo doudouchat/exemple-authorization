@@ -71,7 +71,7 @@ public class AuthorizationTestConfiguration {
     public OAuth2Resource OAuth2Resource() {
         Map<String, OAuth2Entity> authorizations = new ConcurrentHashMap<>();
 
-        return new OAuth2Resource(null) {
+        return new OAuth2Resource(null, null) {
 
             @Override
             public void save(OAuth2Entity oauth2) {
