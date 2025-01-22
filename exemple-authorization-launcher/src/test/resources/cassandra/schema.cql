@@ -41,7 +41,14 @@ CREATE TABLE IF NOT EXISTS main.oauth2 (
 	refresh_token_metadata text
 );
 
-CREATE INDEX IF NOT EXISTS oauth2_authorization_code ON main.oauth2 ( authorization_code_value );
+CREATE TABLE IF NOT EXISTS main.access_token ( 
+	authorization_code_value text,
+	oauth2_id text,
+	PRIMARY KEY (authorization_code_value)
+);
 
-CREATE INDEX IF NOT EXISTS oauth2_refresh_token ON main.oauth2 ( refresh_token_value );
-	
+CREATE TABLE IF NOT EXISTS main.refresh_token ( 
+	refresh_token_value text,
+	oauth2_id text,
+	PRIMARY KEY (refresh_token_value)
+);
