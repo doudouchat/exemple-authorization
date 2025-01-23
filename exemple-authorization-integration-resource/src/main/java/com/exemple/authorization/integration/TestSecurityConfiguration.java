@@ -49,7 +49,7 @@ public class TestSecurityConfiguration {
         private final OpaqueTokenIntrospector delegate;
 
         public CustomAuthoritiesOpaqueTokenIntrospector(String introspectionUri, String clientId, String clientSecret) {
-            delegate = new SpringOpaqueTokenIntrospector(introspectionUri, clientId, clientSecret);
+            delegate = SpringOpaqueTokenIntrospector.withIntrospectionUri(introspectionUri).clientId(clientId).clientSecret(clientSecret).build();
         }
 
         public OAuth2AuthenticatedPrincipal introspect(String token) {
