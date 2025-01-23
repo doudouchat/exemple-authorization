@@ -27,7 +27,7 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Refr
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.exemple.authorization.core.client.AuthorizationClientRepository;
@@ -64,7 +64,7 @@ public class AuthorizationConfiguration {
         http
                 .securityMatcher(endpointsMatcher)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
+                        .requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/**")).permitAll())
                 .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
                 .with(authorizationServerConfigurer, Customizer.withDefaults());
 

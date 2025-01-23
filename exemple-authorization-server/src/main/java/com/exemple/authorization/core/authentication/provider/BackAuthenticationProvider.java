@@ -12,18 +12,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
-
 @Component
 public class BackAuthenticationProvider extends DaoAuthenticationProvider {
 
-    private final Map<String, UserDetails> users;
+    private static final Map<String, UserDetails> USERS;
 
-    public BackAuthenticationProvider() {
+    static {
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-        users = Map.of("admin",
+        USERS = Map.of("admin",
                 User.builder()
                         .username("admin")
                         .password("{bcrypt}" + passwordEncoder.encode("admin123"))
@@ -31,20 +28,16 @@ public class BackAuthenticationProvider extends DaoAuthenticationProvider {
                         .build());
     }
 
-    @PostConstruct
-    protected void init() {
+    public BackAuthenticationProvider() {
 
-        this.setUserDetailsService((String username) -> {
-
-            UserDetails user = this.users.get(username);
-
+        super((String username) -> {
+            UserDetails user = USERS.get(username);
             if (user == null) {
-
                 throw new BadCredentialsException(username);
             }
-
             return User.withUserDetails(user).build();
         });
+
     }
 
     @Override

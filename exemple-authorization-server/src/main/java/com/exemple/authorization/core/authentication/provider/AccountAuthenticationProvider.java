@@ -7,19 +7,11 @@ import org.springframework.stereotype.Component;
 
 import com.exemple.authorization.core.authentication.account.AccountDetailsService;
 
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-
 @Component
-@RequiredArgsConstructor
 public class AccountAuthenticationProvider extends DaoAuthenticationProvider {
 
-    private final AccountDetailsService accountDetailsService;
-
-    @PostConstruct
-    protected void init() {
-
-        this.setUserDetailsService(accountDetailsService);
+    public AccountAuthenticationProvider(AccountDetailsService accountDetailsService) {
+        super(accountDetailsService);
     }
 
     @Override
