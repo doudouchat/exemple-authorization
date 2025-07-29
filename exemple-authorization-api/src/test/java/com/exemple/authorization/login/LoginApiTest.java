@@ -16,8 +16,9 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -26,8 +27,6 @@ import com.exemple.authorization.core.AuthorizationTestConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.login.exception.UsernameAlreadyExistsException;
 import com.exemple.authorization.resource.login.model.LoginEntity;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -40,16 +39,19 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
+@EmbeddedKafka(topics = "new_password", bootstrapServersProperty = "spring.kafka.bootstrap-servers")
 @ActiveProfiles("test")
 class LoginApiTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @LocalServerPort
+    protected int localPort;
 
     @Autowired
     private JWSSigner algorithm;
@@ -66,7 +68,7 @@ class LoginApiTest {
 
         Mockito.reset(loginResource);
 
-        requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG));
+        requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort);
 
     }
 
@@ -99,7 +101,7 @@ class LoginApiTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .head(restTemplate.getRootUri() + URL + "/" + username);
+                .head(URL + "/" + username);
 
         // Then check status
 
@@ -140,7 +142,7 @@ class LoginApiTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .head(restTemplate.getRootUri() + URL + "/" + username);
+                .head(URL + "/" + username);
 
         // Then check status
 
@@ -183,13 +185,13 @@ class LoginApiTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
+                .body(login).put(URL + "/" + username);
 
         // Then check response
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(response.getHeader("Location")).isEqualTo(URI.create(restTemplate.getRootUri() + URL + "/" + username).toString()));
+                () -> assertThat(response.getHeader("Location")).endsWith(URI.create(URL + "/" + username).toString()));
 
         // And check service
 
@@ -239,7 +241,7 @@ class LoginApiTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
+                .body(login).put(URL + "/" + username);
 
         // Then check status
 
@@ -300,7 +302,7 @@ class LoginApiTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
+                .body(login).put(URL + "/" + username);
 
         // Then check status
 
@@ -359,7 +361,7 @@ class LoginApiTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .body(login).put(restTemplate.getRootUri() + URL + "/" + username);
+                .body(login).put(URL + "/" + username);
 
         // Then check status
 
@@ -411,14 +413,14 @@ class LoginApiTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .body(login).post(restTemplate.getRootUri() + URL + "/move");
+                .body(login).post(URL + "/move");
 
         // Then check response
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(response.getHeader("Location"))
-                        .isEqualTo(URI.create(restTemplate.getRootUri() + URL + "/jean.dupont@gmail.com").toString()));
+                        .endsWith(URI.create(URL + "/jean.dupont@gmail.com").toString()));
 
         // And check service
 
@@ -476,7 +478,7 @@ class LoginApiTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .body(login).post(restTemplate.getRootUri() + URL + "/move");
+                .body(login).post(URL + "/move");
 
         // Then check status
 
@@ -532,7 +534,7 @@ class LoginApiTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .body(login).post(restTemplate.getRootUri() + URL + "/move");
+                .body(login).post(URL + "/move");
 
         // Then check status
 
@@ -585,7 +587,7 @@ class LoginApiTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .body(login).post(restTemplate.getRootUri() + URL + "/move");
+                .body(login).post(URL + "/move");
 
         // Then check status
 

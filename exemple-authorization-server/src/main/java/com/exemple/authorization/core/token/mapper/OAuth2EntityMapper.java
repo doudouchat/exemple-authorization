@@ -30,14 +30,13 @@ public class OAuth2EntityMapper {
 
     private final RegisteredClientRepository registeredClientRepository;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = new ObjectMapper();
 
     @PostConstruct
     public void initMapper() {
 
         var classLoader = Thread.currentThread().getContextClassLoader();
-        var securityModules = SecurityJackson2Modules.getModules(classLoader);
-        mapper.registerModules(securityModules);
+        mapper.registerModules(SecurityJackson2Modules.getModules(classLoader));
         mapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
     }
 
