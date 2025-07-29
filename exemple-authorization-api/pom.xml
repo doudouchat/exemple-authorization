@@ -9,9 +9,6 @@
 
 	<properties>
 
-		<!-- KAFKA -->
-		<kafka.broker.logs-dir>${project.build.directory}/kafka</kafka.broker.logs-dir>
-
 		<!-- SONAR -->
 		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
 
@@ -48,17 +45,24 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jersey</artifactId>
+			<artifactId>spring-boot-jersey</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -140,33 +144,7 @@
 						<configuration>
 							<portNames>
 								<portName>hazelcast.port</portName>
-								<portName>kafka.port</portName>
 							</portNames>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>delete_repertory_kafka</id>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<phase>test</phase>
-						<configuration>
-							<excludeDefaultDirectories>true</excludeDefaultDirectories>
-							<verbose>true</verbose>
-							<filesets>
-								<fileset>
-									<directory>${java.io.tmpdir}</directory>
-									<includes>
-										<include>kafka-*/**</include>
-									</includes>
-								</fileset>
-							</filesets>
 						</configuration>
 					</execution>
 				</executions>

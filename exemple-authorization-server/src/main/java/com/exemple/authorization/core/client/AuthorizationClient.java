@@ -37,6 +37,8 @@ public class AuthorizationClient {
 
     private final boolean requireAuthorizationConsent;
 
+    private final boolean requireProofKey;
+
     public RegisteredClient buildRegisteredClient() {
 
         var registeredClient = RegisteredClient.withId(this.id)
@@ -44,6 +46,7 @@ public class AuthorizationClient {
                 .clientSecret(this.clientSecret)
                 .clientSettings(ClientSettings.builder()
                         .requireAuthorizationConsent(this.isRequireAuthorizationConsent())
+                        .requireProofKey(requireProofKey)
                         .build());
 
         this.redirectUris.forEach(registeredClient::redirectUri);

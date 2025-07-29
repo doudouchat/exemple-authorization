@@ -58,8 +58,7 @@ public class AuthenticationConfiguration {
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
-            @Qualifier("hazelcastSession") HazelcastInstance sessionHazelcastInstance)
-            throws Exception {
+            @Qualifier("hazelcastSession") HazelcastInstance sessionHazelcastInstance) {
 
         var sessionStrategy = new RegisterSessionAuthenticationStrategy(
                 new SpringSessionBackedSessionRegistry<>(new HazelcastIndexedSessionRepository(sessionHazelcastInstance)));

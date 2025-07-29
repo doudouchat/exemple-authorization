@@ -5,10 +5,9 @@ import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -25,22 +24,22 @@ import lombok.extern.slf4j.Slf4j;
 @ActiveProfiles("test")
 class JwkSetApiTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @LocalServerPort
+    protected int localPort;
 
     private RequestSpecification requestSpecification;
 
     @BeforeEach
     void before() {
 
-        requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG));
+        requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort);
 
     }
 
     @Test
     void publicKeys() {
 
-        Response response = requestSpecification.get(restTemplate.getRootUri() + "/oauth/jwks");
+        Response response = requestSpecification.get("/oauth/jwks");
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK.value()));
         assertThat(response.jsonPath().get("keys[0].kid"), is("exemple-key-id"));
