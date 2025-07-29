@@ -11,12 +11,12 @@ import org.springframework.http.HttpStatus;
 import com.exemple.authorization.launcher.common.JsonRestTemplate;
 import com.exemple.authorization.launcher.core.IntegrationTestConfiguration;
 import com.exemple.authorization.launcher.token.AuthorizationTestContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class LoginITStepDefinitions {
 

@@ -24,7 +24,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class TestSecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) {
 
         http
                 .authorizeHttpRequests(authorize -> authorize

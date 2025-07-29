@@ -16,8 +16,9 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.authorization.AuthorizationJwtConfiguration;
@@ -47,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
+@EmbeddedKafka(topics = "new_password", bootstrapServersProperty = "spring.kafka.bootstrap-servers")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 class AuthorizationFeatureTest {
@@ -63,8 +65,8 @@ class AuthorizationFeatureTest {
 
     }
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @LocalServerPort
+    protected int localPort;
 
     @Autowired
     private JWSSigner algorithm;
@@ -85,7 +87,7 @@ class AuthorizationFeatureTest {
     @BeforeEach
     void before() {
 
-        requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG));
+        requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort);
         testFilter.context = null;
 
     }
@@ -117,7 +119,7 @@ class AuthorizationFeatureTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "test")
-                .get(restTemplate.getRootUri() + URL);
+                .get(URL);
 
         // Then check status
 
@@ -160,7 +162,7 @@ class AuthorizationFeatureTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "other")
-                .get(restTemplate.getRootUri() + URL);
+                .get(URL);
 
         // Then check status
 
@@ -202,7 +204,7 @@ class AuthorizationFeatureTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .get(restTemplate.getRootUri() + URL);
+                .get(URL);
 
         // Then check status
 
@@ -241,7 +243,7 @@ class AuthorizationFeatureTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "app")
-                .get(restTemplate.getRootUri() + URL);
+                .get(URL);
 
         // Then check status
 
@@ -281,7 +283,7 @@ class AuthorizationFeatureTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "clientId1")
-                .get(restTemplate.getRootUri() + URL);
+                .get(URL);
 
         // Then check status
 
@@ -305,7 +307,7 @@ class AuthorizationFeatureTest {
 
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("app", "clientId1")
-                .get(restTemplate.getRootUri() + URL);
+                .get(URL);
 
         // Then check status
 
@@ -339,7 +341,7 @@ class AuthorizationFeatureTest {
         Response response = requestSpecification.contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + accessToken.serialize())
                 .header("app", "clientId1")
-                .get(restTemplate.getRootUri() + URL);
+                .get(URL);
 
         // Then check status
 

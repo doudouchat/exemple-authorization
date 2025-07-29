@@ -2,14 +2,12 @@ package com.exemple.authorization.launcher.swagger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.exemple.authorization.launcher.common.JsonRestTemplate;
 import com.exemple.authorization.launcher.core.IntegrationTestConfiguration;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Transpose;
@@ -17,6 +15,8 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class SwaggerStepDefinitions {
 
@@ -35,10 +35,10 @@ public class SwaggerStepDefinitions {
     }
 
     @When("schema contains paths")
-    public void containsPath(@Transpose DataTable expectedPaths) throws IOException {
+    public void containsPath(@Transpose DataTable expectedPaths) {
 
-        Iterator<String> paths = MAPPER.readTree(context.getResponse().print()).get("paths").fieldNames();
-        assertThat(paths).toIterable().containsExactlyInAnyOrderElementsOf(expectedPaths.asList());
+        Iterator<JsonNode> paths = MAPPER.readTree(context.getResponse().print()).get("paths").iterator();
+        assertThat(paths).toIterable().map(JsonNode::stringValue).containsExactlyInAnyOrderElementsOf(expectedPaths.asList());
 
     }
 
