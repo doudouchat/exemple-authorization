@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Context unpackWAR='true' allowLinking='false' privileged='true'
-	swallowOutput='true' override='true' reloadable='true'>
+<Context>
 
 	<Environment name="spring.config.location"
 		type="java.lang.String"
