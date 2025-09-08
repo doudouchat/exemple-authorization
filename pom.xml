@@ -50,7 +50,7 @@
 
 		<!-- VERSION -->
 		<cassandra.version>5.0.5</cassandra.version>
-		<zookeeper.version>3.9.3</zookeeper.version>
+		<zookeeper.version>3.9.4</zookeeper.version>
 		<jacoco.version>0.8.12</jacoco.version>
 
 		<!-- SONAR -->
