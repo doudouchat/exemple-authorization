@@ -81,6 +81,7 @@
 		<dependency>
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-hazelcast</artifactId>
+			<version>4.0.0-M2</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.hazelcast</groupId>
@@ -139,6 +140,7 @@
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
 			<scope>test</scope>
+			<version>5.5.6</version>
 		</dependency>
 
 		<!-- TEST CONTAINER -->
