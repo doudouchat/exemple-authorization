@@ -357,6 +357,8 @@
 												</ports>
 												<env>
 													<JVM_OPTS>-Dcassandra.skip_wait_for_gossip_to_settle=0 -Dcassandra.initial_token=0</JVM_OPTS>
+													<HEAP_NEWSIZE>128M</HEAP_NEWSIZE>
+													<MAX_HEAP_SIZE>1024M</MAX_HEAP_SIZE>
 												</env>
 												<wait>
 													<log>(?s)Startup complete</log>
