@@ -30,11 +30,11 @@ import com.exemple.authorization.core.client.AuthorizationClient;
 import com.exemple.authorization.core.client.resource.AuthorizationClientResource;
 import com.exemple.authorization.core.client.resource.AuthorizationClientResourceConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @Import({ ResourceConfiguration.class, ApplicationConfiguration.class, AuthorizationClientResourceConfiguration.class })

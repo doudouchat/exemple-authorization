@@ -40,6 +40,13 @@
 			<artifactId>java-driver-mapper-runtime</artifactId>
 		</dependency>
 
+		<!-- TOOLS JACKSON -->
+
+		<dependency>
+			<groupId>tools.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
 		<!-- JARKATA ANNOTATION -->
 
 		<dependency>
