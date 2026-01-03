@@ -7,12 +7,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Null;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.extern.jackson.Jacksonized;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 @Getter
-@Jacksonized
+//TODO move to @Jacksonized
+@JsonDeserialize(builder = LoginModel.LoginModelBuilder.class)
 public class LoginModel {
 
     @Null
@@ -22,5 +24,9 @@ public class LoginModel {
     @NotBlank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final String password;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class LoginModelBuilder {
+    }
 
 }

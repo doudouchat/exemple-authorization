@@ -8,23 +8,20 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.EmbeddedKafkaZKBroker;
 
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
@@ -44,15 +41,6 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 @ComponentScan(basePackageClasses = ApiResourceKeyspace.class)
 @EnableAutoConfiguration
 public class AuthorizationTestConfiguration {
-
-    @Value("${authorization.kafka.bootstrap-servers}")
-    private String bootstrapServers;
-
-    @Value("${authorization.kafka.embedded.port}")
-    private int kafkaPort;
-
-    @Value("${authorization.kafka.embedded.dir}")
-    private String logDir;
 
     public static final RSAKey RSA_KEY;
 
@@ -83,22 +71,12 @@ public class AuthorizationTestConfiguration {
     }
 
     @Bean
-    public EmbeddedKafkaBroker embeddedKafka() {
-
-        var embeddedKafka = new EmbeddedKafkaZKBroker(1, true, "new_password")
-                .brokerProperty("log.dirs",logDir + "/" + UUID.randomUUID());
-        embeddedKafka.kafkaPorts(kafkaPort);
-
-        return embeddedKafka;
-    }
-
-    @Bean
-    public Consumer<?, ?> consumerKafka() {
+    public Consumer<?, ?> consumerKafka(EmbeddedKafkaBroker embeddedKafkaBroker) {
 
         Map<String, Object> configs = Map.of(
-                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, embeddedKafkaBroker.getBrokersAsString(),
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JacksonJsonDeserializer.class,
                 ConsumerConfig.GROUP_ID_CONFIG, "test");
         return new KafkaConsumer<>(configs);
 

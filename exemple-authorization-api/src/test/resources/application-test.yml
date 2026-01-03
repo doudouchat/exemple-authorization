@@ -11,10 +11,7 @@ authorization:
       alias: mytest
       password: mypass
    kafka:
-      bootstrap-servers: localhost:${kafka.port}
-      embedded:
-         dir: ${kafka.broker.logs-dir}
-         port: ${kafka.port}
+      bootstrap-servers: ${spring.embedded.kafka.brokers}
    password:
       expiryTime: 60
 spring:

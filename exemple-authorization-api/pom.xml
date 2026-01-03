@@ -9,9 +9,6 @@
 
 	<properties>
 
-		<!-- KAFKA -->
-		<kafka.broker.logs-dir>${project.build.directory}/kafka</kafka.broker.logs-dir>
-
 		<!-- SONAR -->
 		<sonar.coverage.jacoco.xmlReportPaths>${sonar.coverage.report.path}</sonar.coverage.jacoco.xmlReportPaths>
 
@@ -48,12 +45,13 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jersey</artifactId>
+			<artifactId>spring-boot-jersey</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.glassfish.jersey.media</groupId>
+					<artifactId>jersey-media-json-jackson</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -62,11 +60,30 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- SPRING SECURITY -->
 
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-oauth2-jose</artifactId>
+		</dependency>
+
+		<!-- TOOLS JACKSON -->
+
+		<dependency>
+			<groupId>tools.jackson.jakarta.rs</groupId>
+			<artifactId>jackson-jakarta-rs-json-provider</artifactId>
 		</dependency>
 
 		<!-- SWAGGER -->
@@ -139,33 +156,7 @@
 						<configuration>
 							<portNames>
 								<portName>hazelcast.port</portName>
-								<portName>kafka.port</portName>
 							</portNames>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>delete_repertory_kafka</id>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<phase>test</phase>
-						<configuration>
-							<excludeDefaultDirectories>true</excludeDefaultDirectories>
-							<verbose>true</verbose>
-							<filesets>
-								<fileset>
-									<directory>${java.io.tmpdir}</directory>
-									<includes>
-										<include>kafka-*/**</include>
-									</includes>
-								</fileset>
-							</filesets>
 						</configuration>
 					</execution>
 				</executions>

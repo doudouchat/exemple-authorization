@@ -1,7 +1,6 @@
 package com.exemple.authorization.launcher;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +21,7 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 
-@SpringBootApplication(exclude = CassandraAutoConfiguration.class)
+@SpringBootApplication
 @Import({ AuthorizationConfiguration.class,
         AuthenticationConfiguration.class,
         HazelcastHttpSessionConfiguration.class,

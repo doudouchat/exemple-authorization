@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-dependencies</artifactId>
-		<version>3.5.0</version>
+		<version>4.0.0</version>
 		<relativePath />
 	</parent>
 	<groupId>exemple</groupId>
@@ -68,7 +68,7 @@
 			<dependency>
 				<groupId>org.springdoc</groupId>
 				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-				<version>2.8.14</version>
+				<version>3.0.0</version>
 			</dependency>
 
 			<!-- CURATOR -->
@@ -78,6 +78,15 @@
 				<groupId>org.apache.curator</groupId>
 				<artifactId>curator-recipes</artifactId>
 				<version>5.9.0</version>
+			</dependency>
+
+			<!-- REST ASSURED -->
+
+			<dependency>
+				<groupId>io.rest-assured</groupId>
+				<artifactId>rest-assured</artifactId>
+				<version>6.0.0</version>
+				<scope>test</scope>
 			</dependency>
 
 		</dependencies>

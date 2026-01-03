@@ -3,11 +3,13 @@ package com.exemple.authorization.login.model;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.extern.jackson.Jacksonized;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 @Builder
 @Getter
-@Jacksonized
+//TODO move to @Jacksonized
+@JsonDeserialize(builder = CopyLoginModel.CopyLoginModelBuilder.class)
 public class CopyLoginModel {
 
     @NotBlank
@@ -15,5 +17,9 @@ public class CopyLoginModel {
 
     @NotBlank
     private final String fromUsername;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class CopyLoginModelBuilder {
+    }
 
 }

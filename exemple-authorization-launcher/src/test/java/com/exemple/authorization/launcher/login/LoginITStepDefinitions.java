@@ -2,7 +2,6 @@ package com.exemple.authorization.launcher.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +10,12 @@ import org.springframework.http.HttpStatus;
 import com.exemple.authorization.launcher.common.JsonRestTemplate;
 import com.exemple.authorization.launcher.core.IntegrationTestConfiguration;
 import com.exemple.authorization.launcher.token.AuthorizationTestContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class LoginITStepDefinitions {
 
@@ -66,7 +65,7 @@ public class LoginITStepDefinitions {
     }
 
     @And("change username from {string} to {string} fails because")
-    public void changeUsername(String fromUsername, String toUsername, JsonNode error) throws IOException {
+    public void changeUsername(String fromUsername, String toUsername, JsonNode error) {
 
         Map<String, Object> body = Map.of("toUsername", toUsername, "fromUsername", fromUsername);
 

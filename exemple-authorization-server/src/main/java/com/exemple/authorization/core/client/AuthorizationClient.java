@@ -10,11 +10,13 @@ import org.springframework.security.oauth2.server.authorization.settings.ClientS
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
-import lombok.extern.jackson.Jacksonized;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 @Builder
 @Getter
-@Jacksonized
+//TODO move to @Jacksonized
+@JsonDeserialize(builder = AuthorizationClient.AuthorizationClientBuilder.class)
 public class AuthorizationClient {
 
     private final String id;
@@ -37,6 +39,8 @@ public class AuthorizationClient {
 
     private final boolean requireAuthorizationConsent;
 
+    private final boolean requireProofKey;
+
     public RegisteredClient buildRegisteredClient() {
 
         var registeredClient = RegisteredClient.withId(this.id)
@@ -44,6 +48,7 @@ public class AuthorizationClient {
                 .clientSecret(this.clientSecret)
                 .clientSettings(ClientSettings.builder()
                         .requireAuthorizationConsent(this.isRequireAuthorizationConsent())
+                        .requireProofKey(requireProofKey)
                         .build());
 
         this.redirectUris.forEach(registeredClient::redirectUri);
@@ -61,4 +66,7 @@ public class AuthorizationClient {
         return registeredClient.build();
     }
 
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class AuthorizationClientBuilder {
+    }
 }

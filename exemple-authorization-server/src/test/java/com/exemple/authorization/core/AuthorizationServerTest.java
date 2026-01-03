@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -82,8 +82,8 @@ class AuthorizationServerTest {
 
     }
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @LocalServerPort
+    protected int localPort;
 
     @Autowired
     private JWSSigner algorithm;
@@ -200,7 +200,7 @@ class AuthorizationServerTest {
 
         Mockito.reset(resource);
 
-        requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG));
+        requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort);
 
     }
 
@@ -245,7 +245,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -280,7 +280,7 @@ class AuthorizationServerTest {
 
                 Response response = requestSpecification.header("Authorization", "Bearer " + accessToken)
                         .formParams("username", username, "password", "123")
-                        .post(restTemplate.getRootUri() + "/login");
+                        .post("/login");
 
                 // Then check response
 
@@ -299,7 +299,7 @@ class AuthorizationServerTest {
 
                 // When perform authorize
 
-                String authorizeUrl = restTemplate.getRootUri()
+                String authorizeUrl = "http://localhost:" + localPort
                         + "/oauth/authorize?response_type=code&client_id=test_user&scope=account:read&state=123";
                 Response response = requestSpecification.when().redirects().follow(false).header("X-Auth-Token", xAuthToken).get(authorizeUrl);
 
@@ -340,7 +340,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -377,7 +377,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -413,7 +413,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -434,7 +434,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/check_token");
+                        .post("/oauth/check_token");
 
                 // Then check response
 
@@ -490,7 +490,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -517,7 +517,7 @@ class AuthorizationServerTest {
 
                 Response response = requestSpecification.header("Authorization", "Bearer " + accessToken)
                         .formParams("username", username, "password", "admin123")
-                        .post(restTemplate.getRootUri() + "/login");
+                        .post("/login");
 
                 // Then check response
 
@@ -536,7 +536,7 @@ class AuthorizationServerTest {
 
                 // When perform authorize
 
-                String authorizeUrl = restTemplate.getRootUri()
+                String authorizeUrl = "http://localhost:" + localPort
                         + "/oauth/authorize?response_type=code&client_id=test_back&scope=stock:read&state=123";
                 Response response = requestSpecification.when().redirects().follow(false).header("X-Auth-Token", xAuthToken).get(authorizeUrl);
 
@@ -577,7 +577,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -614,7 +614,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -650,7 +650,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -671,7 +671,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/check_token");
+                        .post("/oauth/check_token");
 
                 // Then check response
 
@@ -729,7 +729,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/token");
+                    .post("/oauth/token");
 
             // Then check response
 
@@ -764,7 +764,7 @@ class AuthorizationServerTest {
 
             Response response = requestSpecification.header("Authorization", "Bearer " + accessToken)
                     .formParams("username", username, "password", "123")
-                    .post(restTemplate.getRootUri() + "/login");
+                    .post("/login");
 
             // Then check response
 
@@ -789,7 +789,7 @@ class AuthorizationServerTest {
 
             // When perform authorize
 
-            String authorizeUrl = restTemplate.getRootUri()
+            String authorizeUrl = "http://localhost:" + localPort
                     + "/oauth/authorize?response_type=code&client_id=test_user_pkce&scope=account:read&state=123&code_challenge="
                     + codeChallenge
                     + "&code_challenge_method=S256";
@@ -832,7 +832,7 @@ class AuthorizationServerTest {
 
             Response response = requestSpecification
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/token");
+                    .post("/oauth/token");
 
             // Then check response
 
@@ -864,7 +864,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+                    .post("/oauth/check_token");
 
             // Then check response
 
@@ -903,7 +903,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/token");
+                    .post("/oauth/token");
 
             // Then check response
 
@@ -944,7 +944,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String((login + ":" + password).getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/token");
+                    .post("/oauth/token");
 
             // Then check response
 
@@ -965,7 +965,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+                    .post("/oauth/check_token");
 
             // Then check response
 
@@ -1015,7 +1015,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/token");
+                    .post("/oauth/token");
 
             // Then check response
 
@@ -1050,7 +1050,7 @@ class AuthorizationServerTest {
 
             Response response = requestSpecification.header("Authorization", "Bearer " + accessToken)
                     .formParams("username", username, "password", "123")
-                    .post(restTemplate.getRootUri() + "/login");
+                    .post("/login");
 
             // Then check response
 
@@ -1069,7 +1069,7 @@ class AuthorizationServerTest {
 
             // When perform authorize
 
-            String authorizeUrl = restTemplate.getRootUri()
+            String authorizeUrl = "http://localhost:" + localPort
                     + "/oauth/authorize?response_type=code&client_id=mobile&scope=account:read&state=123&redirect_uri=http://xxx";
             Response response = requestSpecification.when().redirects().follow(false).header("X-Auth-Token", xAuthToken).get(authorizeUrl);
 
@@ -1097,7 +1097,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+                    .post("/oauth/check_token");
 
             // Then check response
 
@@ -1161,7 +1161,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -1186,7 +1186,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/check_token");
+                        .post("/oauth/check_token");
 
                 // Then check response
 
@@ -1225,7 +1225,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -1277,7 +1277,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -1312,7 +1312,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -1339,7 +1339,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/token");
+                        .post("/oauth/token");
 
                 // Then check response
 
@@ -1359,7 +1359,7 @@ class AuthorizationServerTest {
                 Response response = requestSpecification
                         .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                         .formParams(params)
-                        .post(restTemplate.getRootUri() + "/oauth/check_token");
+                        .post("/oauth/check_token");
 
                 // Then check response
 
@@ -1419,7 +1419,7 @@ class AuthorizationServerTest {
 
             Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
                     .formParams("username", username, "password", "123")
-                    .post(restTemplate.getRootUri() + "/login");
+                    .post("/login");
 
             // Then check status
 
@@ -1455,7 +1455,7 @@ class AuthorizationServerTest {
 
             Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
                     .formParams("username", username, "password", "123")
-                    .post(restTemplate.getRootUri() + "/login");
+                    .post("/login");
 
             // Then check status
 
@@ -1492,7 +1492,7 @@ class AuthorizationServerTest {
 
             Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
                     .formParams("username", username, "password", "123")
-                    .post(restTemplate.getRootUri() + "/login");
+                    .post("/login");
 
             // Then check status
 
@@ -1514,7 +1514,7 @@ class AuthorizationServerTest {
 
             Response response = requestSpecification
                     .formParams("username", username, "password", "123")
-                    .post(restTemplate.getRootUri() + "/login");
+                    .post("/login");
 
             // Then check status
 
@@ -1543,7 +1543,7 @@ class AuthorizationServerTest {
 
             Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
                     .formParams("username", username, "password", "123")
-                    .post(restTemplate.getRootUri() + "/login");
+                    .post("/login");
 
             // Then check response
 
@@ -1577,7 +1577,7 @@ class AuthorizationServerTest {
 
             Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
                     .formParams("username", "other", "password", "admin123")
-                    .post(restTemplate.getRootUri() + "/login");
+                    .post("/login");
 
             // Then check response
 
@@ -1623,7 +1623,7 @@ class AuthorizationServerTest {
 
                 Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
                         .formParams("username", username, "password", "123")
-                        .post(restTemplate.getRootUri() + "/login");
+                        .post("/login");
 
                 // Then check response
 
@@ -1660,7 +1660,7 @@ class AuthorizationServerTest {
 
                 Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
                         .formParams("username", username, "password", "123")
-                        .post(restTemplate.getRootUri() + "/login");
+                        .post("/login");
 
                 // Then check response
 
@@ -1710,7 +1710,7 @@ class AuthorizationServerTest {
 
                 Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
                         .formParams("username", "other", "password", "admin123")
-                        .post(restTemplate.getRootUri() + "/login");
+                        .post("/login");
 
                 // Then check response
 
@@ -1747,7 +1747,7 @@ class AuthorizationServerTest {
 
                 Response response = requestSpecification.header("Authorization", "Bearer " + accessToken.serialize())
                         .formParams("username", username, "password", "admin123")
-                        .post(restTemplate.getRootUri() + "/login");
+                        .post("/login");
 
                 // Then check response
 
@@ -1803,7 +1803,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+                    .post("/oauth/check_token");
 
             // Then check response
 
@@ -1837,7 +1837,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+                    .post("/oauth/check_token");
 
             // Then check response
 
@@ -1872,7 +1872,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+                    .post("/oauth/check_token");
 
             // Then check response
 
@@ -1905,7 +1905,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+                    .post("/oauth/check_token");
 
             // Then check response
 
@@ -1952,7 +1952,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/revoke_token");
+                    .post("/oauth/revoke_token");
 
             // Then check response
 
@@ -1960,10 +1960,10 @@ class AuthorizationServerTest {
 
             // And check token
 
-            Response checkResponse = RestAssured.given().filters(new LoggingFilter(LOG))
+            Response checkResponse = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort)
                     .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+                    .post("/oauth/check_token");
 
             assertAll(
                     () -> assertThat(checkResponse.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
@@ -1995,7 +1995,7 @@ class AuthorizationServerTest {
             Response response = requestSpecification
                     .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/revoke_token");
+                    .post("/oauth/revoke_token");
 
             // Then check response
 
@@ -2003,10 +2003,10 @@ class AuthorizationServerTest {
 
             // And check token
 
-            Response checkResponse = RestAssured.given().filters(new LoggingFilter(LOG))
+            Response checkResponse = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort)
                     .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/check_token");
+                    .post("/oauth/check_token");
 
             assertAll(
                     () -> assertThat(checkResponse.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
@@ -2052,7 +2052,7 @@ class AuthorizationServerTest {
                     .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret"
                             .getBytes()))
                     .formParams(params)
-                    .post(restTemplate.getRootUri() + "/oauth/revoke_token");
+                    .post("/oauth/revoke_token");
 
             // Then check response
 

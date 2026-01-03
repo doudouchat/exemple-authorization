@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.springframework.security.jackson2.SecurityJackson2Modules;
+import org.springframework.security.jackson.SecurityJacksonModules;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
@@ -12,17 +12,17 @@ import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.jackson2.OAuth2AuthorizationServerJackson2Module;
+import org.springframework.security.oauth2.server.authorization.jackson.OAuth2AuthorizationServerJacksonModule;
 import org.springframework.stereotype.Component;
 
 import com.exemple.authorization.resource.oauth2.model.OAuth2Entity;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 @RequiredArgsConstructor
@@ -30,15 +30,17 @@ public class OAuth2EntityMapper {
 
     private final RegisteredClientRepository registeredClientRepository;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private JsonMapper mapper;
 
     @PostConstruct
     public void initMapper() {
 
         var classLoader = Thread.currentThread().getContextClassLoader();
-        var securityModules = SecurityJackson2Modules.getModules(classLoader);
-        mapper.registerModules(securityModules);
-        mapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
+
+        mapper = JsonMapper.builder()
+                .addModules(SecurityJacksonModules.getModules(classLoader))
+                .addModules(new OAuth2AuthorizationServerJacksonModule())
+                .build();
     }
 
     public OAuth2Authorization toObject(OAuth2Entity entity) {

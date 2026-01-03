@@ -70,7 +70,7 @@ public class AuthorizationFeatureFilter implements ContainerRequestFilter {
 
     private static AuthorizationContextSecurity buildApiSecurityContext(Jwt jwt) {
 
-        Principal principal = () -> ObjectUtils.defaultIfNull(jwt.getSubject(), getClientId(jwt));
+        Principal principal = () -> ObjectUtils.getIfNull(jwt.getSubject(), getClientId(jwt));
         Collection<String> roles = new ArrayList<>();
         if (jwt.hasClaim("scope")) {
             roles.addAll(jwt.getClaimAsStringList("scope"));
