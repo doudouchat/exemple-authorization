@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -18,8 +17,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.core.ApplicationTestConfiguration;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(classes = ApplicationTestConfiguration.class)
 @ActiveProfiles("test")
@@ -81,7 +82,7 @@ class ApplicationDetailServiceTest {
         Throwable throwable = catchThrowable(() -> service.get("fails"));
 
         // Then check throwable
-        assertThat(throwable).isInstanceOf(IOException.class);
+        assertThat(throwable).isInstanceOf(JacksonException.class);
     }
 
 }

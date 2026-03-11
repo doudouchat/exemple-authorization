@@ -27,9 +27,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -54,12 +55,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = { AuthorizationTestConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
+@EmbeddedKafka(topics = "new_password", bootstrapServersProperty = "spring.kafka.bootstrap-servers")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 class NewPasswordApiTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @LocalServerPort
+    protected int localPort;
 
     @Autowired
     private JWSSigner algorithm;
@@ -86,7 +88,7 @@ class NewPasswordApiTest {
 
         Mockito.reset(loginResource);
 
-        requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG));
+        requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort);
 
     }
 
@@ -147,7 +149,7 @@ class NewPasswordApiTest {
             Response response = requestSpecification.contentType(ContentType.JSON)
                     .header("Authorization", "Bearer " + accessToken.serialize())
                     .header("app", "app")
-                    .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
+                    .body(newPassword).post("/ws/v1/new_password");
 
             // Then check response
 
@@ -219,7 +221,7 @@ class NewPasswordApiTest {
             Response response = requestSpecification.contentType(ContentType.JSON)
                     .header("Authorization", "Bearer " + accessToken.serialize())
                     .header("app", "app")
-                    .body(newPassword).post(restTemplate.getRootUri() + "/ws/v1/new_password");
+                    .body(newPassword).post("/ws/v1/new_password");
 
             // Then check response
 

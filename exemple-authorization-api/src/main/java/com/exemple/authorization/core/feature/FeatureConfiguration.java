@@ -2,7 +2,6 @@ package com.exemple.authorization.core.feature;
 
 import java.util.logging.Level;
 
-import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
@@ -14,6 +13,7 @@ import com.exemple.authorization.core.feature.authorization.AuthorizationFeature
 import com.exemple.authorization.password.properties.PasswordProperties;
 
 import jakarta.ws.rs.ApplicationPath;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 @Configuration
 @ApplicationPath("/ws")

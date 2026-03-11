@@ -40,6 +40,13 @@
 			<artifactId>java-driver-mapper-runtime</artifactId>
 		</dependency>
 
+		<!-- TOOLS JACKSON -->
+
+		<dependency>
+			<groupId>tools.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
 		<!-- JARKATA ANNOTATION -->
 
 		<dependency>
@@ -72,13 +79,13 @@
 
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>junit-jupiter</artifactId>
+			<artifactId>testcontainers-junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>cassandra</artifactId>
+			<artifactId>testcontainers-cassandra</artifactId>
 			<scope>test</scope>
 		</dependency>
 

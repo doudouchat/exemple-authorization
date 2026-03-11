@@ -31,7 +31,6 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -55,7 +54,6 @@ public class LoginApi {
     private ContainerRequestContext servletContext;
 
     @HEAD
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{username}")
     @Operation(tags = "login")
     @RolesAllowed("login:head")

@@ -17,5 +17,4 @@ public class NewPassword {
     @NotBlank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String login;
-
 }
