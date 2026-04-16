@@ -38,7 +38,7 @@ public class AuthorizationClientResourceConfiguration {
     public CuratorFramework authorizationCuratorFramework() {
 
         var client = CuratorFrameworkFactory.newClient(address, sessionTimeout, connectionTimeout, new RetryNTimes(retry, sleepMsBetweenRetries));
-        client.getConnectionStateListenable().addListener((c, state) -> LOG.debug("State changed to: {}", state));
+        client.getConnectionStateListenable().addListener((_, state) -> LOG.debug("State changed to: {}", state));
 
         return client;
 

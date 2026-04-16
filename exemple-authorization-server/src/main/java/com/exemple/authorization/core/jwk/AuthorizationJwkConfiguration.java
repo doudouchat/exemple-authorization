@@ -30,7 +30,7 @@ public class AuthorizationJwkConfiguration {
                 .keyID("exemple-key-id")
                 .build();
         var jwkSet = new JWKSet(rsaKey);
-        return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
+        return (jwkSelector, _) -> jwkSelector.select(jwkSet);
     }
 
     @Bean

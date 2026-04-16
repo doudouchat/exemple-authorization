@@ -192,7 +192,7 @@
 			<id>authorization</id>
 
 			<properties>
-				<docker.buildArg.VERSION_TOMCAT>${tomcat.version}-jdk21</docker.buildArg.VERSION_TOMCAT>
+				<docker.buildArg.VERSION_TOMCAT>${tomcat.version}-jdk${maven.compiler.target}</docker.buildArg.VERSION_TOMCAT>
 				<docker.buildArg.VERSION_TEMURIN>${maven.compiler.target}-jdk</docker.buildArg.VERSION_TEMURIN>
 			</properties>
 

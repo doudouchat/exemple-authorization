@@ -29,7 +29,7 @@ public class ApplicationConfiguration {
                 applicationProperties.zookeeper().connectionTimeout(),
                 new RetryNTimes(applicationProperties.zookeeper().retry(), applicationProperties.zookeeper().sleepMsBetweenRetries()));
 
-        client.getConnectionStateListenable().addListener((c, state) -> LOG.debug("State changed to: {}", state));
+        client.getConnectionStateListenable().addListener((_, state) -> LOG.debug("State changed to: {}", state));
 
         return client;
 

@@ -50,7 +50,7 @@ public class NewPasswordApi {
 
         AuthorizationContextSecurity securityContext = (AuthorizationContextSecurity) servletContext.getSecurityContext();
         loginResource.get(newPassword.getLogin())
-                .map((LoginEntity login) -> accessTokenBuilder.createAccessToken(newPassword, app, securityContext))
+                .map((LoginEntity _) -> accessTokenBuilder.createAccessToken(newPassword, app, securityContext))
                 .ifPresent((String token) -> {
                     var data = Map.of("token", token);
                     var message = MessageBuilder.withPayload(data).setHeader(KafkaHeaders.TOPIC, "new_password").build();
