@@ -5,39 +5,27 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.exemple.authorization.resource.core.ResourceExecutionContext;
 import com.exemple.authorization.resource.core.ResourceTestConfiguration;
+import com.exemple.authorization.resource.core.cassandra.ResourceContextExtension;
+import com.exemple.authorization.resource.core.cassandra.WithResourceContext;
 import com.exemple.authorization.resource.oauth2.model.OAuth2Entity;
 
 @SpringBootTest(classes = ResourceTestConfiguration.class)
+@ExtendWith(ResourceContextExtension.class)
 @ActiveProfiles("test")
 class OAuth2ResourceTest {
 
     @Autowired
     private OAuth2Resource resource;
 
-    @BeforeAll
-    static void initKeyspace() {
-
-        ResourceExecutionContext.get().setKeyspace("main");
-
-    }
-
-    @AfterAll
-    static void destroy() {
-
-        ResourceExecutionContext.destroy();
-
-    }
-
     @Test
+    @WithResourceContext(keyspace = "test")
     void save() {
 
         // Given oauth2 token
@@ -67,6 +55,7 @@ class OAuth2ResourceTest {
     }
 
     @Test
+    @WithResourceContext(keyspace = "test")
     void findByAuthorizationCodeValue() {
 
         // Given oauth2 token
@@ -93,6 +82,7 @@ class OAuth2ResourceTest {
     }
 
     @Test
+    @WithResourceContext(keyspace = "test")
     void findByRefreshTokenValue() {
 
         // Given oauth2 token

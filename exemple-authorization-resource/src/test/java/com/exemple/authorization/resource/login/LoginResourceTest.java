@@ -7,40 +7,28 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.exemple.authorization.resource.core.ResourceExecutionContext;
 import com.exemple.authorization.resource.core.ResourceTestConfiguration;
+import com.exemple.authorization.resource.core.cassandra.ResourceContextExtension;
+import com.exemple.authorization.resource.core.cassandra.WithResourceContext;
 import com.exemple.authorization.resource.login.exception.UsernameAlreadyExistsException;
 import com.exemple.authorization.resource.login.model.LoginEntity;
 
 @SpringBootTest(classes = ResourceTestConfiguration.class)
+@ExtendWith(ResourceContextExtension.class)
 @ActiveProfiles("test")
 class LoginResourceTest {
 
     @Autowired
     private LoginResource resource;
 
-    @BeforeAll
-    static void initKeyspace() {
-
-        ResourceExecutionContext.get().setKeyspace("test");
-
-    }
-
-    @AfterAll
-    static void destroy() {
-
-        ResourceExecutionContext.destroy();
-
-    }
-
     @Test
+    @WithResourceContext(keyspace = "test")
     void create() throws UsernameAlreadyExistsException {
 
         // Given login
@@ -68,6 +56,7 @@ class LoginResourceTest {
     }
 
     @Test
+    @WithResourceContext(keyspace = "test")
     void createFailureIfUsernameAlreadyExists() throws UsernameAlreadyExistsException {
 
         // Given login
@@ -89,6 +78,7 @@ class LoginResourceTest {
     }
 
     @Test
+    @WithResourceContext(keyspace = "test")
     void get() {
 
         LoginEntity login = resource.get("jean.dupond@gmail.com").get();
@@ -100,6 +90,7 @@ class LoginResourceTest {
     }
 
     @Test
+    @WithResourceContext(keyspace = "test")
     void update() throws UsernameAlreadyExistsException {
 
         // Given login
@@ -134,6 +125,7 @@ class LoginResourceTest {
     }
 
     @Test
+    @WithResourceContext(keyspace = "test")
     void delete() throws UsernameAlreadyExistsException {
 
         // Given login

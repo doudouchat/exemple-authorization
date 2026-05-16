@@ -9,19 +9,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 
 import com.exemple.authorization.core.feature.FeatureConfiguration;
-import com.exemple.authorization.core.keyspace.ApiResourceKeyspace;
 
 import lombok.RequiredArgsConstructor;
 
 @Configuration
+@EnableAspectJAutoProxy
 @Import(FeatureConfiguration.class)
-@ComponentScan(basePackageClasses = ApiResourceKeyspace.class)
+@ComponentScan(basePackageClasses = FeatureConfiguration.class)
 @RequiredArgsConstructor
 public class ApiConfiguration {
 

@@ -20,10 +20,11 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 import org.springframework.session.hazelcast.HazelcastIndexedSessionRepository;
 import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
+import com.exemple.authorization.application.common.exception.NotFoundApplicationException;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.authentication.provider.AccountAuthenticationProvider;
 import com.exemple.authorization.core.authentication.provider.BackAuthenticationProvider;
-import com.exemple.authorization.resource.core.ResourceExecutionContext;
+import com.exemple.authorization.resource.core.ResourceContext;
 import com.hazelcast.core.HazelcastInstance;
 
 import jakarta.servlet.Filter;
@@ -33,6 +34,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 @Configuration
 @ComponentScan(basePackages = "com.exemple.authorization.core.authentication")
@@ -87,12 +89,24 @@ public class AuthenticationConfiguration {
             var httpRequest = (HttpServletRequest) request;
             var applicationName = httpRequest.getHeader(APP_HEADER);
             if (applicationName != null) {
-                applicationDetailService.get(applicationName)
-                        .ifPresent(applicationDetail -> ResourceExecutionContext.get().setKeyspace(applicationDetail.getKeyspace()));
+
+                var applicationDetail = applicationDetailService.get(applicationName)
+                        .orElseThrow(() -> new NotFoundApplicationException(applicationName));
+
+                ScopedValue.where(ResourceContext.KEYSPACE, applicationDetail.getKeyspace()).run(() -> process(request, response, chain));
+
+            } else {
+
+                chain.doFilter(request, response);
+
             }
 
-            chain.doFilter(request, response);
-
         }
+
+        @SneakyThrows
+        private static void process(ServletRequest request, ServletResponse response, FilterChain chain) {
+            chain.doFilter(request, response);
+        }
+
     }
 }

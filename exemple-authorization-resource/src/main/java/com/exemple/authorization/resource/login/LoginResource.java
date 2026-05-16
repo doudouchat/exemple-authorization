@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.springframework.stereotype.Service;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.exemple.authorization.resource.core.ResourceExecutionContext;
+import com.exemple.authorization.resource.core.ResourceContext;
 import com.exemple.authorization.resource.login.dao.LoginDao;
 import com.exemple.authorization.resource.login.exception.UsernameAlreadyExistsException;
 import com.exemple.authorization.resource.login.mapper.LoginMapper;
@@ -50,7 +50,7 @@ public class LoginResource {
 
     private LoginDao dao() {
 
-        return mappers.computeIfAbsent(ResourceExecutionContext.get().keyspace(), this::build).loginDao();
+        return mappers.computeIfAbsent(ResourceContext.KEYSPACE.get(), this::build).loginDao();
     }
 
     private LoginMapper build(String keyspace) {

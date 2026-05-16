@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimAccessor;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -16,9 +15,9 @@ import com.exemple.authorization.application.common.exception.NotFoundApplicatio
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.common.security.AuthorizationContextSecurity;
 import com.exemple.authorization.core.feature.FeatureConfiguration;
-import com.exemple.authorization.core.keyspace.ApiResourceKeyspace;
 
 import jakarta.annotation.Priority;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -33,14 +32,15 @@ public class AuthorizationFeatureFilter implements ContainerRequestFilter {
         BEARER = Pattern.compile("Bearer (.*)");
     }
 
-    @Autowired
-    private ApiResourceKeyspace authorizationResourceKeyspace;
+    private final ApplicationDetailService applicationDetailService;
 
-    @Autowired
-    private ApplicationDetailService applicationDetailService;
+    private final JwtDecoder jwtDecoder;
 
-    @Autowired
-    private JwtDecoder jwtDecoder;
+    @Inject
+    public AuthorizationFeatureFilter(ApplicationDetailService applicationDetailService, JwtDecoder jwtDecoder) {
+        this.applicationDetailService = applicationDetailService;
+        this.jwtDecoder = jwtDecoder;
+    }
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -61,8 +61,6 @@ public class AuthorizationFeatureFilter implements ContainerRequestFilter {
 
                 throw new NotFoundApplicationException(getClientId(jwt));
             }
-
-            authorizationResourceKeyspace.initKeyspace(applicationDetail.getKeyspace());
 
         }
 

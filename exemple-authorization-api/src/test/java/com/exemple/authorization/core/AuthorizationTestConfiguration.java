@@ -16,7 +16,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
@@ -26,7 +25,6 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.feature.FeatureTestConfiguration;
-import com.exemple.authorization.core.keyspace.ApiResourceKeyspace;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
@@ -38,7 +36,6 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 
 @Configuration
 @Import({ ApiConfiguration.class, FeatureTestConfiguration.class })
-@ComponentScan(basePackageClasses = ApiResourceKeyspace.class)
 @EnableAutoConfiguration
 public class AuthorizationTestConfiguration {
 

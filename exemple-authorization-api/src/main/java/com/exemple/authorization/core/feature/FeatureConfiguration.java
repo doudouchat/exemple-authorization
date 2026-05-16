@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import com.exemple.authorization.core.feature.authorization.AuthorizationFeatureFilter;
+import com.exemple.authorization.core.feature.context.CreateServiceContext;
 import com.exemple.authorization.password.properties.PasswordProperties;
 
 import jakarta.ws.rs.ApplicationPath;
@@ -38,6 +39,8 @@ public class FeatureConfiguration extends ResourceConfig {
                 // security
                 .register(RolesAllowedDynamicFeature.class)
                 .register(AuthorizationFeatureFilter.class)
+                // context
+                .register(CreateServiceContext.class)
                 // logging
                 .register(LoggingFeature.class)
                 .property(LoggingFeature.LOGGING_FEATURE_VERBOSITY, LoggingFeature.Verbosity.PAYLOAD_ANY)
