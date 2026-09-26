@@ -2,13 +2,13 @@ package com.exemple.authorization.core.client;
 
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.exemple.authorization.core.client.resource.AuthorizationClientResource;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class AuthorizationClientRepository implements RegisteredClientRepository {
 

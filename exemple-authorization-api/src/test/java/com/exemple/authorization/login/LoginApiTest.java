@@ -2,6 +2,12 @@ package com.exemple.authorization.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.util.Map;
@@ -11,7 +17,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -65,7 +70,7 @@ class LoginApiTest {
     @BeforeEach
     void before() {
 
-        Mockito.reset(loginResource);
+        reset(loginResource);
 
         requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort);
 
@@ -93,7 +98,7 @@ class LoginApiTest {
 
         // And mock service
 
-        Mockito.when(loginResource.get(username)).thenReturn(Optional.of(new LoginEntity()));
+        when(loginResource.get(username)).thenReturn(Optional.of(new LoginEntity()));
 
         // When perform head
 
@@ -108,7 +113,7 @@ class LoginApiTest {
 
         // And check mock
 
-        Mockito.verify(loginResource).get(username);
+        verify(loginResource).get(username);
 
     }
 
@@ -134,7 +139,7 @@ class LoginApiTest {
 
         // And mock service
 
-        Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
+        when(loginResource.get(username)).thenReturn(Optional.empty());
 
         // When perform head
 
@@ -149,7 +154,7 @@ class LoginApiTest {
 
         // And check mock
 
-        Mockito.verify(loginResource).get(username);
+        verify(loginResource).get(username);
 
     }
 
@@ -162,7 +167,7 @@ class LoginApiTest {
 
         // And mock service
 
-        Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
+        when(loginResource.get(username)).thenReturn(Optional.empty());
 
         // And token
 
@@ -195,7 +200,7 @@ class LoginApiTest {
         // And check service
 
         ArgumentCaptor<LoginEntity> entity = ArgumentCaptor.forClass(LoginEntity.class);
-        Mockito.verify(loginResource).save(entity.capture());
+        verify(loginResource).save(entity.capture());
 
         assertAll(
                 () -> assertThat(entity.getValue().getUsername()).isEqualTo(username),
@@ -204,7 +209,7 @@ class LoginApiTest {
 
         // And check mock
 
-        Mockito.verify(loginResource).get(username);
+        verify(loginResource).get(username);
 
     }
 
@@ -217,8 +222,8 @@ class LoginApiTest {
 
         // And mock service
 
-        Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
-        Mockito.doThrow(new UsernameAlreadyExistsException(username)).when(loginResource).save(Mockito.any());
+        when(loginResource.get(username)).thenReturn(Optional.empty());
+        doThrow(new UsernameAlreadyExistsException(username)).when(loginResource).save(any());
 
         // And token
 
@@ -278,7 +283,7 @@ class LoginApiTest {
         entity.setDisabled(true);
         entity.setAccountLocked(true);
 
-        Mockito.when(loginResource.get(username)).thenReturn(Optional.of(entity));
+        when(loginResource.get(username)).thenReturn(Optional.of(entity));
 
         // And token
 
@@ -310,7 +315,7 @@ class LoginApiTest {
         // And check service
 
         ArgumentCaptor<LoginEntity> actualEntity = ArgumentCaptor.forClass(LoginEntity.class);
-        Mockito.verify(loginResource).update(actualEntity.capture());
+        verify(loginResource).update(actualEntity.capture());
 
         assertAll(
                 () -> assertThat(actualEntity.getValue().getUsername()).isEqualTo(username),
@@ -321,7 +326,7 @@ class LoginApiTest {
 
         // And check mock
 
-        Mockito.verify(loginResource).get(username);
+        verify(loginResource).get(username);
 
     }
 
@@ -337,7 +342,7 @@ class LoginApiTest {
         LoginEntity entity = new LoginEntity();
         entity.setUsername(username);
 
-        Mockito.when(loginResource.get(username)).thenReturn(Optional.of(entity));
+        when(loginResource.get(username)).thenReturn(Optional.of(entity));
 
         // And token
 
@@ -367,8 +372,8 @@ class LoginApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
 
         // And check mock
-        Mockito.verify(loginResource, Mockito.never()).update(Mockito.any());
-        Mockito.verify(loginResource).get(username);
+        verify(loginResource, never()).update(any());
+        verify(loginResource).get(username);
 
     }
 
@@ -387,7 +392,7 @@ class LoginApiTest {
         entity.setDisabled(true);
         entity.setAccountLocked(true);
 
-        Mockito.when(loginResource.get(username)).thenReturn(Optional.of(entity));
+        when(loginResource.get(username)).thenReturn(Optional.of(entity));
 
         // And token
 
@@ -424,7 +429,7 @@ class LoginApiTest {
         // And check service
 
         ArgumentCaptor<LoginEntity> entityCaptor = ArgumentCaptor.forClass(LoginEntity.class);
-        Mockito.verify(loginResource).save(entityCaptor.capture());
+        verify(loginResource).save(entityCaptor.capture());
 
         assertAll(
                 () -> assertThat(entityCaptor.getValue().getUsername()).isEqualTo("jean.dupont@gmail.com"),
@@ -434,11 +439,11 @@ class LoginApiTest {
 
         // And check mock
 
-        Mockito.verify(loginResource).get(username);
+        verify(loginResource).get(username);
 
         // And check mock
 
-        Mockito.verify(loginResource).delete(username);
+        verify(loginResource).delete(username);
 
     }
 
@@ -451,8 +456,8 @@ class LoginApiTest {
 
         // And mock service
 
-        Mockito.when(loginResource.get(username)).thenReturn(Optional.of(new LoginEntity()));
-        Mockito.doThrow(new UsernameAlreadyExistsException(username)).when(loginResource).save(Mockito.any());
+        when(loginResource.get(username)).thenReturn(Optional.of(new LoginEntity()));
+        doThrow(new UsernameAlreadyExistsException(username)).when(loginResource).save(any());
 
         // And token
 
@@ -508,7 +513,7 @@ class LoginApiTest {
 
         // And mock service
 
-        Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
+        when(loginResource.get(username)).thenReturn(Optional.empty());
 
         // And token
 

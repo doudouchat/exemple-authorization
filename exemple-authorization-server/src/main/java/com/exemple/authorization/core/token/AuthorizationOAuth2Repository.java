@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.exemple.authorization.core.token.mapper.OAuth2EntityMapper;
 import com.exemple.authorization.resource.oauth2.OAuth2Resource;
@@ -22,7 +22,7 @@ import com.exemple.authorization.resource.oauth2.model.OAuth2Entity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 @Slf4j
 public class AuthorizationOAuth2Repository implements OAuth2AuthorizationService {

@@ -1,12 +1,15 @@
 package com.exemple.authorization.core;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.cassandra.autoconfigure.CassandraAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -64,7 +67,7 @@ public class AuthorizationTestConfiguration {
 
     @Bean
     public LoginResource loginResource() {
-        return Mockito.mock(LoginResource.class);
+        return mock(LoginResource.class);
     }
 
     @Bean
@@ -97,14 +100,14 @@ public class AuthorizationTestConfiguration {
     @Bean
     public ApplicationDetailService ApplicationDetailService() {
 
-        ApplicationDetailService service = Mockito.mock(ApplicationDetailService.class);
+        ApplicationDetailService service = mock(ApplicationDetailService.class);
 
         ApplicationDetail detail = ApplicationDetail.builder()
                 .keyspace("test")
                 .clientId("clientId1")
                 .build();
 
-        Mockito.when(service.get(Mockito.anyString())).thenReturn(Optional.of(detail));
+        when(service.get(anyString())).thenReturn(Optional.of(detail));
 
         return service;
     }

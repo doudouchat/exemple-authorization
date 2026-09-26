@@ -3,6 +3,8 @@ package com.exemple.authorization.password;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 import java.security.interfaces.RSAPublicKey;
 import java.time.Clock;
@@ -22,7 +24,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -86,7 +87,7 @@ class NewPasswordApiTest {
     @BeforeEach
     void before() {
 
-        Mockito.reset(loginResource);
+        reset(loginResource);
 
         requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort);
 
@@ -103,15 +104,9 @@ class NewPasswordApiTest {
         @Autowired
         private Consumer<String, Map<String, Object>> consumerKafka;
 
-        private String username;
+        private String username = "jean.dupond@gmail.com";
 
         private String token;
-
-        @BeforeAll
-        void username() {
-
-            username = "jean.dupond@gmail.com";
-        }
 
         @BeforeAll
         void subscribeConsumer() {
@@ -142,7 +137,7 @@ class NewPasswordApiTest {
 
             Map<String, Object> newPassword = Map.of("login", username);
 
-            Mockito.when(loginResource.get(username)).thenReturn(Optional.of(account));
+            when(loginResource.get(username)).thenReturn(Optional.of(account));
 
             // When perform create password
 
@@ -213,7 +208,7 @@ class NewPasswordApiTest {
 
             // And mock login resource
 
-            Mockito.when(loginResource.get(username)).thenReturn(Optional.empty());
+            when(loginResource.get(username)).thenReturn(Optional.empty());
 
             // When perform create password
 

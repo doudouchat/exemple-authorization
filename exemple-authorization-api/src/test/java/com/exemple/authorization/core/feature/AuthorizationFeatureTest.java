@@ -2,6 +2,7 @@ package com.exemple.authorization.core.feature;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.Date;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -112,7 +112,7 @@ class AuthorizationFeatureTest {
 
         // And mock application information
 
-        Mockito.when(applicationDetailService.get("test")).thenReturn(Optional.empty());
+        when(applicationDetailService.get("test")).thenReturn(Optional.empty());
 
         // When perform get
 
@@ -155,7 +155,7 @@ class AuthorizationFeatureTest {
 
         // And mock application information
 
-        Mockito.when(applicationDetailService.get("other")).thenReturn(Optional.of(ApplicationDetail.builder().clientId("test").build()));
+        when(applicationDetailService.get("other")).thenReturn(Optional.of(ApplicationDetail.builder().clientId("test").build()));
 
         // When perform get
 

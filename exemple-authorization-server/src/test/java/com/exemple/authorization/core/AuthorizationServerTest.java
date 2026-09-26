@@ -2,6 +2,11 @@ package com.exemple.authorization.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.text.ParseException;
 import java.time.Instant;
@@ -28,7 +33,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -198,7 +202,7 @@ class AuthorizationServerTest {
     @BeforeEach
     void before() {
 
-        Mockito.reset(resource);
+        reset(resource);
 
         requestSpecification = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort);
 
@@ -274,7 +278,7 @@ class AuthorizationServerTest {
                 account.setUsername(username);
                 account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
 
-                Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+                when(resource.get(username)).thenReturn(Optional.of(account));
 
                 // When perform login
 
@@ -758,7 +762,7 @@ class AuthorizationServerTest {
             account.setUsername(username);
             account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
 
-            Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+            when(resource.get(username)).thenReturn(Optional.of(account));
 
             // When perform login
 
@@ -1044,7 +1048,7 @@ class AuthorizationServerTest {
             account.setUsername(username);
             account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
 
-            Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+            when(resource.get(username)).thenReturn(Optional.of(account));
 
             // When perform login
 
@@ -1147,7 +1151,7 @@ class AuthorizationServerTest {
                 account.setUsername(username);
                 account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
 
-                Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+                when(resource.get(username)).thenReturn(Optional.of(account));
 
                 // When perform get access token
 
@@ -1213,7 +1217,7 @@ class AuthorizationServerTest {
                 account.setUsername(username);
                 account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
 
-                Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+                when(resource.get(username)).thenReturn(Optional.of(account));
 
                 // When perform refresh token
 
@@ -1263,7 +1267,7 @@ class AuthorizationServerTest {
 
                 // Given mock login resource
 
-                Mockito.when(resource.get(username)).thenReturn(loginResponse);
+                when(resource.get(username)).thenReturn(loginResponse);
 
                 // When perform get access token
 
@@ -1429,7 +1433,7 @@ class AuthorizationServerTest {
 
             // And verify resource
 
-            Mockito.verify(resource, Mockito.never()).get(Mockito.any());
+            verify(resource, never()).get(any());
 
         }
 
@@ -1465,7 +1469,7 @@ class AuthorizationServerTest {
 
             // And verify resource
 
-            Mockito.verify(resource, Mockito.never()).get(Mockito.any());
+            verify(resource, never()).get(any());
 
         }
 
@@ -1502,7 +1506,7 @@ class AuthorizationServerTest {
 
             // And verify resource
 
-            Mockito.verify(resource, Mockito.never()).get(Mockito.any());
+            verify(resource, never()).get(any());
 
         }
 
@@ -1551,7 +1555,7 @@ class AuthorizationServerTest {
 
             // And verify resource
 
-            Mockito.verify(resource, Mockito.never()).get(Mockito.any());
+            verify(resource, never()).get(any());
 
         }
 
@@ -1617,7 +1621,7 @@ class AuthorizationServerTest {
 
                 // And mock login resource
 
-                Mockito.when(resource.get(username)).thenReturn(Optional.empty());
+                when(resource.get(username)).thenReturn(Optional.empty());
 
                 // When perform login
 
@@ -1654,7 +1658,7 @@ class AuthorizationServerTest {
                 account.setUsername(username);
                 account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
 
-                Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+                when(resource.get(username)).thenReturn(Optional.of(account));
 
                 // When perform login
 
@@ -1704,7 +1708,7 @@ class AuthorizationServerTest {
 
                 // And mock login resource
 
-                Mockito.when(resource.get(username)).thenReturn(Optional.empty());
+                when(resource.get(username)).thenReturn(Optional.empty());
 
                 // When perform login
 
@@ -1741,7 +1745,7 @@ class AuthorizationServerTest {
                 account.setUsername(username);
                 account.setPassword("{bcrypt}" + BCrypt.hashpw("123", BCrypt.gensalt()));
 
-                Mockito.when(resource.get(username)).thenReturn(Optional.of(account));
+                when(resource.get(username)).thenReturn(Optional.of(account));
 
                 // When perform login
 

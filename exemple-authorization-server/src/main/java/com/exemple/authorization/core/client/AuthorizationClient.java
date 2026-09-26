@@ -59,7 +59,7 @@ public class AuthorizationClient {
                 .map(ClientAuthenticationMethod::new)
                 .forEach(registeredClient::clientAuthenticationMethod);
 
-        this.scopes.stream().forEach(registeredClient::scope);
+        this.scopes.forEach(registeredClient::scope);
 
         return registeredClient.build();
     }
