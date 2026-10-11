@@ -157,6 +157,7 @@ class AuthorizationServerTest {
                 .id(UUID.randomUUID().toString())
                 .clientId("test_user_pkce")
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
                 .clientAuthenticationMethod(ClientAuthenticationMethod.NONE.getValue())
                 .redirectUri("http://xxx")
                 .scope("account:read")
@@ -700,6 +701,8 @@ class AuthorizationServerTest {
 
         private String accessToken;
 
+        private String refreshToken;
+
         private String xAuthToken;
 
         private String username;
@@ -838,6 +841,43 @@ class AuthorizationServerTest {
 
             assertAll(
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
+                    () -> assertThat(response.jsonPath().getString("access_token")).isNotNull(),
+                    () -> assertThat(response.jsonPath().getString("refresh_token")).isNotNull());
+
+            accessToken = response.jsonPath().getString("access_token");
+            refreshToken = response.jsonPath().getString("refresh_token");
+
+            // And check token
+
+            var payload = SignedJWT.parse(accessToken).getJWTClaimsSet();
+            assertAll(
+                    () -> assertThat(payload.getJWTID()).isNotNull(),
+                    () -> assertThat(payload.getClaim("client_id")).isEqualTo("test_user_pkce"),
+                    () -> assertThat(payload.getSubject()).isEqualTo(username),
+                    () -> assertThat(payload.getStringListClaim("authorities")).contains("ROLE_ACCOUNT"),
+                    () -> assertThat(payload.getStringListClaim("scope")).contains("account:read"));
+        }
+
+        @Test
+        @Disabled
+        @Order(4)
+        void refreshToken() throws ParseException {
+
+            // When perform refresh token
+
+            Map<String, String> params = Map.of(
+                    "grant_type", "refresh_token",
+                    "client_id", "test_user_pkce",
+                    "refresh_token", refreshToken);
+
+            Response response = requestSpecification
+                    .formParams(params)
+                    .post("/oauth/token");
+
+            // Then check response
+
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
                     () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
 
             accessToken = response.jsonPath().getString("access_token");
@@ -854,7 +894,7 @@ class AuthorizationServerTest {
         }
 
         @Test
-        @Order(4)
+        @Order(5)
         void checkToken() throws ParseException {
 
             // When perform check token
