@@ -12,7 +12,6 @@ import com.exemple.authorization.application.core.ApplicationConfiguration;
 import com.exemple.authorization.core.ApiConfiguration;
 import com.exemple.authorization.core.AuthorizationConfiguration;
 import com.exemple.authorization.core.authentication.AuthenticationConfiguration;
-import com.exemple.authorization.core.client.resource.AuthorizationClientResourceConfiguration;
 import com.exemple.authorization.core.rsa.KeystoreConfiguration;
 import com.exemple.authorization.core.session.HazelcastHttpSessionConfiguration;
 import com.exemple.authorization.core.swagger.SwaggerConfiguration;
@@ -26,7 +25,6 @@ import com.hazelcast.core.HazelcastInstance;
         AuthenticationConfiguration.class,
         HazelcastHttpSessionConfiguration.class,
         SwaggerConfiguration.class,
-        AuthorizationClientResourceConfiguration.class,
         ApiConfiguration.class,
         ApplicationConfiguration.class,
         ResourceConfiguration.class,

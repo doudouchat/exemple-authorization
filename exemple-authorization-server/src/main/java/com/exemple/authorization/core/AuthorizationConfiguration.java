@@ -30,7 +30,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import com.exemple.authorization.core.client.AuthorizationClientRepository;
 import com.exemple.authorization.core.jwk.AuthorizationJwkConfiguration;
 import com.exemple.authorization.core.token.AuthorizationOAuth2Repository;
 import com.exemple.authorization.core.token.provider.RevokeTokenProvider;
@@ -40,7 +39,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
-@Import({ AuthorizationJwkConfiguration.class, AuthorizationClientRepository.class })
+@Import(AuthorizationJwkConfiguration.class)
 @ComponentScan(basePackageClasses = AuthorizationOAuth2Repository.class)
 @RequiredArgsConstructor
 public class AuthorizationConfiguration {

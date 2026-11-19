@@ -5,17 +5,75 @@ logging:
       root: WARN
       com.exemple.authorization: DEBUG
       com.hazelcast: INFO
-      org.apache.zookeeper: INFO
-authorization:
-   zookeeper:
-      sessionTimeout: 30000
-      connectionTimeout: 10000
-      retry: 3
-      sleepMsBetweenRetries: 1000
-      ttlMs:
-         product: 30000
 spring:
    hazelcast:
       config: file:${project.build.testOutputDirectory}/hazelcast.yaml
-zookeeper:
-   version: ${zookeeper.version}
+   security:
+      oauth2:
+        authorizationserver:
+          client:
+            test:
+              registration:
+                client-id: test
+                client-secret: "{noop}secret_test"
+                client-authentication-methods:
+                  - client_secret_basic
+                authorization-grant-types:
+                  - client_credentials
+                redirect-uris:
+                  - http://xxx
+                scopes:
+                  - account:create
+                  - ROLE_APP
+                  - ROLE_BACK
+            resource:
+              registration:
+                client-id: resource
+                client-secret: "{noop}secret_resource"
+                client-authentication-methods:
+                  - client_secret_basic
+                authorization-grant-types:
+                  - urn:ietf:params:oauth:grant-type:jwt-bearer
+            test_user:
+              registration:
+                client-id: test_user
+                client-secret: "{noop}secret_test_user"
+                client-authentication-methods:
+                  - client_secret_basic
+                authorization-grant-types:
+                  - authorization_code
+                  - refresh_token
+                redirect-uris:
+                  - http://xxx
+                scopes:
+                  - account:read
+                  - account:update
+              require-proof-key: false
+            test_user_pkce:
+              registration:
+                client-id: test_user_pkce
+                client-secret: "{noop}secret_test_user_pkce"
+                client-authentication-methods:
+                  - none
+                authorization-grant-types:
+                  - authorization_code
+                redirect-uris:
+                  - http://xxx
+                scopes:
+                  - account:read
+                  - account:update
+            test_back:
+              registration:
+                client-id: test_back
+                client-secret: "{noop}secret_test_back"
+                client-authentication-methods:
+                  - client_secret_basic
+                authorization-grant-types:
+                  - authorization_code
+                  - refresh_token
+                redirect-uris:
+                  - http://xxx
+                scopes:
+                  - stock:read
+                  - stock:update
+              require-proof-key: false

@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -18,17 +17,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.core.ApplicationConfiguration;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
-import com.exemple.authorization.core.client.AuthorizationClient;
-import com.exemple.authorization.core.client.resource.AuthorizationClientResource;
-import com.exemple.authorization.core.client.resource.AuthorizationClientResourceConfiguration;
 import com.exemple.authorization.resource.core.ResourceConfiguration;
 
 import jakarta.annotation.PostConstruct;
@@ -37,7 +30,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration
-@Import({ ResourceConfiguration.class, ApplicationConfiguration.class, AuthorizationClientResourceConfiguration.class })
+@Import({ ResourceConfiguration.class, ApplicationConfiguration.class })
 @ComponentScan(basePackages = "com.exemple.authorization.launcher", excludeFilters = @ComponentScan.Filter(SpringBootApplication.class))
 public class IntegrationTestConfiguration {
 
@@ -52,9 +45,6 @@ public class IntegrationTestConfiguration {
 
     @Autowired
     private ApplicationDetailService applicationDetailService;
-
-    @Autowired
-    private AuthorizationClientResource authorizationClientResource;
 
     @Autowired
     private CqlSession session;
@@ -102,58 +92,6 @@ public class IntegrationTestConfiguration {
                 .build();
 
         applicationDetailService.put("test", MAPPER.convertValue(detail, JsonNode.class));
-
-    }
-
-    @PostConstruct
-    public void initAuthorization() {
-
-        var secret = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
-
-        var testClient = AuthorizationClient.builder()
-                .id(UUID.randomUUID().toString())
-                .clientId("test")
-                .clientSecret(secret)
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue())
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
-                .redirectUri("http://xxx")
-                .scope("account")
-                .scope("login:update")
-                .scope("login:head")
-                .scope("ROLE_APP")
-                .requireAuthorizationConsent(false)
-                .build();
-
-        authorizationClientResource.save(testClient);
-
-        var resourceClient = AuthorizationClient.builder()
-                .id(UUID.randomUUID().toString())
-                .clientId("resource")
-                .clientSecret(secret)
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue())
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
-                .authorizationGrantType(AuthorizationGrantType.JWT_BEARER.getValue())
-                .requireAuthorizationConsent(false)
-                .build();
-
-        authorizationClientResource.save(resourceClient);
-
-        var testUserClient = AuthorizationClient.builder()
-                .id(UUID.randomUUID().toString())
-                .clientId("test_user")
-                .clientSecret(secret)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
-                .redirectUri("http://xxx")
-                .scope("account")
-                .scope("login:update")
-                .scope("login:head")
-                .scope("login:read")
-                .scope("login:delete")
-                .requireAuthorizationConsent(false)
-                .build();
-
-        authorizationClientResource.save(testUserClient);
 
     }
 

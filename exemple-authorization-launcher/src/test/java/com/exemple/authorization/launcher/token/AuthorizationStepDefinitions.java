@@ -37,7 +37,7 @@ public class AuthorizationStepDefinitions {
                 "scope", scope);
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String((client + ":secret").getBytes()))
+                .header("Authorization", "Basic " + Base64.encodeBase64String((client + ":secret_" + client).getBytes()))
                 .formParams(params).post("/oauth/token");
 
         assertAll(
@@ -59,7 +59,7 @@ public class AuthorizationStepDefinitions {
                 "redirect_uri", "http://xxx");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("back_user:secret".getBytes()))
+                .header("Authorization", "Basic " + Base64.encodeBase64String("back_user:secret_back_user".getBytes()))
                 .formParams(params)
                 .post("/oauth/token");
 
@@ -146,7 +146,7 @@ public class AuthorizationStepDefinitions {
                 "redirect_uri", "/ws/test");
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret_test_user".getBytes()))
                 .formParams(params)
                 .post("/oauth/token");
 
@@ -170,7 +170,7 @@ public class AuthorizationStepDefinitions {
                 "refresh_token", refreshToken);
 
         Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
+                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret_test_user".getBytes()))
                 .formParams(params)
                 .post("/oauth/token");
 

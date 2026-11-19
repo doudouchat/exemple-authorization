@@ -20,7 +20,6 @@ import com.exemple.authorization.AuthorizationJwtConfiguration;
 import com.exemple.authorization.application.common.model.ApplicationDetail;
 import com.exemple.authorization.application.detail.ApplicationDetailService;
 import com.exemple.authorization.core.authentication.AuthenticationConfiguration;
-import com.exemple.authorization.core.client.AuthorizationClientTestConfiguration;
 import com.exemple.authorization.core.session.HazelcastHttpSessionConfiguration;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.oauth2.OAuth2Resource;
@@ -35,7 +34,6 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 
 @Configuration
 @Import({
-        AuthorizationClientTestConfiguration.class,
         AuthorizationConfiguration.class,
         AuthenticationConfiguration.class,
         HazelcastHttpSessionConfiguration.class,

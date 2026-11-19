@@ -40,14 +40,10 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.exemple.authorization.AuthorizationJwtConfiguration;
 import com.exemple.authorization.common.LoggingFilter;
-import com.exemple.authorization.core.client.AuthorizationClient;
-import com.exemple.authorization.core.client.resource.AuthorizationClientResource;
 import com.exemple.authorization.resource.login.LoginResource;
 import com.exemple.authorization.resource.login.model.LoginEntity;
 import com.hazelcast.core.HazelcastInstance;
@@ -95,9 +91,6 @@ class AuthorizationServerTest {
     private LoginResource resource;
 
     @Autowired
-    private AuthorizationClientResource authorizationClientResource;
-
-    @Autowired
     @Qualifier("hazelcastClient")
     private HazelcastInstance client;
 
@@ -108,79 +101,6 @@ class AuthorizationServerTest {
     static {
 
         LOCATION = Pattern.compile(".*code=([a-zA-Z0-9\\-_]*)(&state=)?(.*)?", Pattern.DOTALL);
-    }
-
-    @BeforeAll
-    void init() {
-
-        var secret = "{bcrypt}" + BCrypt.hashpw("secret", BCrypt.gensalt());
-
-        var testClient = AuthorizationClient.builder()
-                .id(UUID.randomUUID().toString())
-                .clientId("test")
-                .clientSecret(secret)
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue())
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
-                .redirectUri("http://xxx")
-                .scope("account:create")
-                .scope("ROLE_APP")
-                .scope("ROLE_BACK")
-                .requireAuthorizationConsent(false)
-                .build();
-
-        authorizationClientResource.save(testClient);
-
-        var resourceClient = AuthorizationClient.builder()
-                .id(UUID.randomUUID().toString())
-                .clientId("resource")
-                .clientSecret(secret)
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue())
-                .authorizationGrantType(AuthorizationGrantType.JWT_BEARER.getValue())
-                .requireAuthorizationConsent(false)
-                .build();
-
-        authorizationClientResource.save(resourceClient);
-
-        var testUserClient = AuthorizationClient.builder()
-                .id(UUID.randomUUID().toString())
-                .clientId("test_user")
-                .clientSecret(secret)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
-                .redirectUri("http://xxx")
-                .scope("account:read")
-                .scope("account:update")
-                .requireAuthorizationConsent(false)
-                .build();
-
-        authorizationClientResource.save(testUserClient);
-
-        var testUserPKCEClient = AuthorizationClient.builder()
-                .id(UUID.randomUUID().toString())
-                .clientId("test_user_pkce")
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
-                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE.getValue())
-                .redirectUri("http://xxx")
-                .scope("account:read")
-                .scope("account:update")
-                .build();
-
-        authorizationClientResource.save(testUserPKCEClient);
-
-        var testBackClient = AuthorizationClient.builder()
-                .id(UUID.randomUUID().toString())
-                .clientId("test_back")
-                .clientSecret(secret)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
-                .redirectUri("http://xxx")
-                .scope("stock:read")
-                .scope("stock:update")
-                .requireAuthorizationConsent(false)
-                .build();
-
-        authorizationClientResource.save(testBackClient);
-
     }
 
     @BeforeEach
@@ -231,7 +151,7 @@ class AuthorizationServerTest {
                 // When perform get access token
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret_test".getBytes()))
                         .formParams(params)
                         .post("/oauth/token");
 
@@ -326,7 +246,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "/ws/test");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret_test_user".getBytes()))
                         .formParams(params)
                         .post("/oauth/token");
 
@@ -363,7 +283,7 @@ class AuthorizationServerTest {
                         "refresh_token", refreshToken);
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret_test_user".getBytes()))
                         .formParams(params)
                         .post("/oauth/token");
 
@@ -399,7 +319,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "/ws/test");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret_test_user".getBytes()))
                         .formParams(params)
                         .post("/oauth/token");
 
@@ -420,7 +340,7 @@ class AuthorizationServerTest {
                 Map<String, String> params = Map.of("token", accessToken);
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret_resource".getBytes()))
                         .formParams(params)
                         .post("/oauth/check_token");
 
@@ -476,7 +396,7 @@ class AuthorizationServerTest {
                 // When perform get access token
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret_test".getBytes()))
                         .formParams(params)
                         .post("/oauth/token");
 
@@ -563,7 +483,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "/ws/test");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret_test_back".getBytes()))
                         .formParams(params)
                         .post("/oauth/token");
 
@@ -600,7 +520,7 @@ class AuthorizationServerTest {
                         "refresh_token", refreshToken);
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret_test_back".getBytes()))
                         .formParams(params)
                         .post("/oauth/token");
 
@@ -636,7 +556,7 @@ class AuthorizationServerTest {
                         "redirect_uri", "/ws/test");
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret".getBytes()))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("test_back:secret_test_back".getBytes()))
                         .formParams(params)
                         .post("/oauth/token");
 
@@ -657,7 +577,7 @@ class AuthorizationServerTest {
                 Map<String, String> params = Map.of("token", accessToken);
 
                 Response response = requestSpecification
-                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
+                        .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret_resource".getBytes()))
                         .formParams(params)
                         .post("/oauth/check_token");
 
@@ -715,7 +635,7 @@ class AuthorizationServerTest {
             // When perform get access token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret_test".getBytes()))
                     .formParams(params)
                     .post("/oauth/token");
 
@@ -850,7 +770,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken);
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret_resource".getBytes()))
                     .formParams(params)
                     .post("/oauth/check_token");
 
@@ -889,7 +809,7 @@ class AuthorizationServerTest {
             // When perform get access token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test:secret_test".getBytes()))
                     .formParams(params)
                     .post("/oauth/token");
 
@@ -951,7 +871,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken);
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret_resource".getBytes()))
                     .formParams(params)
                     .post("/oauth/check_token");
 
@@ -1393,7 +1313,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken.serialize());
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret_resource".getBytes()))
                     .formParams(params)
                     .post("/oauth/check_token");
 
@@ -1427,7 +1347,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken.serialize());
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret_resource".getBytes()))
                     .formParams(params)
                     .post("/oauth/check_token");
 
@@ -1462,7 +1382,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken.serialize());
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret_resource".getBytes()))
                     .formParams(params)
                     .post("/oauth/check_token");
 
@@ -1495,7 +1415,7 @@ class AuthorizationServerTest {
             Map<String, String> params = Map.of("token", accessToken.serialize());
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret_resource".getBytes()))
                     .formParams(params)
                     .post("/oauth/check_token");
 
@@ -1542,7 +1462,7 @@ class AuthorizationServerTest {
             // When perform revoke token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret_test_user".getBytes()))
                     .formParams(params)
                     .post("/oauth/revoke_token");
 
@@ -1553,7 +1473,7 @@ class AuthorizationServerTest {
             // And check token
 
             Response checkResponse = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort)
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret_resource".getBytes()))
                     .formParams(params)
                     .post("/oauth/check_token");
 
@@ -1585,7 +1505,7 @@ class AuthorizationServerTest {
             // When perform revoke token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret_test_user".getBytes()))
                     .formParams(params)
                     .post("/oauth/revoke_token");
 
@@ -1596,7 +1516,7 @@ class AuthorizationServerTest {
             // And check token
 
             Response checkResponse = RestAssured.given().filters(new LoggingFilter(LOG)).port(localPort)
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret".getBytes()))
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("resource:secret_resource".getBytes()))
                     .formParams(params)
                     .post("/oauth/check_token");
 
@@ -1641,7 +1561,7 @@ class AuthorizationServerTest {
             // When perform revoke token
 
             Response response = requestSpecification
-                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret"
+                    .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret_test_user"
                             .getBytes()))
                     .formParams(params)
                     .post("/oauth/revoke_token");

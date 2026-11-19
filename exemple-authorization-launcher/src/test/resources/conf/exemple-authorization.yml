@@ -28,3 +28,51 @@ management:
    info:
       env: 
          enabled: true
+spring:
+   hazelcast:
+      config: file:${project.build.testOutputDirectory}/hazelcast.yaml
+   security:
+      oauth2:
+        authorizationserver:
+          client:
+            test:
+              registration:
+                client-id: test
+                client-secret: "{noop}secret_test"
+                client-authentication-methods:
+                  - client_secret_basic
+                authorization-grant-types:
+                  - client_credentials
+                redirect-uris:
+                  - http://xxx
+                scopes:
+                  - account
+                  - login:update
+                  - login:head
+                  - ROLE_APP
+            resource:
+              registration:
+                client-id: resource
+                client-secret: "{noop}secret_resource"
+                client-authentication-methods:
+                  - client_secret_basic
+                authorization-grant-types:
+                  - urn:ietf:params:oauth:grant-type:jwt-bearer
+            test_user:
+              registration:
+                client-id: test_user
+                client-secret: "{noop}secret_test_user"
+                client-authentication-methods:
+                  - client_secret_basic
+                authorization-grant-types:
+                  - authorization_code
+                  - refresh_token
+                redirect-uris:
+                  - http://xxx
+                scopes:
+                  - account
+                  - login:update
+                  - login:head
+                  - login:read
+                  - login:delete
+              require-proof-key: false
