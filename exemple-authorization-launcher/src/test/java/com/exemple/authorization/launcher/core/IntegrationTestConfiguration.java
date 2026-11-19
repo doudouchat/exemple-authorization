@@ -142,7 +142,6 @@ public class IntegrationTestConfiguration {
                 .id(UUID.randomUUID().toString())
                 .clientId("test_user")
                 .clientSecret(secret)
-                .authorizationGrantType("password")
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
                 .redirectUri("http://xxx")
@@ -155,20 +154,6 @@ public class IntegrationTestConfiguration {
                 .build();
 
         authorizationClientResource.save(testUserClient);
-
-        var testBackClient = AuthorizationClient.builder()
-                .id(UUID.randomUUID().toString())
-                .clientId("test_back")
-                .clientSecret(secret)
-                .authorizationGrantType("password")
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
-                .redirectUri("http://xxx")
-                .scope("ROLE_BACK")
-                .requireAuthorizationConsent(false)
-                .build();
-
-        authorizationClientResource.save(testBackClient);
 
     }
 

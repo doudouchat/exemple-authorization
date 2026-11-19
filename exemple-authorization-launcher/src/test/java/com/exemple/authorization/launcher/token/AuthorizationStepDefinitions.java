@@ -48,69 +48,6 @@ public class AuthorizationStepDefinitions {
 
     }
 
-    @Given("get access token by password for username {string} and password {string}")
-    @Given("connect to {string} and password {string}")
-    public void tokenByPassword(String username, String password) {
-
-        Map<String, Object> params = Map.of(
-                "grant_type", "password",
-                "username", username,
-                "password", password,
-                "client_id", "test_user",
-                "redirect_uri", "http://xxx");
-
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
-                .formParams(params)
-                .post("/oauth/token");
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getString("access_token")).isNotNull());
-
-        context.setAccessToken(response.jsonPath().getString("access_token"));
-        context.setResponse(response);
-
-    }
-
-    @Given("get access token by password for username {string} and password {string} is bad")
-    public void tokenByPasswordIsBad(String username, String password) {
-
-        Map<String, Object> params = Map.of(
-                "grant_type", "password",
-                "username", username,
-                "password", password,
-                "client_id", "test_user",
-                "redirect_uri", "http://xxx");
-
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
-                .formParams(params)
-                .post("/oauth/token");
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-
-    }
-
-    @Given("get access token by password for username {string} and password {string} is unauthorized")
-    public void tokenByPasswordIsUnauthorized(String username, String password) {
-
-        Map<String, Object> params = Map.of(
-                "grant_type", "password",
-                "username", username,
-                "password", password,
-                "client_id", "test_user",
-                "redirect_uri", "http://xxx");
-
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC)
-                .header("Authorization", "Basic " + Base64.encodeBase64String("test_user:secret".getBytes()))
-                .formParams(params)
-                .post("/oauth/token");
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
-
-    }
-
     @Given("get access token by password for back {string} and password {string}")
     public void tokenByPasswordForBack(String back, String password) {
 
@@ -186,34 +123,6 @@ public class AuthorizationStepDefinitions {
                 .get("/oauth/authorize");
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value());
 
-        context.setResponse(response);
-
-    }
-
-    @And("authorize implicit")
-    public void authorizeImplict() {
-
-        assertThat(context.getResponse().getHeader("X-Auth-Token")).isNotNull();
-
-        String xAuthToken = context.getResponse().getHeader("X-Auth-Token");
-
-        Response response = JsonRestTemplate.given(IntegrationTestConfiguration.AUTHORIZATION_URL, ContentType.URLENC).redirects()
-                .follow(false)
-                .header("X-Auth-Token", xAuthToken)
-                .queryParam("response_type", "token")
-                .queryParam("client_id", "test_user")
-                .get("/oauth/authorize");
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND.value()),
-                () -> assertThat(response.getHeader(HttpHeaders.LOCATION)).isNotNull());
-
-        String location = response.getHeader(HttpHeaders.LOCATION);
-
-        String accessToken = location.split("#|=|&")[2];
-        assertThat(accessToken).isNotNull();
-
-        context.setAccessToken(accessToken);
         context.setResponse(response);
 
     }
